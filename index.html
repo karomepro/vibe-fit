@@ -614,7 +614,7 @@
      ========================================================= */
   const SCORE = { perRep: 1, volumePer: 50, perCardioMin: 2, kcalPer: 10, prBonus: 25 };
   const LIFT_MET = 5, MIN_PER_SET = 2;          // resistance-training burn estimate
-  const RUN_THRESHOLD = 7.5;                    // km/h — switch ACSM walking → running equation
+  const RUN_FROM = 8;                           // km/h — walking equation (LCDA) below, running equation (ACSM) from here
   const BAR_KG = 20;
   const PLATES = [25, 20, 15, 10, 5, 2.5, 1.25];
   const MED = ['🥇', '🥈', '🥉'];
@@ -795,21 +795,24 @@
   /* =========================================================
      Calculations
      ========================================================= */
-  // ACSM metabolic equations — VO2 in ml/kg/min.
-  // Walking: VO2 = 0.1·S + 1.8·S·G + 3.5   Running: VO2 = 0.2·S + 0.9·S·G + 3.5   (S in m/min, G = grade)
-  function acsm(speedKmh, inclinePct, minutes, weightKg) {
-    const mpm = speedKmh * 1000 / 60;
-    const grade = Math.max(0, inclinePct || 0) / 100;
-    const running = speedKmh >= RUN_THRESHOLD;
-    const kH = running ? 0.2 : 0.1, kV = running ? 0.9 : 1.8;
-    const horiz = kH * mpm, vert = kV * mpm * grade, rest = 3.5;
-    const vo2 = horiz + vert + rest;
-    const kcalMin = vo2 * weightKg / 1000 * 5;        // ≈ 5 kcal per litre of O2
-    const distance = speedKmh * minutes / 60;
-    return {
-      mpm, grade, running, kH, kV, horiz, vert, rest, vo2, met: vo2 / 3.5, kcalMin,
-      kcal: kcalMin * minutes, distance, climb: distance * 1000 * grade, pace: speedKmh > 0 ? 60 / speedKmh : 0
-    };
+  // Energy cost of moving, as gross metabolic rate in W/kg.
+  // Walking: LCDA equation (Looney et al., Med Sci Sports Exerc 2019; 51:1954), accurate from slow to
+  //   fast walking and on grades:  M = 1.44 + 1.94·S^0.43 + 0.24·S^4 + 0.34·S·G·(1 − 1.05^(1 − 1.1^(G+32)))
+  //   (S in m/s, G = grade in %). ACSM's walking line underestimates brisk walking (at 7 km/h by ~40%).
+  // Running (from 8 km/h): ACSM  VO2 = 0.2·S + 0.9·S·G + 3.5  (S in m/min, G as a fraction), 5 kcal per litre O2.
+  // The two meet at 8 km/h, so the switch has no jump.
+  const WKG_PER_VO2 = 5 * 4184 / 1000 / 60;        // ml O2/kg/min → W/kg at 5 kcal per litre
+  function moveCost(speedKmh, inclinePct) {
+    const G = Math.max(0, inclinePct || 0);
+    if (speedKmh >= RUN_FROM) {
+      const mpm = speedKmh * 1000 / 60;
+      const vo2 = 0.2 * mpm + 0.9 * mpm * G / 100 + 3.5;
+      return { running: true, mpm, vo2, wkg: vo2 * WKG_PER_VO2 };
+    }
+    const S = speedKmh / 3.6;
+    const gradeTerm = G > 0 ? 0.34 * S * G * (1 - Math.pow(1.05, 1 - Math.pow(1.1, G + 32))) : 0;
+    const wkg = 1.44 + 1.94 * Math.pow(S, 0.43) + 0.24 * Math.pow(S, 4) + gradeTerm;
+    return { running: false, S, gradeTerm, vo2: wkg / WKG_PER_VO2, wkg };
   }
   const paceStr = p => { if (!(p > 0) || !Number.isFinite(p)) return '—'; let m = Math.floor(p), s = Math.round((p - m) * 60); if (s === 60) { m += 1; s = 0; } return `${m}:${pad2(s)}`; };
   const bmr = p => { const b = 10 * p.weight + 6.25 * p.height - 5 * p.age; return p.sex === 'f' ? b - 161 : b + 5; };
@@ -817,7 +820,12 @@
   const dailyTarget = p => tdee(p) + ((GOALS[p.goal] || GOALS.maintain).adj);
   const validProfile = p => p && p.age >= 10 && p.age <= 100 && p.height >= 100 && p.height <= 250 && p.weight >= 25 && p.weight <= 300 && p.activity > 0;
   const epley = (w, r) => r <= 1 ? w : w * (1 + r / 30);
-  const strideM = heightCm => (heightCm || 170) * 0.415 / 100;
+  // Step length: about 41.5% of height when walking; a run (cadence 160+ steps/min) is about 65%.
+  const strideM = (heightCm, cadence) => {
+    const walk = (heightCm || 170) * 0.415 / 100, run = (heightCm || 170) * 0.65 / 100;
+    const t = clamp(((cadence || 100) - 135) / 25, 0, 1);
+    return walk + (run - walk) * t;
+  };
 
   function dayStats(u, date) {
     const kinds = {}; u.pages.forEach(p => { kinds[p.id] = p.kind; });
@@ -883,7 +891,7 @@
     confirm: null, modal: null, lastFocus: null,
     cardioMode: 'treadmill', outMeasure: 'pace',
     tm: { min: '30', speed: '5.5', incline: '8' },
-    out: { min: '45', distance: '', steps: '', pace: '5' },
+    out: { min: '45', dur: '', distance: '', steps: '', pace: '5' },
     prof: null, plateW: null,
     chatDraft: '', chatStick: true
   };
@@ -1468,8 +1476,25 @@
   /* =========================================================
      View: Walking & cardio
      ========================================================= */
+  // Calories of a cardio session = ACTIVE calories (like a watch's "active calories"): the energy of the
+  // movement minus what the body burns at rest in the same minutes (BMR ÷ 1440 per minute). The resting
+  // part is already in the daily need, so counting it again would inflate the daily balance.
+  const WALK_CADENCE = 100;                 // steps per minute of moderate walking, used when no time is given
   function computeCardio(u) {
-    const w = (u.profile && u.profile.weight) || 75;
+    const p = u.profile || {};
+    const w = p.weight || 75;
+    const rest = validProfile(p) ? bmr(p) / 1440 : 0.0175 * w;     // kcal/min at rest (1 MET without a profile)
+    const session = (speed, inc, minutes, extra) => {
+      const m = moveCost(speed, inc), f = inc > 0 ? moveCost(speed, 0) : m;
+      const gross = m.wkg * w * 60 / 4184;
+      const active = Math.max(0, gross - rest), flatActive = Math.max(0, f.wkg * w * 60 / 4184 - rest);
+      const distance = speed * minutes / 60;
+      return Object.assign({
+        speed, incline: inc, minutes, weight: w, running: m.running, cost: m, wkg: m.wkg, vo2: m.vo2, met: m.vo2 / 3.5,
+        grossMin: gross, restMin: rest, kcalMin: active, kcal: active * minutes, total: gross * minutes, restKcal: rest * minutes,
+        flatKcal: flatActive * minutes, distance, grade: inc / 100, climb: distance * 1000 * inc / 100, pace: speed > 0 ? 60 / speed : 0
+      }, extra);
+    };
     if (ui.cardioMode === 'treadmill') {
       const m = num(ui.tm.min), s = num(ui.tm.speed), inc = num(ui.tm.incline);
       if (!(m > 0)) return { error: 'أدخل مدة المشي بالدقائق.' };
@@ -1478,29 +1503,44 @@
       if (s > 25) return { error: 'السرعة القصوى المدعومة 25 كم/س.' };
       if (!(inc >= 0)) return { error: 'أدخل درجة الميل (0 إن كان السير مستوياً).' };
       if (inc > 30) return { error: 'الميل الأقصى المدعوم 30%.' };
-      const c = acsm(s, inc, m, w);
-      return Object.assign(c, { mode: 'treadmill', minutes: m, speed: s, incline: inc, weight: w, flatKcal: acsm(s, 0, m, w).kcal });
+      return session(s, inc, m, { mode: 'treadmill' });
     }
-    const m = num(ui.out.min);
-    if (!(m > 0)) return { error: 'أدخل مدة المشي بالدقائق.' };
-    if (m > 600) return { error: 'المدة القصوى للجلسة 600 دقيقة.' };
-    const stride = strideM(u.profile.height);
-    let distance, steps, speed, basis;
+    const H = p.height || 170;
+    if (ui.outMeasure !== 'distance' && ui.outMeasure !== 'steps') {
+      const m = num(ui.out.min);
+      if (!(m > 0)) return { error: 'أدخل مدة المشي بالدقائق.' };
+      if (m > 600) return { error: 'المدة القصوى للجلسة 600 دقيقة.' };
+      const speed = num(ui.out.pace) || 5;
+      const stride = strideM(H, WALK_CADENCE);
+      return session(speed, 0, m, { mode: 'outdoor', basis: 'pace', stride, steps: Math.round(speed * m / 60 * 1000 / stride) });
+    }
+    // distance or steps: the time is optional
+    const durTxt = String(ui.out.dur == null ? '' : ui.out.dur).trim();
+    const dur = num(durTxt), hasDur = durTxt !== '';
+    if (hasDur && !(dur > 0)) return { error: 'المدة لازم تكون رقم أكبر من صفر، أو اتركها فاضية.' };
+    if (hasDur && dur > 600) return { error: 'المدة القصوى 600 دقيقة.' };
     if (ui.outMeasure === 'distance') {
-      distance = num(ui.out.distance);
-      if (!(distance > 0)) return { error: 'أدخل المسافة التي مشيتها بالكيلومتر.' };
-      speed = distance / (m / 60); steps = Math.round(distance * 1000 / stride); basis = 'distance';
-    } else if (ui.outMeasure === 'steps') {
-      steps = num(ui.out.steps);
-      if (!(steps > 0)) return { error: 'أدخل عدد الخطوات.' };
-      distance = steps * stride / 1000; speed = distance / (m / 60); basis = 'steps';
-    } else {
-      speed = num(ui.out.pace) || 5;
-      distance = speed * m / 60; steps = Math.round(distance * 1000 / stride); basis = 'pace';
+      const dist = num(ui.out.distance);
+      if (!(dist > 0)) return { error: 'أدخل المسافة اللي مشيتها بالكيلومتر.' };
+      if (dist > 100) return { error: 'المسافة القصوى 100 كم.' };
+      let minutes = hasDur ? dur : dist / 5 * 60, note = hasDur ? '' : 'noTime';
+      if (hasDur && dist / (dur / 60) < 2.5) { minutes = dist / 4.5 * 60; note = 'spread'; }   // stops and breaks: count the walking only
+      const speed = dist / (minutes / 60);
+      if (speed > 25) return { error: 'السرعة الناتجة أعلى من 25 كم/س. راجع المدة أو المسافة.' };
+      const stride = strideM(H, speed >= RUN_FROM ? 165 : WALK_CADENCE);
+      return session(speed, 0, minutes, { mode: 'outdoor', basis: 'distance', note, stride, steps: Math.round(dist * 1000 / stride) });
     }
-    if (speed > 25) return { error: 'السرعة الناتجة أعلى من 25 كم/س. راجع المدة أو المسافة.' };
-    const c = acsm(speed, 0, m, w);
-    return Object.assign(c, { mode: 'outdoor', minutes: m, speed, incline: 0, distance, steps: Math.round(steps), weight: w, stride, basis });
+    const steps = Math.round(num(ui.out.steps));
+    if (!(steps > 0)) return { error: 'أدخل عدد الخطوات.' };
+    if (steps > 100000) return { error: 'عدد الخطوات الأقصى 100,000.' };
+    let cadence = hasDur ? steps / dur : WALK_CADENCE, note = hasDur ? '' : 'noTime';
+    if (cadence > 230) return { error: `${fmt(steps)} خطوة في ${fmt(dur)} دقيقة كثيرة (أكثر من 230 خطوة بالدقيقة). تأكد من المدة، أو اتركها فاضية ونحسبها من خطواتك.` };
+    if (cadence < 60) { cadence = WALK_CADENCE; note = 'spread'; }                         // the day's steps: count the walking only
+    const stride = strideM(H, cadence);
+    const minutes = steps / cadence, dist = steps * stride / 1000;
+    const speed = dist / (minutes / 60);
+    if (speed > 25) return { error: 'السرعة الناتجة أعلى من 25 كم/س. راجع المدة أو عدد الخطوات.' };
+    return session(speed, 0, minutes, { mode: 'outdoor', basis: 'steps', note, stride, cadence, steps });
   }
   function inclineSVG(angle, incline) {
     const a = Math.max(0, angle);
@@ -1530,9 +1570,10 @@
     return `<div class="rounded-2xl bg-slate-800 text-white p-5 sm:p-6 flex flex-col gap-5 h-full">
       <div class="flex items-start justify-between gap-4">
         <div class="min-w-0">
-          <p class="text-xs font-bold text-slate-300">السعرات المحروقة المتوقعة</p>
+          <p class="text-xs font-bold text-slate-300">سعرات الحركة المحروقة</p>
           <p class="mt-1.5 flex items-baseline gap-2"><span class="num text-6xl font-extrabold leading-none">${fmt(c.kcal)}</span><span class="text-slate-300 font-bold">سعرة</span></p>
-          <p class="mt-2 text-xs text-slate-400">≈ <span class="num">${fmt(c.kcalMin, 1)}</span> سعرة في الدقيقة · شدة <span class="num">${fmt(c.met, 1)}</span> <span dir="ltr">MET</span></p>
+          <p class="mt-2 text-xs text-slate-400">≈ <span class="num">${fmt(c.kcalMin, 1)}</span> سعرة في الدقيقة · شدة <span class="num">${fmt(c.met, 1)}</span> <span dir="ltr">MET</span>${c.mode === 'outdoor' && c.basis !== 'pace' ? ` · <span class="num">${fmt(c.minutes)}</span> دقيقة مشي${c.running ? '/جري' : ''}` : ''}</p>
+          <p class="mt-0.5 text-xs text-slate-400">ومع حرق جسمك الأساسي بنفس الوقت: <span class="num">${fmt(c.total)}</span> سعرة</p>
         </div>
         ${tm ? inclineSVG(angle, c.incline) : `<span class="w-14 h-14 rounded-2xl bg-white/[.06] grid place-items-center shrink-0">${icon('route', 'w-7 h-7 text-slate-300')}</span>`}
       </div>
@@ -1546,15 +1587,31 @@
         <div class="flex justify-between text-xs text-slate-300 mb-1.5"><span class="font-bold">أثر الميل على الحرق</span><span class="num font-bold" dir="ltr">${boost > 0.5 ? '+' + fmt(boost) + '%' : '0%'}</span></div>
         <div class="h-2.5 rounded-full bg-white/10 overflow-hidden flex gap-[2px]"><span class="bg-slate-400" style="width:${flatShare.toFixed(1)}%"></span>${boost > 0.5 ? `<span class="bg-white" style="width:${(100 - flatShare).toFixed(1)}%"></span>` : ''}</div>
         <p class="mt-1.5 text-xs text-slate-400 leading-5">${c.incline > 0 ? `بنفس السرعة على أرض مستوية: <span class="num">${fmt(c.flatKcal)}</span> سعرة. الميل ${pct(c.incline)} أضاف <b class="num text-slate-200">${fmt(c.kcal - c.flatKcal)}</b> سعرة.` : 'ارفع الميل لترى كم يضيف إلى الحرق بنفس السرعة.'}</p>
-      </div>` : `<p class="text-xs text-slate-400 leading-5">${c.basis === 'pace' ? 'المسافة محسوبة من الوتيرة المختارة.' : c.basis === 'steps' ? `المسافة محسوبة من خطواتك بطول خطوة تقديري <span class="num">${fmt(c.stride, 2)}</span> م (من طولك).` : 'السرعة محسوبة من المسافة والمدة.'} المشي الخارجي يُحسب على أرض مستوية.</p>`}
+      </div>` : `<p class="text-xs text-slate-400 leading-5">${cardioBasisText(c)}</p>`}
       <div class="rounded-xl bg-black/20 p-3.5 text-[13px] leading-6">
-        <p class="font-bold text-slate-200 mb-1">كيف حُسبت؟ معادلة <span dir="ltr">ACSM</span> ${c.running ? 'للجري' : 'للمشي'}</p>
-        <p dir="ltr" class="num text-slate-300 text-left break-words">VO₂ = ${c.kH}×${fmt(c.mpm, 1)} + ${c.kV}×${fmt(c.mpm, 1)}×${fmt(c.grade, 3)} + 3.5 = ${fmt(c.vo2, 1)} ml/kg/min</p>
-        <p dir="ltr" class="num text-slate-300 text-left break-words">kcal = ${fmt(c.vo2, 1)} × ${fmt(c.weight, 1)} kg ÷ 1000 × 5 × ${fmt(c.minutes)} min = ${fmt(c.kcal)}</p>
-        <p class="mt-1 text-xs text-slate-400 leading-5">السرعة بالمتر في الدقيقة = كم/س × 16.67، وكل لتر أكسجين ≈ 5 سعرات. ${c.running ? 'استُخدمت معادلة الجري لأن السرعة 7.5 كم/س أو أكثر.' : 'تُستخدم معادلة الجري تلقائياً من 7.5 كم/س فأكثر.'}</p>
+        <p class="font-bold text-slate-200 mb-1">كيف حُسبت؟ ${c.running ? 'معادلة <span dir="ltr">ACSM</span> للجري' : 'معادلة <span dir="ltr">LCDA</span> للمشي'}</p>
+        ${c.running
+          ? `<p dir="ltr" class="num text-slate-300 text-left break-words">VO₂ = 0.2×${fmt(c.cost.mpm, 1)} + 0.9×${fmt(c.cost.mpm, 1)}×${fmt(c.grade, 3)} + 3.5 = ${fmt(c.vo2, 1)} ml/kg/min</p>`
+          : `<p dir="ltr" class="num text-slate-300 text-left break-words">M = 1.44 + 1.94×${fmt(c.cost.S, 2)}^0.43 + 0.24×${fmt(c.cost.S, 2)}^4${c.cost.gradeTerm ? ` + ${fmt(c.cost.gradeTerm, 2)}` : ''} = ${fmt(c.wkg, 2)} W/kg</p>`}
+        <p dir="ltr" class="num text-slate-300 text-left break-words">${fmt(c.wkg, 2)} W/kg × ${fmt(c.weight, 1)} kg × ${fmt(c.minutes)} min = ${fmt(c.total)} kcal − rest ${fmt(c.restKcal)} = ${fmt(c.kcal)} kcal</p>
+        <p class="mt-1 text-xs text-slate-400 leading-5">${c.running ? 'السرعة بالمتر في الدقيقة، وكل لتر أكسجين ≈ 5 سعرات. معادلة الجري تبدأ من 8 كم/س.' : `S = السرعة بالمتر في الثانية${c.incline > 0 ? '، والجزء الأخير أثر الميل' : ''}. معادلة حديثة (Looney وزملاؤه، 2019) أدق من القديمة في المشي السريع والمرتفعات، ومن 8 كم/س نستخدم معادلة الجري.`}</p>
+        <p class="mt-1 text-xs text-slate-400 leading-5">الرقم الكبير = سعرات الحركة فقط: طرحنا اللي يحرقه جسمك وهو مرتاح بنفس الوقت (<span class="num">${fmt(c.restKcal)}</span> سعرة) لأنه محسوب أصلاً في احتياجك اليومي، مثل «السعرات النشطة» في الساعات الذكية.</p>
       </div>
-      <p class="text-xs text-slate-400">الحساب على وزن <b class="num text-slate-200">${fmt(c.weight, 1)}</b> كجم. <button data-act="nav" data-v="calories" class="underline underline-offset-4 text-slate-200 hover:text-white">عدّل وزنك من صفحة السعرات</button></p>
+      <p class="text-xs text-slate-400">الحساب على وزن <b class="num text-slate-200">${fmt(c.weight, 1)}</b> كجم. <button data-act="nav" data-v="calories" class="underline underline-offset-4 text-slate-200 hover:text-white">عدّل وزنك وطولك وعمرك من صفحة السعرات</button></p>
     </div>`;
+  }
+  function cardioBasisText(c) {
+    const st = `<span class="num">${fmt(c.stride, 2)}</span> م`;
+    if (c.basis === 'pace') return `المسافة من الوتيرة والمدة، والخطوات تقديرية بطول خطوة ${st} (من طولك).`;
+    if (c.basis === 'distance') {
+      if (c.note === 'noTime') return 'ما حددت المدة، فافترضنا مشي معتدل بسرعة 5 كم/س. أضف المدة لو تعرفها وتصير السرعة أدق.';
+      if (c.note === 'spread') return 'المدة طويلة على المسافة (فيها وقفات)، فحسبنا وقت المشي الفعلي بسرعة 4.5 كم/س.';
+      return 'السرعة محسوبة من المسافة والمدة. المشي الخارجي يُحسب على أرض مستوية.';
+    }
+    const cad = `<span class="num">${fmt(c.cadence)}</span> خطوة بالدقيقة`;
+    if (c.note === 'noTime') return `المسافة = خطواتك × طول خطوة ${st} (من طولك). ما حددت المدة، فافترضنا مشي معتدل ${cad}.`;
+    if (c.note === 'spread') return `المسافة = خطواتك × طول خطوة ${st}. المدة طويلة على عدد الخطوات (خطوات يومك)، فحسبنا وقت المشي الفعلي بإيقاع ${cad} فقط.`;
+    return `المسافة = خطواتك × طول خطوة ${st} (من طولك${c.running ? ' وإيقاع الجري' : ''})، والإيقاع ${cad}.`;
   }
   function rangeField(id, label, unit, value, min, max, step) {
     const v = num(value);
@@ -1577,18 +1634,19 @@
         ${rangeField('tm-speed', 'درجة السرعة', 'كم/س', ui.tm.speed, 1, 16, 0.1)}
         ${rangeField('tm-incline', 'درجة الارتفاع / الميل', '%', ui.tm.incline, 0, 15, 0.5)}`
       : `
-        ${rangeField('out-min', 'المدة (كم دقيقة مشيت)', 'دقيقة', ui.out.min, 5, 180, 1)}
         <fieldset>
           <legend class="text-sm font-bold text-slate-700 mb-2">بماذا تقيس مشيك؟</legend>
           <div class="grid grid-cols-3 p-1 rounded-xl bg-slate-100">
-            ${[['distance', 'المسافة'], ['steps', 'الخطوات'], ['pace', 'الوتيرة فقط']].map(([k, l]) => `<button type="button" data-act="out-measure" data-v="${k}" aria-pressed="${ui.outMeasure === k}" class="seg justify-center h-9 px-2 text-[13px] ${ui.outMeasure === k ? 'seg-on' : ''}">${l}</button>`).join('')}
+            ${[['distance', 'المسافة'], ['steps', 'الخطوات'], ['pace', 'الوتيرة']].map(([k, l]) => `<button type="button" data-act="out-measure" data-v="${k}" aria-pressed="${ui.outMeasure === k}" class="seg justify-center h-9 px-2 text-[13px] ${ui.outMeasure === k ? 'seg-on' : ''}">${l}</button>`).join('')}
           </div>
         </fieldset>
         ${ui.outMeasure === 'distance' ? `<div><label for="out-distance" class="lbl">المسافة (كم)</label><input id="out-distance" class="inp num h-11" inputmode="decimal" autocomplete="off" placeholder="مثال: 4.2" value="${esc(ui.out.distance)}"></div>` : ''}
-        ${ui.outMeasure === 'steps' ? `<div><label for="out-steps" class="lbl">عدد الخطوات</label><input id="out-steps" class="inp num h-11" inputmode="numeric" autocomplete="off" placeholder="مثال: 6500" value="${esc(ui.out.steps)}"><p class="text-[11px] text-slate-400 mt-1">طول خطوتك التقديري <span class="num">${fmt(strideM(u.profile.height), 2)}</span> م، محسوب من طولك (<span class="num">${fmt(u.profile.height)}</span> سم).</p></div>` : ''}
-        ${ui.outMeasure === 'pace' ? `<div><span class="lbl">وتيرة المشي</span><div class="grid grid-cols-2 sm:grid-cols-4 gap-2">${[['4', 'هادئ'], ['5', 'معتدل'], ['6', 'سريع'], ['6.5', 'سريع جداً']].map(([v, l]) => `<button type="button" data-act="out-pace" data-v="${v}" aria-pressed="${ui.out.pace === v}" class="chip h-11 justify-center ${ui.out.pace === v ? 'chip-on' : ''}">${l} · <span class="num">${v}</span> كم/س</button>`).join('')}</div></div>` : ''}`;
+        ${ui.outMeasure === 'steps' ? `<div><label for="out-steps" class="lbl">عدد الخطوات</label><input id="out-steps" class="inp num h-11" inputmode="numeric" autocomplete="off" placeholder="مثال: 6500" value="${esc(ui.out.steps)}"><p class="text-[11px] text-slate-400 mt-1">طول خطوتك بالمشي ≈ <span class="num">${fmt(strideM(u.profile.height, WALK_CADENCE), 2)}</span> م (من طولك <span class="num">${fmt(u.profile.height)}</span> سم)، ويطول تلقائياً إذا كان إيقاعك جري.</p></div>` : ''}
+        ${ui.outMeasure === 'distance' || ui.outMeasure === 'steps' ? `<div><label for="out-dur" class="lbl">المدة بالدقائق <span class="font-normal text-slate-400">(اختياري)</span></label><input id="out-dur" class="inp num h-11" inputmode="decimal" autocomplete="off" placeholder="${ui.outMeasure === 'steps' ? 'إذا ما تعرفها نحسبها من خطواتك' : 'إذا ما تعرفها نفترض مشي معتدل'}" value="${esc(ui.out.dur)}"><p class="text-[11px] text-slate-400 mt-1">المدة تحدد سرعتك (مشي أو جري). السعرات تعتمد أكثر على ${ui.outMeasure === 'steps' ? 'خطواتك' : 'المسافة'} ووزنك.</p></div>` : ''}
+        ${ui.outMeasure !== 'distance' && ui.outMeasure !== 'steps' ? `${rangeField('out-min', 'المدة (كم دقيقة مشيت)', 'دقيقة', ui.out.min, 5, 180, 1)}
+        <div><span class="lbl">وتيرة المشي</span><div class="grid grid-cols-2 sm:grid-cols-4 gap-2">${[['4', 'هادئ'], ['5', 'معتدل'], ['6', 'سريع'], ['6.5', 'سريع جداً']].map(([v, l]) => `<button type="button" data-act="out-pace" data-v="${v}" aria-pressed="${ui.out.pace === v}" class="chip h-11 justify-center ${ui.out.pace === v ? 'chip-on' : ''}">${l} · <span class="num">${v}</span> كم/س</button>`).join('')}</div></div>` : ''}`;
     return `<section class="space-y-6 fade-in">
-      ${pageHeader('الكارديو', 'المشي والكارديو', 'اختر نوع المشي وأدخل الأرقام: المسافة والسعرات تُحسب فوراً بمعادلة علمية تراعي السرعة والميل ووزنك.')}
+      ${pageHeader('الكارديو', 'المشي والكارديو', 'اختر نوع المشي وأدخل الأرقام: المسافة وسعرات الحركة تُحسب فوراً بمعادلات علمية تراعي السرعة والميل ووزنك وطولك وعمرك.')}
       <div class="inline-flex p-1 rounded-2xl bg-slate-200/70" role="tablist" aria-label="نوع المشي">
         <button role="tab" aria-selected="${!tm}" data-act="cardio-mode" data-mode="outdoor" class="seg ${!tm ? 'seg-on' : ''}">${icon('route', 'w-4 h-4')} مشي طبيعي (خارجي)</button>
         <button role="tab" aria-selected="${tm}" data-act="cardio-mode" data-mode="treadmill" class="seg ${tm ? 'seg-on' : ''}">${icon('treadmill', 'w-4 h-4')} سير كهربائي</button>
@@ -1597,7 +1655,7 @@
         <form data-form="cardio" class="card p-5 sm:p-6 flex flex-col gap-6" novalidate>
           <div>
             <h2 class="font-display font-extrabold text-lg text-slate-900">${tm ? 'جلسة على السير الكهربائي' : 'مشي حر في الخارج'}</h2>
-            <p class="text-sm text-slate-500">${tm ? 'حرّك المؤشرات أو اكتب الأرقام كما تظهر على شاشة الجهاز.' : 'أدخل المدة، ثم المسافة أو الخطوات إن كانت لديك.'}</p>
+            <p class="text-sm text-slate-500">${tm ? 'حرّك المؤشرات أو اكتب الأرقام كما تظهر على شاشة الجهاز.' : 'اختر: المسافة أو الخطوات (والمدة اختيارية)، أو المدة والوتيرة.'}</p>
           </div>
           ${fields}
           <button class="btn-dark w-full h-12 mt-auto">${icon('check', 'w-4 h-4')} سجّل الجلسة</button>
@@ -5808,7 +5866,7 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
 
   const DRAFT_FIELDS = {
     'tm-min': ['tm', 'min'], 'tm-speed': ['tm', 'speed'], 'tm-incline': ['tm', 'incline'],
-    'out-min': ['out', 'min'], 'out-distance': ['out', 'distance'], 'out-steps': ['out', 'steps']
+    'out-min': ['out', 'min'], 'out-dur': ['out', 'dur'], 'out-distance': ['out', 'distance'], 'out-steps': ['out', 'steps']
   };
   document.addEventListener('input', e => {
     const t = e.target;
