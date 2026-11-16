@@ -705,7 +705,10 @@
     chevL: '<path d="m14.5 6-6 6 6 6"/>',
     chevR: '<path d="m9.5 6 6 6-6 6"/>',
     quote: '<path d="M9.5 7.5C6.5 8.5 5 10.5 5 13.5V17h4.5v-4.5H7c0-1.8.9-3 2.5-3.5M18.5 7.5c-3 1-4.5 3-4.5 6V17h4.5v-4.5H16c0-1.8.9-3 2.5-3.5"/>',
-    moon: '<path d="M19.5 14.5A8 8 0 1 1 9.5 4.5a6.5 6.5 0 0 0 10 10Z"/>'
+    moon: '<path d="M19.5 14.5A8 8 0 1 1 9.5 4.5a6.5 6.5 0 0 0 10 10Z"/>',
+    swap: '<path d="M4 8h15M15 4l4 4-4 4M20 16H5M9 12l-4 4 4 4"/>',
+    up: '<path d="m6 15 6-6 6 6"/>',
+    down: '<path d="m6 9 6 6 6-6"/>'
   };
   const icon = (n, cls = 'w-5 h-5') => `<svg class="${cls}" data-ic="${n}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${I[n] || ''}</svg>`;
 
@@ -915,10 +918,10 @@
       ${side}
     </header>`;
   }
-  function confirmStrip(text, act, id, extra = '') {
+  function confirmStrip(text, act, id, extra = '', yes = 'نعم، احذف') {
     return `<div class="flex flex-wrap items-center gap-2 rounded-xl bg-slate-100 border border-slate-200 p-2.5 text-sm fade-in" role="alert">
       <span class="px-1 text-slate-700 font-bold flex-1 min-w-[10rem]">${text}</span>
-      <button data-act="${act}" data-id="${id}" ${extra} class="btn-dark h-9 px-3 text-sm">نعم، احذف</button>
+      <button data-act="${act}" data-id="${id}" ${extra} class="btn-dark h-9 px-3 text-sm">${yes}</button>
       <button data-act="cancel-confirm" class="btn-ghost h-9 px-3 text-sm">إلغاء</button>
     </div>`;
   }
@@ -949,7 +952,7 @@
         .concat(u.pages.filter(p => p.prog).map(p => {
           const ps = pageDayStats(u, p.id, d);
           const isToday = !!info && typeof info.slot === 'number' && info.act.pageIds[info.slot] === p.id;
-          return { v: 'page-' + p.id, label: p.name, icon: pageIcon(p), badge: ps.reps ? fmt(ps.reps) : isToday ? 'اليوم' : '', alert: isToday && !ps.reps, tone: progTone(PROG_BY_ID[p.prog]) };
+          return { v: 'page-' + p.id, label: p.name, icon: pageIcon(p), badge: ps.reps ? fmt(ps.reps) : isToday ? 'اليوم' : '', alert: isToday && !ps.reps, tone: progTone(getProg(u, p.prog)) };
         })) },
       { title: 'صفحات التمارين', add: true, items: [{ v: 'log', label: 'جدول العدات', icon: 'table', badge: st.reps ? fmt(st.reps) : '' }]
         .concat(u.pages.filter(p => !p.prog).map(p => { const ps = pageDayStats(u, p.id, d); return { v: 'page-' + p.id, label: p.name, icon: pageIcon(p), badge: ps.reps ? fmt(ps.reps) : '' }; })) },
@@ -1319,7 +1322,7 @@
   function workoutView(u, page) {
     const d = today();
     const ps = pageDayStats(u, page.id, d);
-    const kindLabel = page.kind === 'resistance' ? 'صفحة أساسية · مقاومة' : page.kind === 'deadlift' ? 'صفحة أساسية · ديدلفت' : page.prog ? `برنامج · ${esc((PROG_BY_ID[page.prog] || {}).name || '')}` : 'صفحة مخصصة';
+    const kindLabel = page.kind === 'resistance' ? 'صفحة أساسية · مقاومة' : page.kind === 'deadlift' ? 'صفحة أساسية · ديدلفت' : page.prog ? `برنامج · ${esc((getProg(u, page.prog) || {}).name || '')}` : 'صفحة مخصصة';
     const side = page.builtin || page.prog ? '' : (ui.confirm === 'page:' + page.id
       ? `<div class="w-full sm:w-auto">${confirmStrip('حذف الصفحة مع كل تمارينها وسجلاتها؟', 'del-page', page.id)}</div>`
       : `<button data-act="ask-confirm" data-key="page:${page.id}" class="btn-ghost h-10 text-sm text-slate-600">${icon('trash', 'w-4 h-4')} حذف الصفحة</button>`);
@@ -2011,7 +2014,7 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
   const MUSCLE = {
     chest: 'صدر', lats: 'ظهر (لاتس)', midback: 'منتصف الظهر', lowback: 'أسفل الظهر', traps: 'ترابيس',
     shoulders: 'أكتاف', reardelts: 'أكتاف خلفية', biceps: 'بايسبس', triceps: 'ترايسبس', forearms: 'ساعد',
-    quads: 'أرجل أمامية', hams: 'أرجل خلفية', glutes: 'مؤخرة', calves: 'سمانة', core: 'بطن'
+    quads: 'أرجل أمامية', hams: 'أرجل خلفية', glutes: 'مؤخرة', calves: 'سمانة', core: 'بطن', adductors: 'الفخذ الداخلي'
   };
   // First match wins: [pattern, muscles (primary first), picture, rest (s), rep range, weight step (kg)]
   const EX_RULES = [
@@ -2207,6 +2210,7 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
       </div>`;
     }).join('');
     const editing = ui.exMenu === ex.id;
+    const nAlt = altsFor(ex).length, altOpen = !!nAlt && ui.altOpen === ex.id;
     const opt = (vals, cur, fmtFn) => vals.map(v => `<option value="${v}" ${Math.abs(v - cur) < 1e-9 ? 'selected' : ''}>${fmtFn(v)}</option>`).join('');
     return `<article class="card p-3 sm:p-5 flex flex-col gap-3">
       <div class="flex items-start gap-3">
@@ -2217,6 +2221,7 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
           <p class="text-[13px] text-slate-500">${meta.plan ? `<span class="num">${meta.sets}</span> ${setsWord(meta.sets)} · ثقيلة ثم باك أوف` : `<span class="num" dir="ltr">${meta.sets} × ${repsLabel(meta)}</span>${rpeNow ? ` · <span class="num" dir="ltr">RPE ${fmt(rpeNow, 1)}</span>` : ''}`} · راحة <span class="num">${restStr(meta.rest)}</span>${meta.star ? ' · <b class="text-slate-800 whitespace-nowrap" title="عضلة اخترتها كأولوية: جولة إضافية">★ أولوية</b>' : ''}</p>
           ${info.target ? `<p class="mt-1 flex items-start gap-1.5 text-[13px] text-slate-600 leading-snug">${icon('target', 'w-4 h-4 shrink-0 mt-px text-slate-500')}<span><b class="text-slate-800">يستهدف:</b> ${esc(info.target)}</span></p>` : ''}
           ${chips ? `<div class="flex flex-wrap gap-1.5 mt-1.5">${chips}</div>` : ''}
+          ${nAlt ? `<button type="button" data-act="ex-alt" data-ex="${ex.id}" aria-expanded="${altOpen}" class="chip h-8 mt-2 text-[12.5px] ${altOpen ? 'chip-on' : ''}">${icon('swap', 'w-4 h-4')} البدائل <span class="num opacity-70">${nAlt}</span></button>` : ''}
         </div>
         <button data-act="ex-menu" data-ex="${ex.id}" class="icon-btn ${editing ? 'bg-slate-100 text-slate-900' : ''}" aria-expanded="${editing}" aria-label="إعدادات ${esc(ex.name)}" title="إعدادات التمرين">${icon('dots', 'w-5 h-5')}</button>
       </div>
@@ -2235,6 +2240,13 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
         </div>
       </div>` : ''}
       ${ui.confirm === 'ex:' + ex.id ? confirmStrip('سيُحذف التمرين وكل سجلاته. متأكد؟', 'del-ex', ex.id, `data-page="${page.id}"`) : ''}
+      ${altOpen ? `<div class="rounded-2xl bg-slate-50 border border-slate-200 p-3 fade-in">
+        <div class="flex items-start justify-between gap-2 mb-2.5">
+          <div class="min-w-0"><p class="font-display font-bold text-slate-900">بدائل بنفس الفعالية</p><p class="text-[12px] text-slate-500 leading-5">نفس العضلات ونفس الحركة، اختر اللي متوفر عندك. التبديل يحتفظ بالجولات والعدات.</p></div>
+          <button type="button" data-act="ex-alt" data-ex="${ex.id}" class="icon-btn w-8 h-8" aria-label="إغلاق البدائل">${icon('x', 'w-4 h-4')}</button>
+        </div>
+        ${altListHTML(ex, { act: 'ex-swap', attrs: `data-page="${page.id}" data-ex="${ex.id}"` })}
+      </div>` : ''}
       ${T && meta.plan ? planChips(T, doneN, done) : ''}
       <p class="flex items-start gap-2 text-[13.5px] font-bold text-slate-800">${icon('chart', 'w-4 h-4 shrink-0 mt-0.5')}<span>${esc(T ? liftSuggestion(meta, T, doneN) : sug.text)}</span></p>
       ${rpeNow && !T ? `<p class="flex items-start gap-2 text-[13px] text-slate-600">${icon('bolt', 'w-4 h-4 shrink-0 mt-0.5')}<span><b class="num" dir="ltr">RPE ${fmt(rpeNow, 1)}</b>: ${meta.amrap ? 'أقصى عدد عدات لين ' : ''}${rirText(rpeNow)}</span></p>` : ''}
@@ -2367,7 +2379,51 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
     dips: ['Dips', 'متوازي (ديبس)', ['triceps', 'chest'], 'body', 120],
     rdext: ['Rear Deltoids Extensions', 'كتف خلفي', ['reardelts', 'midback'], 'machine', 60],
     glute45: ['Glute Extension 45°', 'تمديد الظهر 45° للمؤخرة', ['glutes', 'hams', 'lowback'], 'body', 75],
-    preacher: ['Preacher Bicep Curls', 'بايسبس بريتشر', ['biceps'], 'machine', 60]
+    preacher: ['Preacher Bicep Curls', 'بايسبس بريتشر', ['biceps'], 'machine', 60],
+    // more choices for building a program and for the alternatives of each exercise (modern ones included)
+    tbar: ['T-Bar Row', 'تجديف تي بار', ['midback', 'lats', 'biceps', 'reardelts'], 'barbell', 90],
+    hexdl: ['Hex Bar Deadlift', 'ديدلفت بالهيكس بار', ['quads', 'glutes', 'hams', 'traps'], 'barbell', 150, 'تدخل وسط البار والمقابض على جنبك: أريح للظهر من الديدلفت العادي'],
+    hacksq: ['Hack Squat', 'هاك سكوات', ['quads', 'glutes'], 'machine', 120],
+    pendsq: ['Pendulum Squat', 'بندولوم سكوات', ['quads', 'glutes'], 'machine', 120],
+    beltsq: ['Belt Squat', 'بلت سكوات', ['quads', 'glutes'], 'machine', 120, 'الوزن على حوضك بالحزام: أرجل بدون ضغط على الظهر'],
+    smithsq: ['Smith Machine Squat', 'سكوات على السميث', ['quads', 'glutes', 'hams'], 'machine', 120],
+    bulgarian: ['Bulgarian Split Squat', 'سكوات بلغاري', ['quads', 'glutes'], 'dumbbell', 90, 'كمّل عدات رجل وحدة وبعدين بدّل'],
+    adductor: ['Adductor Machine', 'جهاز الضم · الفخذ الداخلي', ['adductors'], 'machine', 60],
+    abductor: ['Abductor Machine', 'جهاز الفتح · الفخذ الخارجي', ['glutes'], 'machine', 60],
+    hipthrust: ['Barbell Hip Thrust', 'هيب ثرست بالبار', ['glutes', 'hams'], 'barbell', 90],
+    ckick: ['Cable Glute Kickback', 'ركل خلفي بالكيبل', ['glutes', 'hams'], 'machine', 60],
+    dbrdl: ['Dumbbell RDL', 'رومانيان بالدمبل', ['hams', 'glutes', 'lowback'], 'dumbbell', 90],
+    scalf: ['Standing Calf Raise', 'سمانة واقف بالجهاز', ['calves'], 'machine', 45],
+    inclinedb: ['Incline Dumbbell Press', 'ضغط دمبل مائل', ['chest', 'shoulders', 'triceps'], 'dumbbell', 90],
+    inclinebb: ['Incline Bench Press', 'بنش مائل بالبار', ['chest', 'shoulders', 'triceps'], 'barbell', 120],
+    pullover: ['Dumbbell Pullover', 'تجميع دمبل عالي (بول أوفر)', ['chest', 'lats'], 'dumbbell', 75],
+    cablecross: ['Cable Crossover', 'تفتيح كروس بالكيبل', ['chest'], 'machine', 60],
+    dbflyb: ['Dumbbell Fly', 'تفتيح دمبل على البنش', ['chest'], 'dumbbell', 60],
+    cgbench: ['Close-Grip Bench Press', 'بنش ضيق للترايسبس', ['triceps', 'chest'], 'barbell', 120],
+    skull: ['Skull Crushers', 'سكل كرشر بالبار المتعرج', ['triceps'], 'barbell', 75],
+    dbshp: ['Dumbbell Shoulder Press', 'ضغط أكتاف بالدمبل', ['shoulders', 'triceps'], 'dumbbell', 90],
+    ohp: ['Overhead Press', 'ضغط أكتاف بالبار واقف', ['shoulders', 'triceps'], 'barbell', 120],
+    arnold: ['Arnold Press', 'ضغط أرنولد', ['shoulders', 'triceps'], 'dumbbell', 90],
+    cablelat: ['Cable Lateral Raise', 'رفرفة جانبي بالكيبل', ['shoulders'], 'machine', 60],
+    cablefront: ['Cable Front Raise', 'رفرفة أمامي بالكيبل', ['shoulders'], 'machine', 60],
+    facepull: ['Face Pull', 'فيس بول بالكيبل', ['reardelts', 'traps'], 'machine', 60],
+    csrow: ['Incline Chest-Supported Row', 'تجديف مسنود على البنش المائل', ['midback', 'reardelts', 'lats'], 'dumbbell', 75],
+    altcurl: ['Alternating Dumbbell Curl', 'بايسبس تبادل بالدمبل', ['biceps', 'forearms'], 'dumbbell', 60],
+    bbcurl: ['Barbell Curl', 'بايسبس بالبار', ['biceps', 'forearms'], 'barbell', 75],
+    ihammer: ['Incline Hammer Curl', 'هامر على البنش المائل', ['biceps', 'forearms'], 'dumbbell', 60],
+    ropehammer: ['Rope Hammer Curl', 'هامر بالحبل', ['biceps', 'forearms'], 'machine', 60],
+    dbshrug: ['Dumbbell Shrug', 'ترابيس بالدمبل', ['traps'], 'dumbbell', 60],
+    bbshrug: ['Barbell Shrug', 'ترابيس بالبار', ['traps'], 'barbell', 60],
+    wcurl: ['Wrist Curl', 'رست · ساعد', ['forearms'], 'barbell', 45],
+    hangraise: ['Hanging Leg Raise', 'رفع الرجلين معلّق', ['core'], 'body', 60],
+    highrow: ['Machine High Row', 'سحب عالي بالجهاز (هامر)', ['lats', 'midback', 'biceps'], 'machine', 90],
+    vbarpd: ['Close-Grip Pulldown', 'سحب أمامي بمسكة ضيقة', ['lats', 'biceps', 'midback'], 'machine', 90],
+    assistpu: ['Assisted Pull Up', 'عقلة بالجهاز المساعد', ['lats', 'biceps'], 'machine', 90],
+    sapd: ['Single-Arm Cable Pulldown', 'سحب بيد وحدة بالكيبل', ['lats', 'biceps'], 'machine', 75],
+    bbfront: ['Barbell Front Raise', 'رفرفة أمامي بالبار', ['shoulders'], 'barbell', 60],
+    declinebb: ['Decline Bench Press', 'بنش سفلي بالبار', ['chest', 'triceps'], 'barbell', 120],
+    sumodl: ['Sumo Deadlift', 'سومو ديدلفت', ['glutes', 'quads', 'hams', 'lowback'], 'barbell', 150],
+    dbdl: ['Dumbbell Deadlift', 'ديدلفت بالدمبل', ['glutes', 'hams', 'quads', 'lowback'], 'dumbbell', 120]
   };
   // An exercise in a program day: reps = number | [min, max] | 'amrap'
   // plan = per-set targets: [reps, RPE] or [reps, −drop%] for a back-off off the heaviest RPE set
@@ -2506,6 +2562,41 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
   ];
   const PROG_BY_ID = {};
   PROGRAMS.forEach(p => { PROG_BY_ID[p.id] = p; });
+  // ---- your own programs (built in the program builder, saved on the account) ----
+  const MY_MAX = 8;
+  const DEFAULT_WEEK = { 1: [0, 'r', 'r', 'r', 'r', 'r', 'r'], 2: [0, 'r', 'r', 1, 'r', 'r', 'r'], 3: [0, 'r', 1, 'r', 2, 'r', 'r'], 4: [0, 1, 'r', 2, 3, 'r', 'r'], 5: [0, 1, 2, 'r', 3, 4, 'r'], 6: [0, 1, 2, 3, 4, 5, 'r'], 7: [0, 1, 2, 3, 4, 5, 6] };
+  const repsPair = r => { const a = Array.isArray(r) ? r : [r, r]; const lo = clamp(Math.round(Number(a[0]) || 10), 1, 100); return [lo, Math.max(lo, clamp(Math.round(Number(a[1]) || lo), 1, 100))]; };
+  // one exercise of a day: a library key, or a name the user typed
+  function mySpec(x) {
+    if (!x) return null;
+    const sets = clamp(Math.round(Number(x.sets) || 3), 1, 8), reps = repsPair(x.reps);
+    if (x.k && XL[x.k]) return { k: x.k, sets, reps };
+    const n = String(x.n || '').trim().replace(/\s+/g, ' ').slice(0, 40);
+    return n ? { n, sets, reps } : null;
+  }
+  const myCache = new WeakMap();
+  function customProg(c) {
+    if (!c || !c.id || !Array.isArray(c.list) || !c.list.length) return null;
+    const list = c.list.slice(0, 7).map((d, i) => ({ t: String((d && d.t) || '').trim().slice(0, 40) || `اليوم ${i + 1}`, ex: (d && Array.isArray(d.ex) ? d.ex : []).map(mySpec).filter(Boolean).slice(0, 15) }));
+    const n = list.length;
+    const week = Array.isArray(c.week) && c.week.length === 7
+      ? c.week.map(x => x === 'c' ? 'c' : (Number.isInteger(x) && x >= 0 && x < n) ? x : 'r') : (DEFAULT_WEEK[n] || DEFAULT_WEEK[3]).slice();
+    const eqs = new Set();
+    list.forEach(d => d.ex.forEach(x => eqs.add(x.k ? equipOf(x.k) : guessMeta(x.n).glyph)));
+    const place = Array.from(eqs).some(e => e !== 'dumbbell' && e !== 'body') ? 'gym' : eqs.has('dumbbell') ? 'db' : 'home';
+    const per = week.filter(x => x !== 'r').length;
+    const nEx = sum(list, d => d.ex.length);
+    return { id: c.id, custom: true, style: 'bb', name: String(c.name || '').trim().slice(0, 40) || 'برنامجي', per, place, goals: [], levels: [],
+      blurb: `برنامج من تصميمك: ${n} ${n === 1 ? 'يوم تمرين' : n === 2 ? 'يومين تمرين' : `${n} أيام تمرين`} و${nEx} ${arN(nEx, 'تمرين', 'تمرينين', 'تمارين', 'تمرين')}، ولكل تمرين بدائل بنفس الفعالية.`,
+      warm: place === 'gym' ? WARM_GYM : place === 'db' ? WARM_DB : WARM_HOME, week, cardio: LIGHT_CARDIO, list };
+  }
+  function myPrograms(u) {
+    const arr = u && u.plan && Array.isArray(u.plan.custom) ? u.plan.custom : null;
+    if (!arr) return [];
+    if (!myCache.has(arr)) myCache.set(arr, arr.map(customProg).filter(Boolean));
+    return myCache.get(arr);
+  }
+  const getProg = (u, id) => PROG_BY_ID[id] || myPrograms(u).find(p => p.id === id) || null;
   // Each program gets its own shade of the site's slate: lighter for fewer days, darker for more
   const SLATE = ['#F1F5F9', '#E2E8F0', '#CBD5E1', '#94A3B8', '#64748B', '#475569', '#334155', '#1E293B', '#0F172A', '#020617'];
   const PROG_ORDER = ['cal3', 'bb3', 'db3', 'body4', 'db4', 'bb4', 'ul4', 'bulk4', 'home5', 'bb5', 'full5', 'cut5', 'ppl6', 'pl4', 'pl5'];
@@ -2519,6 +2610,7 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
   }
   function progTone(p) {
     if (!p) return slateAt(0.5);
+    if (p.custom) return slateAt(0.66);
     if (p.style === 'pl') return slateAt(p.id === 'pl4' ? 0.55 : 0.93);
     const bb = PROG_ORDER.filter(id => PROG_BY_ID[id] && PROG_BY_ID[id].style === 'bb');
     return slateAt(0.12 + Math.max(0, bb.indexOf(p.id)) / Math.max(1, bb.length - 1) * 0.84);
@@ -2533,7 +2625,7 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
   };
   const PLACES = { gym: ['النادي', 'أجهزة وأوزان كاملة', 'machine'], db: ['المنزل مع دمبلز', 'تحتاج زوج دمبلز فقط', 'dumbbell'], home: ['بدون أوزان', 'بوزن جسمك بس، بالبيت أو بأي مكان', 'body'] };
   const FOCUS = [['chest', 'الصدر'], ['shoulders', 'الأكتاف'], ['arms', 'الذراعين'], ['abs', 'البطن'], ['back', 'الظهر'], ['legs', 'الأرجل']];
-  const FOCUS_MUSCLES = { chest: ['chest'], shoulders: ['shoulders', 'reardelts'], arms: ['biceps', 'triceps', 'forearms'], abs: ['core'], back: ['lats', 'midback', 'traps', 'lowback'], legs: ['quads', 'hams', 'glutes', 'calves'] };
+  const FOCUS_MUSCLES = { chest: ['chest'], shoulders: ['shoulders', 'reardelts'], arms: ['biceps', 'triceps', 'forearms'], abs: ['core'], back: ['lats', 'midback', 'traps', 'lowback'], legs: ['quads', 'hams', 'glutes', 'calves', 'adductors'] };
   const focusHit = (muscle, focus) => (focus || []).some(f => (FOCUS_MUSCLES[f] || []).includes(muscle));
   const STYLE_LABEL = { bb: 'بودي بلدنق', pl: 'باورلفتنق' };
   const progCount = n => n === 1 ? 'جدول واحد' : n === 2 ? 'جدولين' : `${n} ${n <= 10 ? 'جداول' : 'جدول'}`;
@@ -2613,7 +2705,7 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
   // ---- program state ----
   function planInfo(u, date) {
     const act = u && u.plan && u.plan.active;
-    const prog = act && PROG_BY_ID[act.id];
+    const prog = act && getProg(u, act.id);
     if (!prog) return null;
     const diff = Math.max(0, daysBetween(act.start, date || today()));
     const idx = diff % 7;
@@ -2628,10 +2720,10 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
   }
   function rpeAdd(u, ex) {
     const hit = findEx(u, ex.id);
-    const prog = hit && hit.page.prog ? PROG_BY_ID[hit.page.prog] : null;
+    const prog = hit && hit.page.prog ? getProg(u, hit.page.prog) : null;
     if (!prog || !prog.rpeStep) return 0;
     const info = planInfo(u);
-    const wk = info && info.prog === prog ? info.week : 1;
+    const wk = info && info.prog.id === prog.id ? info.week : 1;
     return (Math.min(wk, prog.block || 4) - 1) * prog.rpeStep;
   }
   // Per-set targets of a barbell lift: load from the 1RM (or from today's sets) and the RPE chart;
@@ -2726,8 +2818,10 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
 
   // ---- start / stop ----
   function buildEx(s, focus, reuse) {
-    const [name, ar, mus, g, rest, note] = XL[s.k];
-    const star = focus.length > 0 && focusHit(mus[0], focus);
+    let name, ar, mus, g, rest, note;
+    if (s.k && XL[s.k]) [name, ar, mus, g, rest, note] = XL[s.k];
+    else { const m = guessMeta(s.n); name = String(s.n || 'تمرين'); ar = ''; mus = m.muscles.slice(); g = m.glyph; rest = m.rest; note = ''; }
+    const star = focus.length > 0 && !!mus[0] && focusHit(mus[0], focus);
     const plan = Array.isArray(s.plan) ? s.plan.map(([r, v]) => v < 0 ? { r, drop: -v } : { r, rpe: v }) : null;
     const reps = plan ? plan.map(p => p.r) : s.reps === 'amrap' ? [5, 30] : Array.isArray(s.reps) ? s.reps : [s.reps, s.reps];
     const cfg = { sets: plan ? plan.length : Math.min(6, s.sets + (star ? 1 : 0)), repMin: Math.min(...reps), repMax: Math.max(...reps), rest, mus: mus.slice(), g };
@@ -2741,27 +2835,34 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
     const ids = reuse.get(exKey(name));
     return { id: ids && ids.length ? ids.shift() : 'e' + uid(), name, ar, cfg };
   }
-  function startProgram(u, id) {
-    const prog = PROG_BY_ID[id];
-    if (!prog) return;
-    const plan = u.plan = Object.assign({}, u.plan);
-    const reuse = new Map();          // keep exercise ids (and so their history) across a switch
+  // The day pages of a program. Exercise ids are reused by name (so history carries over), and the
+  // page ids too when the same program is rebuilt after an edit (so this week's ticks stay).
+  function programPages(u, prog) {
+    const reuse = new Map();
     u.pages.filter(p => p.prog).forEach(p => p.exercises.forEach(e => {
       const k = exKey(e.name);
       if (!reuse.has(k)) reuse.set(k, []);
       reuse.get(k).push(e.id);
     }));
+    const same = u.pages.filter(p => p.prog === prog.id);
     u.pages = u.pages.filter(p => !p.prog);
-    const a = plan.intake || {};
+    const a = (u.plan && u.plan.intake) || {};
     const focus = prog.style === 'bb' && a.style === 'bb' ? (a.focus || []).filter(f => f !== 'all') : [];
-    const pageIds = prog.list.map((d, i) => {
-      const page = { id: 'pg' + uid(), kind: 'program', builtin: false, prog: id, day: i,
+    return prog.list.map((d, i) => {
+      const old = same.find(p => p.day === i);
+      const page = { id: old ? old.id : 'pg' + uid(), kind: 'program', builtin: false, prog: prog.id, day: i,
         name: `يوم ${i + 1} · ${d.t}`, desc: '', exercises: d.ex.map(s => buildEx(s, focus, reuse)) };
       u.pages.push(page);
       return page.id;
     });
+  }
+  function startProgram(u, id) {
+    const prog = getProg(u, id);
+    if (!prog) return;
+    const plan = u.plan = Object.assign({}, u.plan);
+    const pageIds = programPages(u, prog);
     plan.active = { id, start: today(), at: Date.now(), pageIds };
-    ui.progBrowse = false; ui.progOpen = null; ui.heroOpen = false; ui.confirm = null;
+    ui.progBrowse = false; ui.progOpen = null; ui.heroOpen = false; ui.confirm = null; ui.wiz = null;
     saveDB();
     renderApp();
     window.scrollTo(0, 0);
@@ -2772,7 +2873,7 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
   function stopProgram(u) {
     const plan = u.plan;
     if (!plan || !plan.active) return;
-    const name = (PROG_BY_ID[plan.active.id] || {}).name || '';
+    const name = (getProg(u, plan.active.id) || {}).name || '';
     u.pages = u.pages.filter(p => !p.prog);
     plan.active = null;
     ui.confirm = null; ui.progBrowse = true;
@@ -2991,6 +3092,10 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
         <p id="wz-err" class="mt-4 text-sm font-bold text-slate-800 empty:hidden" role="alert">${esc(w.err)}</p>
         <button type="submit" class="btn-dark h-12 w-full mt-5 text-base ia">${w.i >= steps.length - 1 ? `${icon('sparkle', 'w-5 h-5')} اعرض الجداول المناسبة لي` : 'متابعة'}</button>
       </form>
+      <div class="max-w-2xl flex flex-wrap items-center gap-3 rounded-2xl border-2 border-dashed border-slate-300 bg-white/70 p-4">
+        <p class="flex-1 min-w-[12rem] text-sm text-slate-600 leading-6"><b class="text-slate-900">تعرف وش تبي؟</b> اصنع برنامجك بنفسك: أيامك وتمارينك وجولاتك، ولكل تمرين بدائل بنفس الفعالية.</p>
+        <button type="button" data-act="bd-new" class="btn-ghost h-10 text-sm">${icon('plus', 'w-4 h-4')} اصنع برنامجك</button>
+      </div>
     </section>`;
   }
   function weekMini(p) {
@@ -3014,7 +3119,8 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
           ${d.cardio ? `<span class="text-[11.5px] font-bold text-slate-500">+ ${d.cardio.map(c => `${esc(c[0])} <span class="num">${c[1]}</span> د`).join(' + ')}</span>` : ''}
         </div>
         <ul class="divide-y divide-slate-100">${d.ex.map(s => {
-          const L = XL[s.k];
+          const L = s.k ? XL[s.k] : null;
+          if (!L) return `<li class="px-3 py-2 flex items-center gap-3"><span class="w-12 h-11 rounded-xl bg-slate-50 border border-slate-200 shrink-0 grid place-items-center"><svg viewBox="0 0 48 48" class="w-8 h-8" aria-hidden="true">${GLYPH[guessMeta(s.n).glyph] || GLYPH.dumbbell}</svg></span><span class="min-w-0 flex-1 text-sm font-bold text-slate-800 leading-snug">${esc(s.n)}</span><span class="num text-[13px] font-bold text-slate-700 shrink-0" dir="ltr">${specLabel(s, false)}</span></li>`;
           const star = focus.length > 0 && focusHit(L[2][0], focus);
           const xt = XT[s.k];
           return `<li><button type="button" data-act="guide-key" data-k="${s.k}" class="w-full text-start px-3 py-2 flex items-center gap-3 hover:bg-slate-50 transition-colors">
@@ -3034,14 +3140,14 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
     const act = u.plan && u.plan.active;
     const isActive = !!act && act.id === p.id;
     const focus = ctx && ctx.style === 'bb' && p.style === 'bb' ? (ctx.focus || []).filter(f => f !== 'all') : [];
-    const tags = [p.levels.map(l => LEVELS[l][0]).join(' / ')]
+    const tags = p.custom ? ['من تصميمك'] : [p.levels.map(l => LEVELS[l][0]).join(' / ')]
       .concat(p.style === 'bb' ? p.goals.map(g => PGOALS[g] ? PGOALS[g][0].split(' ')[0] : '') : [p.sub]);
     const switching = ui.confirm === 'switch:' + p.id;
     const T = progTone(p);
     return `<article class="card prog-card overflow-hidden ${rec ? 'ring-2 ring-slate-800' : ''}" style="--tone:${T.bg};--on:${T.fg}">
       <div class="prog-band px-4 sm:px-5 pt-3.5 pb-3 flex items-start justify-between gap-3">
         <div class="min-w-0">
-          <p class="text-xs font-bold prog-band-sub">${STYLE_LABEL[p.style]}${p.sub ? ` · ${esc(p.sub)}` : ''}</p>
+          <p class="text-xs font-bold prog-band-sub">${p.custom ? 'برنامجك الخاص' : STYLE_LABEL[p.style]}${p.sub ? ` · ${esc(p.sub)}` : ''}</p>
           <h3 class="font-display font-extrabold text-xl leading-snug">${esc(p.name)}</h3>
         </div>
         <div class="flex flex-col items-end gap-1.5 shrink-0">
@@ -3055,14 +3161,17 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
       <p class="mt-2 flex flex-wrap items-center gap-1.5 text-[12px] font-bold text-slate-500">ينفع: ${placeTags(progPlaces(p))}</p>
       <div class="mt-3">${weekMini(p)}</div>
       ${switching ? `<div class="mt-4 flex flex-wrap items-center gap-2 rounded-xl bg-slate-100 border border-slate-200 p-2.5 text-sm fade-in" role="alert">
-          <span class="px-1 text-slate-700 font-bold flex-1 min-w-[10rem]">تبدّل برنامجك الحالي «${esc((PROG_BY_ID[act.id] || {}).name || '')}»؟ صفحات أيامه تنحذف وسجلاتك تبقى.</span>
+          <span class="px-1 text-slate-700 font-bold flex-1 min-w-[10rem]">تبدّل برنامجك الحالي «${esc((getProg(u, act.id) || {}).name || '')}»؟ صفحات أيامه تنحذف وسجلاتك تبقى.</span>
           <button data-act="prog-start" data-id="${p.id}" class="btn-dark h-9 px-3 text-sm">نعم، بدّل</button>
           <button data-act="cancel-confirm" class="btn-ghost h-9 px-3 text-sm">إلغاء</button>
         </div>` : `<div class="mt-4 flex flex-wrap gap-2">
           ${isActive ? `<button data-act="prog-back" class="btn-ghost h-10 text-sm">${icon('calendar', 'w-4 h-4')} افتح برنامجك</button>`
             : `<button data-act="${act ? 'prog-switch' : 'prog-start'}" data-id="${p.id}" class="btn-dark h-10 text-sm">${icon('check', 'w-4 h-4')} ابدأ هذا البرنامج</button>`}
           <button data-act="prog-open" data-id="${p.id}" aria-expanded="${open}" class="btn-ghost h-10 text-sm">${open ? 'إخفاء الجدول' : 'عرض الجدول كامل'}</button>
+          ${p.custom ? `<button data-act="bd-edit" data-id="${esc(p.id)}" class="btn-ghost h-10 text-sm">${icon('clip', 'w-4 h-4')} تعديل</button>
+            <button data-act="ask-confirm" data-key="bd-del:${esc(p.id)}" class="btn-ghost h-10 text-sm" aria-label="حذف ${esc(p.name)}">${icon('trash', 'w-4 h-4')}</button>` : ''}
         </div>`}
+      ${p.custom && ui.confirm === 'bd-del:' + p.id ? `<div class="mt-3">${confirmStrip(`تحذف «${esc(p.name)}»؟${isActive ? ' هو برنامجك الحالي، وبيوقف وتنحذف صفحات أيامه.' : ''} سجلات تمارينك تبقى.`, 'bd-del', esc(p.id))}</div>` : ''}
       ${open ? `<div class="mt-4">${progDetail(p, focus)}</div>` : ''}
       </div>
     </article>`;
@@ -3084,7 +3193,7 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
       <ul class="mt-4 grid sm:grid-cols-2 gap-2">${recReasons(u, p, a).map(r => `<li class="flex items-start gap-2 text-sm"><span class="mt-0.5 w-5 h-5 rounded-full bg-white/15 grid place-items-center shrink-0">${icon('check', 'w-3.5 h-3.5')}</span><span>${esc(r)}</span></li>`).join('')}</ul>
       <div class="mt-4">${weekMini(p).replace(/bg-slate-50 text-slate-400 border border-slate-200/g, 'bg-white/10 text-slate-300').replace(/bg-slate-800 text-white/g, 'bg-white text-slate-900').replace(/bg-slate-200 text-slate-700/g, 'bg-white/40 text-white')}</div>
       ${switching ? `<div class="mt-5 flex flex-wrap items-center gap-2 rounded-xl bg-white/10 p-2.5 text-sm" role="alert">
-          <span class="px-1 font-bold flex-1 min-w-[10rem]">تبدّل برنامجك الحالي «${esc((PROG_BY_ID[act.id] || {}).name || '')}»؟ صفحات أيامه تنحذف وسجلاتك تبقى.</span>
+          <span class="px-1 font-bold flex-1 min-w-[10rem]">تبدّل برنامجك الحالي «${esc((getProg(u, act.id) || {}).name || '')}»؟ صفحات أيامه تنحذف وسجلاتك تبقى.</span>
           <button data-act="prog-start" data-id="${p.id}" class="btn-light h-9 px-3 text-sm">نعم، بدّل</button>
           <button data-act="cancel-confirm" class="h-9 px-3 rounded-xl border border-white/25 font-bold text-sm">إلغاء</button>
         </div>` : `<div class="mt-5 flex flex-wrap gap-2">
@@ -3193,6 +3302,7 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
         <p class="text-sm text-slate-500 flex items-start gap-2">${icon('info', 'w-4 h-4 shrink-0 mt-1')}<span>${esc(T.note)}</span></p>
       </div>
       ${hero ? recHero(u, PROG_BY_ID[recId], ctx) : ''}
+      ${myProgramsSection(u)}
       <div class="flex flex-wrap items-center justify-between gap-3">
         ${place === 'gym' ? `<div class="inline-flex p-1 rounded-2xl bg-slate-100" role="tablist" aria-label="نوع التدريب">${['bb', 'pl'].map(st => `<button role="tab" data-act="prog-tab" data-v="${st}" aria-selected="${tab === st}" class="seg ${tab === st ? 'seg-on' : ''}">${STYLE_LABEL[st]} <span class="num text-xs text-slate-400">${progsAt('gym', st).length}</span></button>`).join('')}</div>`
           : `<h2 class="font-display font-extrabold text-xl text-slate-900 flex items-center gap-2"><span class="place-ic ia">${icon(T.ic, 'w-4 h-4')}</span>${esc(T.t)}</h2>`}
@@ -3364,11 +3474,13 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
     const { act, prog } = info;
     const blockDone = prog.block && info.week > prog.block;
     const side = `<div class="flex flex-wrap gap-2">
+      ${prog.custom ? `<button data-act="bd-edit" data-id="${esc(prog.id)}" class="btn-dark h-10 text-sm">${icon('clip', 'w-4 h-4')} عدّل برنامجك</button>` : ''}
       <button data-act="prog-browse" class="btn-ghost h-10 text-sm">${icon('layers', 'w-4 h-4')} غيّر البرنامج</button>
-      <button data-act="wiz-start" class="btn-ghost h-10 text-sm">${icon('sparkle', 'w-4 h-4')} أعد الأسئلة</button>
+      <button data-act="bd-new" class="btn-ghost h-10 text-sm">${icon('plus', 'w-4 h-4')} اصنع برنامجك</button>
+      ${prog.custom ? '' : `<button data-act="wiz-start" class="btn-ghost h-10 text-sm">${icon('sparkle', 'w-4 h-4')} أعد الأسئلة</button>`}
     </div>`;
     return `<section class="space-y-6 fade-in">
-      ${pageHeader(`برنامجك · ${STYLE_LABEL[prog.style]}${prog.sub ? ` · ${esc(prog.sub)}` : ''}`, esc(prog.name), `بدأته ${esc(longDate(act.start))} · الأسبوع <span class="num">${info.week}</span>${prog.block ? ` من بلوك <span class="num">${prog.block}</span> أسابيع` : ''}`, side)}
+      ${pageHeader(`برنامجك · ${prog.custom ? 'من تصميمك' : STYLE_LABEL[prog.style]}${prog.sub ? ` · ${esc(prog.sub)}` : ''}`, esc(prog.name), `بدأته ${esc(longDate(act.start))} · الأسبوع <span class="num">${info.week}</span>${prog.block ? ` من بلوك <span class="num">${prog.block}</span> أسابيع` : ''}`, side)}
       <div class="space-y-2">
         <p class="text-sm font-bold text-slate-600">جداول ثانية حسب مكان تمرينك</p>
         <div class="place-strip">${placeTiles(null)}</div>
@@ -3398,6 +3510,7 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
     </section>`;
   }
   function programsView(u) {
+    if (ui.builder) return builderPage(u);
     const info = planInfo(u);
     if (!ui.wiz && !(u.plan && u.plan.intake) && !info) wizInit(u);
     if (ui.wiz) return wizardPage(u);
@@ -3406,11 +3519,11 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
   }
   // Workout page of a program day: where it sits in the program, warm-up, RPE week, cardio after
   function programBanner(u, page) {
-    const prog = PROG_BY_ID[page.prog];
+    const prog = getProg(u, page.prog);
     if (!prog) return '';
     const info = planInfo(u);
     const d = prog.list[page.day] || { t: '' };
-    const mine = !!info && info.prog === prog;
+    const mine = !!info && info.prog.id === prog.id;
     const isToday = mine && info.slot === page.day;
     const wk = mine ? info.week : 1;
     const add = prog.rpeStep ? (Math.min(wk, prog.block) - 1) * prog.rpeStep : 0;
@@ -3439,7 +3552,7 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
     if (!info) return `<div class="card p-4 flex flex-wrap items-center gap-3">
       <span class="w-11 h-11 rounded-2xl bg-slate-800 text-white grid place-items-center shrink-0 ia">${icon('clip', 'w-5 h-5')}</span>
       <div class="flex-1 min-w-[12rem]"><p class="font-display font-bold text-slate-900">جديد: البرامج التدريبية</p><p class="text-sm text-slate-500">جاوب على أسئلة سريعة (وزنك وطولك وعمرك وهدفك) ونرشح لك جدول بودي بلدنق أو باورلفتنق.</p></div>
-      <button data-act="nav" data-v="programs" class="btn-dark h-10 text-sm">اختر برنامجك</button>
+      <div class="flex flex-wrap gap-2"><button data-act="nav" data-v="programs" class="btn-dark h-10 text-sm">اختر برنامجك</button><button data-act="bd-new" class="btn-ghost h-10 text-sm">${icon('plus', 'w-4 h-4')} اصنع برنامجك</button></div>
     </div>`;
     const { act, prog, slot } = info;
     const page = typeof slot === 'number' ? dayPage(u, act, slot) : null;
@@ -3452,6 +3565,261 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
         : slot === 'c' ? `<button data-act="nav" data-v="cardio" class="btn-dark h-10 text-sm">سجّل الكارديو</button>`
         : `<button data-act="nav" data-v="programs" class="btn-ghost h-10 text-sm">البرنامج</button>`}
     </div>`;
+  }
+
+  /* =========================================================
+     Build your own program: days, exercises from the library (or typed), sets × reps,
+     the week layout, and for every exercise its alternatives by equipment.
+     Starts blank, from a template (Push Pull Legs, a 6-day split) or from a ready program.
+     ========================================================= */
+  const BD_REPS = [[5, 5], [6, 6], [8, 8], [10, 10], [12, 12], [15, 15], [20, 20], [6, 8], [8, 10], [8, 12], [10, 12], [12, 15], [15, 20]];
+  const repsTxt = r => r[0] === r[1] ? `${r[0]}` : `\u200E${r[0]}–${r[1]}`;
+  const TEMPLATES = {
+    ppl: { name: 'Push · Pull · Legs', week: [0, 1, 2, 'r', 0, 1, 2], list: [
+      { t: 'Push · صدر وأكتاف وترايسبس', ex: ['pullover', 'cfly', 'dbshp', 'dblat', 'dbfront', 'pushdown', 'ohext'] },
+      { t: 'Pull · ظهر وبايسبس', ex: ['latpd', 'srow', 'dbrfly', 'dbrow1', 'tbar', 'altcurl', 'preacher'] },
+      { t: 'Legs · أرجل وساعد وبطن', ex: ['squat', 'hacksq', 'lcurl', 'lext', 'scalf', 'wcurl', 'situp'] }
+    ] },
+    split6: { name: 'تقسيم 6 أيام', week: [0, 1, 2, 3, 4, 5, 'r'], list: [
+      { t: 'صدر + ترايسبس', ex: ['bench', 'inclinedb', 'cfly', 'rope', 'dbtri', 'skull'] },
+      { t: 'ظهر + بايسبس', ex: ['latpd', 'srow', 'csrow', 'bbcurl', 'ihammer', 'preacher'] },
+      { t: 'أرجل', ex: ['hacksq', 'lext', 'adductor', 'lcurl', 'shcurl', 'lpress'] },
+      { t: 'أكتاف', ex: ['rear', 'dbfront', 'dblat', 'dbrfly', 'dbshp', 'arnold'] },
+      { t: 'ذراعين', ex: ['rope', 'dbtri', 'skull', 'bbcurl', 'ihammer', 'preacher'] },
+      { t: 'فل بدي', ex: ['squat', 'inclinedb', 'brow', 'latpd', 'bcurl', 'rope'] }
+    ] }
+  };
+  const TPL_CHIPS = [['blank', 'صفحة فاضية'], ['ppl', 'Push · Pull · Legs'], ['split6', 'تقسيم 6 أيام']];
+  // a template, a ready program or one of yours → an editable draft
+  function bdDraft(src, id) {
+    const days = (src.list || []).map((d, i) => ({ t: d.t || `اليوم ${i + 1}`, ex: (d.ex || []).map(x => mySpec(typeof x === 'string' ? { k: x, sets: 3, reps: [10, 12] } : { k: x.k, n: x.n, sets: x.sets || 3, reps: x.reps === 'amrap' ? [8, 12] : x.reps })).filter(Boolean) }));
+    const list = days.length ? days : [{ t: 'اليوم 1', ex: [] }];
+    const week = Array.isArray(src.week) && src.week.length === 7 ? src.week.map(x => (Number.isInteger(x) && x < list.length) || x === 'c' ? x : 'r') : DEFAULT_WEEK[list.length].slice();
+    return { id: id || null, name: src.name || 'برنامجي', week, days: list, err: '', alt: null, touched: false };
+  }
+  function bdOpen(u, id) {
+    const c = id ? myPrograms(u).find(p => p.id === id) : null;
+    ui.builder = c ? bdDraft(c, c.id) : bdDraft({ name: 'برنامجي', list: [{ t: 'اليوم 1', ex: [] }] });
+    ui.confirm = null; ui.pick = null;
+    if (view !== 'programs') setView('programs'); else renderApp();
+    window.scrollTo(0, 0);
+  }
+  function bdApply(key) {
+    const b = ui.builder;
+    if (!b) return;
+    const src = TEMPLATES[key] || (key.startsWith('prog:') ? PROG_BY_ID[key.slice(5)] : null);
+    const next = src ? bdDraft(src, b.id) : bdDraft({ name: b.name, list: [{ t: 'اليوم 1', ex: [] }] }, b.id);
+    if (b.id || (b.name && b.name !== 'برنامجي' && !src)) next.name = b.name;
+    ui.builder = next; ui.confirm = null;
+    renderApp();
+  }
+  const bdHasWork = b => !!b && b.days.some(d => d.ex.length);
+  function bdReweek(b) { if (!b.touched) b.week = DEFAULT_WEEK[b.days.length].slice(); }
+  function bdWeekLabel(x) { return x === 'r' ? 'راحة' : x === 'c' ? 'كارديو' : `يوم ${x + 1}`; }
+  function bdExRow(x, di, i, n) {
+    const L = x.k ? XL[x.k] : null;
+    const fig = x.k && XT[x.k] ? XT[x.k][0] : guessMeta(x.n).fig;
+    const alts = altsFor({ name: L ? L[0] : x.n });
+    const open = ui.builder.alt === `${di}:${i}`;
+    const repOpts = BD_REPS.some(r => r[0] === x.reps[0] && r[1] === x.reps[1]) ? BD_REPS : BD_REPS.concat([x.reps]);
+    const thumb = FIGS[fig] ? figSVG(fig, 'w-full h-full', !!x.k && FIG_NOEQ.has(x.k)) : `<svg viewBox="0 0 48 48" class="w-8 h-8 m-auto mt-2" aria-hidden="true">${GLYPH[x.k ? XL[x.k][3] : guessMeta(x.n).glyph] || GLYPH.dumbbell}</svg>`;
+    return `<li class="p-3">
+      <div class="flex items-start gap-3">
+        ${x.k ? `<button type="button" data-act="guide-key" data-k="${x.k}" class="w-14 h-12 rounded-xl bg-slate-50 border border-slate-200 shrink-0 overflow-hidden" aria-label="شرح ${esc(L[0])}">${thumb}</button>` : `<span class="w-14 h-12 rounded-xl bg-slate-50 border border-slate-200 shrink-0 overflow-hidden">${thumb}</span>`}
+        <div class="flex-1 min-w-0">
+          <p class="font-bold text-slate-900 leading-snug text-[14px]">${esc(L ? L[0] : x.n)}</p>
+          ${L ? `<p class="text-[12px] text-slate-500 leading-snug">${esc(L[1])} · <b class="text-slate-600">${EQUIP[equipOf(x.k)]}</b></p>` : '<p class="text-[12px] text-slate-500">تمرين كتبته بنفسك</p>'}
+          <div class="mt-2 flex flex-wrap items-center gap-1.5">
+            <label class="sr-only" for="bd-s-${di}-${i}">عدد الجولات</label>
+            <select id="bd-s-${di}-${i}" class="inp num h-9 text-sm" style="width:auto;padding-inline-end:2rem">${[1, 2, 3, 4, 5, 6, 7, 8].map(v => `<option value="${v}" ${v === x.sets ? 'selected' : ''}>${v}</option>`).join('')}</select>
+            <span class="text-xs text-slate-400" aria-hidden="true">×</span>
+            <label class="sr-only" for="bd-r-${di}-${i}">العدات</label>
+            <select id="bd-r-${di}-${i}" class="inp num h-9 text-sm" style="width:auto;padding-inline-end:2rem">${repOpts.map(r => `<option value="${r[0]}-${r[1]}" ${r[0] === x.reps[0] && r[1] === x.reps[1] ? 'selected' : ''}>${repsTxt(r)}</option>`).join('')}</select>
+            <span class="text-xs text-slate-500">عدة</span>
+            ${alts.length ? `<button type="button" data-act="bd-alt" data-d="${di}" data-i="${i}" aria-expanded="${open}" class="chip h-9 ${open ? 'chip-on' : ''}">${icon('swap', 'w-4 h-4')} البدائل <span class="num opacity-70">${alts.length}</span></button>` : ''}
+          </div>
+        </div>
+        <div class="flex flex-col gap-0.5 shrink-0">
+          <button type="button" data-act="bd-ex-up" data-d="${di}" data-i="${i}" class="icon-btn w-8 h-8 disabled:opacity-30" ${i === 0 ? 'disabled' : ''} aria-label="فوق">${icon('up', 'w-4 h-4')}</button>
+          <button type="button" data-act="bd-ex-down" data-d="${di}" data-i="${i}" class="icon-btn w-8 h-8 disabled:opacity-30" ${i === n - 1 ? 'disabled' : ''} aria-label="تحت">${icon('down', 'w-4 h-4')}</button>
+          <button type="button" data-act="bd-ex-del" data-d="${di}" data-i="${i}" class="icon-btn w-8 h-8" aria-label="حذف التمرين">${icon('trash', 'w-4 h-4')}</button>
+        </div>
+      </div>
+      ${open ? `<div class="mt-3 rounded-2xl bg-slate-50 border border-slate-200 p-3 fade-in">
+        <p class="font-display font-bold text-slate-900">بدائل بنفس الفعالية</p>
+        <p class="text-[12px] text-slate-500 leading-5 mb-2.5">اختر اللي متوفر عندك: نفس العضلات ونفس الحركة، والجولات والعدات تبقى.</p>
+        ${altListHTML({ name: L ? L[0] : x.n }, { act: 'bd-swap', attrs: `data-d="${di}" data-i="${i}"` })}
+      </div>` : ''}
+    </li>`;
+  }
+  function builderPage(u) {
+    const b = ui.builder;
+    const n = b.days.length;
+    const act = u.plan && u.plan.active;
+    const editingActive = !!b.id && !!act && act.id === b.id;
+    const per = b.week.filter(x => x !== 'r').length;
+    const pending = ui.confirm && ui.confirm.startsWith('bd-tpl:') ? ui.confirm.slice(7) : '';
+    const ready = PROGRAMS.filter(p => p.style === 'bb');
+    return `<section class="space-y-5 fade-in">
+      ${pageHeader('البرامج التدريبية', b.id ? 'عدّل برنامجك' : 'اصنع برنامجك بنفسك', 'رتّب أيامك وتمارينك وجولاتك. وعند كل تمرين زر «البدائل»: تمارين بنفس الفعالية بالبار أو الدمبل أو الجهاز أو الكيبل أو الهيكس بار.', `<button data-act="bd-cancel" class="btn-ghost h-10 text-sm">${icon('x', 'w-4 h-4')} إلغاء</button>`)}
+      <div class="card p-4 sm:p-5 space-y-5">
+        <div>
+          <p class="lbl">ابدأ من</p>
+          <div class="flex flex-wrap gap-2">${TPL_CHIPS.map(([k, label]) => `<button type="button" data-act="bd-tpl" data-v="${k}" class="chip h-9">${k === 'blank' ? icon('plus', 'w-4 h-4') : icon('layers', 'w-4 h-4')} ${esc(label)}</button>`).join('')}</div>
+          <label class="sr-only" for="bd-copy">انسخ جدول جاهز</label>
+          <select id="bd-copy" class="inp h-10 mt-2 text-sm"><option value="">أو انسخ جدول جاهز وعدّل عليه…</option>${ready.map(p => `<option value="prog:${p.id}">${esc(p.name)} · ${p.per} أيام</option>`).join('')}</select>
+          ${pending ? `<div class="mt-3">${confirmStrip('يتبدل اللي صممته الحين بالقالب الجديد. متأكد؟', 'bd-tpl-ok', esc(pending), '', 'نعم، بدّل')}</div>` : ''}
+        </div>
+        <div><label class="lbl" for="bd-name">اسم البرنامج</label><input id="bd-name" class="inp h-12" maxlength="40" autocomplete="off" value="${esc(b.name)}" placeholder="مثال: برنامجي الصيفي"></div>
+        <div>
+          <div class="flex items-baseline justify-between gap-2"><p class="lbl">توزيع الأسبوع</p><span class="text-[11px] text-slate-400">اضغط أي يوم لتغييره</span></div>
+          <div class="grid grid-cols-7 gap-1">${b.week.map((x, i) => `<button type="button" data-act="bd-week" data-i="${i}" class="h-12 rounded-xl grid place-items-center text-[11px] font-bold leading-tight px-0.5 ${typeof x === 'number' ? 'bg-slate-800 text-white' : x === 'c' ? 'bg-slate-200 text-slate-700' : 'bg-white text-slate-400 border border-dashed border-slate-300'}" aria-label="اليوم ${i + 1} من الأسبوع: ${bdWeekLabel(x)}">${typeof x === 'number' ? `<span>يوم<br><span class="num text-[14px]">${x + 1}</span></span>` : bdWeekLabel(x)}</button>`).join('')}</div>
+          <p class="text-[11.5px] text-slate-500 mt-1.5">الأسبوع يبدأ من يوم ما تبدأ البرنامج: ${per === 1 ? 'يوم تمرين واحد' : per === 2 ? 'يومين تمرين' : `<span class="num">${per}</span> أيام تمرين`}${per === 7 ? ' بدون راحة' : ` و${7 - per === 1 ? 'يوم راحة' : 7 - per === 2 ? 'يومين راحة' : `<span class="num">${7 - per}</span> أيام راحة`}`}.</p>
+        </div>
+      </div>
+      ${b.days.map((d, di) => `<article class="card overflow-hidden">
+        <div class="px-3 sm:px-4 py-3 bg-slate-50 border-b border-slate-200 flex items-center gap-2">
+          <span class="w-9 h-9 rounded-xl bg-slate-800 text-white grid place-items-center num font-extrabold shrink-0">${di + 1}</span>
+          <label class="sr-only" for="bd-dt-${di}">اسم اليوم ${di + 1}</label>
+          <input id="bd-dt-${di}" class="inp h-10 flex-1 min-w-0 font-bold" maxlength="40" autocomplete="off" value="${esc(d.t)}" placeholder="مثال: صدر + ترايسبس">
+          ${n > 1 ? `<button type="button" data-act="ask-confirm" data-key="bd-day:${di}" class="icon-btn" aria-label="حذف اليوم ${di + 1}">${icon('trash', 'w-4 h-4')}</button>` : ''}
+        </div>
+        ${ui.confirm === 'bd-day:' + di ? `<div class="px-3 pt-3">${confirmStrip(`تحذف اليوم ${di + 1}${d.ex.length ? ' مع تمارينه' : ''}؟`, 'bd-day-del', String(di))}</div>` : ''}
+        ${d.ex.length ? `<ul class="divide-y divide-slate-100">${d.ex.map((x, i) => bdExRow(x, di, i, d.ex.length)).join('')}</ul>` : '<p class="px-4 pt-4 text-sm text-slate-500">ما فيه تمارين بعد. أضف من المكتبة أو اكتب اسم تمرين.</p>'}
+        <div class="p-3"><button type="button" data-act="bd-add" data-d="${di}" class="btn-ghost h-11 w-full">${icon('plus', 'w-4 h-4')} أضف تمارين لليوم ${di + 1}</button></div>
+      </article>`).join('')}
+      ${n < 7 ? `<button type="button" data-act="bd-day-add" class="nav-add justify-center h-12">${icon('plus', 'w-4 h-4')} أضف يوم تمرين</button>` : ''}
+      <p id="bd-err" class="text-sm font-bold text-slate-800 empty:hidden" role="alert">${esc(b.err || '')}</p>
+      <div class="sticky z-30 glass rounded-2xl p-2 flex flex-wrap gap-2" style="bottom:calc(12px + env(safe-area-inset-bottom,0px))">
+        <button type="button" data-act="bd-save" data-start="1" class="btn-dark h-12 flex-1 min-w-[10rem]">${icon('check', 'w-4 h-4')} ${editingActive ? 'احفظ التعديلات' : act ? 'احفظ وبدّل له' : 'احفظ وابدأ البرنامج'}</button>
+        ${editingActive ? '' : '<button type="button" data-act="bd-save" class="btn-ghost h-12">احفظ بس</button>'}
+      </div>
+    </section>`;
+  }
+  // ---- exercise picker (modal) ----
+  const normAr = v => String(v || '').toLowerCase().replace(/[ً-ْـ]/g, '').replace(/[أإآ]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي').replace(/[-–·()]/g, ' ').replace(/\s+/g, ' ').trim();
+  let pickKeysCache = null;           // built on first use: the library tables are defined further down
+  function pickKeys() {
+    if (!pickKeysCache) {
+      const seen = new Set();
+      pickKeysCache = Object.keys(XL).filter(k => !LIB_SKIP.has(k) && XT[k]).filter(k => { const nm = exKey(XL[k][0]); if (seen.has(nm)) return false; seen.add(nm); return true; });
+    }
+    return pickKeysCache;
+  }
+  function pickerList() {
+    const P = ui.pick, b = ui.builder;
+    const day = b && P ? b.days[P.d] : null;
+    if (!day) return '';
+    const have = new Set(day.ex.map(x => x.k).filter(Boolean));
+    const q = normAr(P.q);
+    const words = q ? q.split(' ') : [];
+    const hit = k => {
+      const L = XL[k];
+      if (P.e && equipOf(k) !== P.e) return false;
+      if (!words.length) return true;
+      const hay = normAr(`${L[0]} ${L[1]} ${XT[k][1]} ${L[2].map(m => MUSCLE[m]).join(' ')} ${EQUIP[equipOf(k)]}`);
+      return words.every(w => hay.includes(w));
+    };
+    const groups = FOCUS.filter(([g]) => !P.g || P.g === g).map(([g, label]) => ({ label, keys: pickKeys().filter(k => (FOCUS_MUSCLES[g] || []).includes(XL[k][2][0]) && hit(k)).sort((x, y) => EQ_ORDER.indexOf(equipOf(x)) - EQ_ORDER.indexOf(equipOf(y))) })).filter(g => g.keys.length);
+    if (!groups.length) return `<p class="text-sm text-slate-500 text-center py-8">ما لقينا تمرين بهذا الاسم. اكتبه تحت وأضفه كتمرين من عندك.</p>`;
+    return groups.map(g => `<div class="mb-4">
+      ${P.g ? '' : `<p class="text-xs font-extrabold text-slate-500 mb-2">${esc(g.label)} <span class="num text-slate-400">${g.keys.length}</span></p>`}
+      <ul class="grid sm:grid-cols-2 gap-2">${g.keys.map(k => {
+        const L = XL[k], on = have.has(k);
+        return `<li><button type="button" data-act="pk-add" data-k="${k}" aria-pressed="${on}" class="w-full text-start flex items-center gap-2.5 rounded-xl border p-1.5 pe-2.5 transition-colors ${on ? 'bg-slate-800 border-slate-800 text-white' : 'bg-white border-slate-200 hover:border-slate-400'}">
+          <span class="w-14 h-12 rounded-lg bg-slate-50 border border-slate-200 shrink-0 overflow-hidden">${figSVG(XT[k][0], 'w-full h-full', FIG_NOEQ.has(k))}</span>
+          <span class="min-w-0 flex-1"><span class="block text-[13px] font-bold leading-snug">${esc(L[0])}</span><span class="block text-[11.5px] leading-snug ${on ? 'text-slate-300' : 'text-slate-500'}">${esc(L[1])} · ${EQUIP[equipOf(k)]}</span></span>
+          <span class="w-7 h-7 rounded-full grid place-items-center shrink-0 ${on ? 'bg-white text-slate-900' : 'border border-slate-300 text-slate-400'}">${icon(on ? 'check' : 'plus', 'w-4 h-4')}</span>
+        </button></li>`;
+      }).join('')}</ul>
+    </div>`).join('');
+  }
+  function pickerView() {
+    const P = ui.pick, b = ui.builder;
+    const day = b && P ? b.days[P.d] : null;
+    if (!day) return '';
+    return `<div class="fixed inset-0 z-[80] flex items-end sm:items-center justify-center bg-slate-900/40 backdrop-blur-[2px] gutter" data-act="modal-bg">
+      <div role="dialog" aria-modal="true" aria-labelledby="pk-title" class="modal-card w-full sm:max-w-2xl bg-white rounded-t-3xl sm:rounded-3xl shadow-2xl flex flex-col" style="max-height:92vh">
+        <div class="p-4 sm:p-5 border-b border-slate-200 space-y-3">
+          <div class="flex items-start justify-between gap-3">
+            <div class="min-w-0"><h2 id="pk-title" class="font-display font-extrabold text-xl text-slate-900">أضف تمارين · اليوم <span class="num">${P.d + 1}</span></h2><p class="text-sm text-slate-500"><span id="pk-count" class="num">${day.ex.length}</span> تمارين في «${esc(day.t)}»</p></div>
+            <button type="button" data-act="pk-done" data-autofocus class="icon-btn" aria-label="إغلاق">${icon('x')}</button>
+          </div>
+          <label class="sr-only" for="pk-q">ابحث عن تمرين</label>
+          <input id="pk-q" class="inp h-11" autocomplete="off" placeholder="ابحث: بنش، سكوات، تي بار، هيكس…" value="${esc(P.q || '')}">
+          <div class="flex gap-2 overflow-x-auto no-scrollbar -mx-1 px-1" role="group" aria-label="العضلة">${[['', 'الكل']].concat(FOCUS).map(([g, label]) => `<button type="button" data-act="pk-group" data-v="${g}" aria-pressed="${(P.g || '') === g}" class="chip h-8 shrink-0 ${(P.g || '') === g ? 'chip-on' : ''}">${esc(label)}</button>`).join('')}</div>
+          <div class="flex gap-2 overflow-x-auto no-scrollbar -mx-1 px-1" role="group" aria-label="الأداة">${[['', 'كل الأدوات']].concat(EQ_ORDER.map(e => [e, EQUIP[e]])).map(([e, label]) => `<button type="button" data-act="pk-eq" data-v="${e}" aria-pressed="${(P.e || '') === e}" class="chip h-8 shrink-0 ${(P.e || '') === e ? 'chip-on' : ''}">${esc(label)}</button>`).join('')}</div>
+        </div>
+        <div id="pk-list" class="flex-1 overflow-y-auto p-3 sm:p-4">${pickerList()}</div>
+        <div class="p-3 border-t border-slate-200 flex flex-wrap gap-2 items-center" style="padding-bottom:calc(.75rem + env(safe-area-inset-bottom,0px))">
+          <label class="sr-only" for="pk-name">اسم تمرين من عندك</label>
+          <input id="pk-name" class="inp h-11 flex-1 min-w-[10rem]" maxlength="40" autocomplete="off" placeholder="تمرين مو موجود؟ اكتب اسمه">
+          <button type="button" data-act="pk-custom" class="btn-ghost h-11">أضف</button>
+          <button type="button" data-act="pk-done" class="btn-dark h-11 px-6">تم</button>
+        </div>
+      </div>
+    </div>`;
+  }
+  function refreshPicker() {
+    const box = $('#pk-list');
+    if (box) { const top = box.scrollTop; box.innerHTML = pickerList(); box.scrollTop = top; }
+    const day = ui.builder && ui.pick ? ui.builder.days[ui.pick.d] : null;
+    const c = $('#pk-count'); if (c && day) c.textContent = day.ex.length;
+  }
+  // ---- save ----
+  function bdSave(u, start) {
+    const b = ui.builder;
+    if (!b || !u) return;
+    const fail = msg => { b.err = msg; const box = $('#bd-err'); if (box) { box.textContent = msg; box.scrollIntoView({ block: 'center', behavior: 'smooth' }); } };
+    const days = b.days.map((d, i) => ({ t: String(d.t || '').trim().slice(0, 40) || `اليوم ${i + 1}`, ex: d.ex.map(mySpec).filter(Boolean) }));
+    if (!days.length) return fail('أضف يوم تمرين واحد على الأقل.');
+    const empty = days.findIndex(d => !d.ex.length);
+    if (empty >= 0) return fail(`اليوم ${empty + 1} ما فيه تمارين. أضف له تمارين أو احذفه.`);
+    const missing = days.findIndex((d, i) => !b.week.includes(i));
+    if (missing >= 0) return fail(`اليوم ${missing + 1} مو موجود بتوزيع الأسبوع. اضغط على يوم راحة بالأسبوع وخلّه اليوم ${missing + 1}.`);
+    const list = (u.plan && Array.isArray(u.plan.custom) ? u.plan.custom : []).slice();
+    if (!b.id && list.length >= MY_MAX) return fail(`عندك ${MY_MAX} برامج، وهذا الحد. احذف برنامج قديم من «برامجي» وارجع احفظ.`);
+    const rec = { id: b.id || 'my' + uid(), name: String(b.name || '').trim().slice(0, 40) || 'برنامجي', week: b.week.slice(), list: days, at: Date.now() };
+    const at = list.findIndex(c => c.id === rec.id);
+    if (at >= 0) list[at] = rec; else list.push(rec);
+    u.plan = Object.assign({}, u.plan, { custom: list });
+    const act = u.plan.active;
+    ui.builder = null; ui.confirm = null; ui.pick = null;
+    if (act && act.id === rec.id) {
+      act.pageIds = programPages(u, getProg(u, rec.id));         // same start date, pages follow the edit
+      ui.progBrowse = false;
+      saveDB(); renderApp(); window.scrollTo(0, 0);
+      toast(`حُفظ برنامجك «${rec.name}»`, 'صفحات أيامه تحدّثت، وسجلاتك محفوظة.');
+      return;
+    }
+    if (start) { startProgram(u, rec.id); return; }
+    ui.progBrowse = true;
+    saveDB(); renderApp(); window.scrollTo(0, 0);
+    toast(`حُفظ برنامجك «${rec.name}»`, 'تلقاه تحت «برامجي»، وتقدر تبدأه أي وقت.');
+  }
+  function bdDelete(u, id) {
+    const list = (u.plan && Array.isArray(u.plan.custom) ? u.plan.custom : []).filter(c => c.id !== id);
+    const gone = myPrograms(u).find(p => p.id === id);
+    u.plan = Object.assign({}, u.plan, { custom: list });
+    if (u.plan.active && u.plan.active.id === id) { u.pages = u.pages.filter(p => p.prog !== id); u.plan.active = null; ui.progBrowse = true; }
+    ui.confirm = null;
+    saveDB(); renderApp();
+    toast('حُذف البرنامج', gone ? `«${gone.name}» · سجلات تمارينك محفوظة.` : 'سجلات تمارينك محفوظة.');
+  }
+  function myProgramsSection(u) {
+    const mine = myPrograms(u);
+    return `<section class="space-y-4" aria-labelledby="my-h">
+      <div class="rounded-3xl border-2 border-dashed border-slate-300 bg-white/70 p-4 sm:p-5 flex flex-wrap items-center gap-4">
+        <span class="w-12 h-12 rounded-2xl bg-slate-800 text-white grid place-items-center shrink-0 ia">${icon('layers', 'w-6 h-6')}</span>
+        <div class="flex-1 min-w-[13rem]">
+          <h2 id="my-h" class="font-display font-extrabold text-xl text-slate-900">اصنع برنامجك بنفسك</h2>
+          <p class="text-sm text-slate-500 leading-6">اختر أيامك وتمارينك وجولاتك، أو ابدأ من قالب Push Pull Legs أو تقسيم 6 أيام. ولكل تمرين بدائل بنفس الفعالية: بار، دمبل، جهاز، كيبل أو هيكس بار.</p>
+        </div>
+        <button type="button" data-act="bd-new" class="btn-dark h-11">${icon('plus', 'w-4 h-4')} ابدأ التصميم</button>
+      </div>
+      ${mine.length ? `<div class="flex items-center gap-3"><h2 class="font-display font-extrabold text-lg text-slate-900 shrink-0">برامجي</h2><span class="h-px flex-1 bg-slate-200"></span><span class="text-xs text-slate-400"><span class="num">${mine.length}</span> من <span class="num">${MY_MAX}</span></span></div>
+        <div class="grid gap-4 lg:grid-cols-2 items-start">${mine.map(p => progCard(u, p, false, null)).join('')}</div>` : ''}
+    </section>`;
   }
 
   /* =========================================================
@@ -3666,7 +4034,14 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
     bridge: { n: 'جسر المؤخرة', v: 'side', base: { leg: { w: [82, 98], b: -1 }, arm: { a: [86, 92] } }, hi: ['th', 'torso'], p: [{ P: [58, 94], t: -92, hd: 2 }, { P: [57, 79], t: -118, hd: 28 }] },
     climber: { n: 'متسلق الجبل', v: 'side', base: { P: [50, 77], t: 72, arm: { w: [82, 98], b: -1 }, leg2: { w: [12, 96], b: 1 }, ft2: 25 }, hi: ['th', 'torso'], d: 1.1, p: [{ leg: { w: [12, 96], b: 1 }, ft: 25 }, { leg: { w: [64, 90], b: -1 }, ft: 40 }] },
     pike: { n: 'ضغط بايك', v: 'side', base: { leg: { w: [30, 97], b: 1 }, ft: 40, arm: { w: [80, 98], b: -1 } }, hi: ['ua', 'torso'], p: [{ P: [50, 58], t: 110, hd: 30 }, { P: [49, 60], t: 140, hd: 20 }] },
-    twist: { n: 'لف الجذع', v: 'front', base: F_FSTAND, hi: ['torso'], d: 2.8, p: [{ armL: { a: [88, 90] }, armR: { a: [88, 90], l: [0.35, 0.35] } }, { armL: { a: [88, 90], l: [0.35, 0.35] }, armR: { a: [88, 90] } }] }
+    twist: { n: 'لف الجذع', v: 'front', base: F_FSTAND, hi: ['torso'], d: 2.8, p: [{ armL: { a: [88, 90] }, armR: { a: [88, 90], l: [0.35, 0.35] } }, { armL: { a: [88, 90], l: [0.35, 0.35] }, armR: { a: [88, 90] } }] },
+    // more movements
+    tbar: { n: 'تجديف تي بار', v: 'side', base: { P: [54, 60], t: 52, hd: 4, leg: { a: [16, -10] } }, hi: ['torso', 'ua'], p: [{ arm: { a: [-6, -4] } }, { arm: { w: [66, 60], b: 1 } }], eq: [{ k: 'lever', from: [8, 99], at: 'W', z: -1 }, { k: 'plate', at: 'W', r: 7 }] },
+    hexdl: { n: 'ديدلفت بالهيكس بار', v: 'side', base: { leg: { w: [58, 98], b: -1 } }, hi: ['th', 'torso'], p: [{ P: [47, 75], t: 45, arm: { w: [59, 88], b: 1 } }, { P: [57, 55], t: 0, arm: { w: [59, 56], b: 1 } }], eq: [{ k: 'plate', at: 'W', r: 8 }, { k: 'handle', at: 'W' }] },
+    adduct: { n: 'جهاز الضم والفتح', v: 'front', base: { P: [60, 70], arms: { a: [14, 4] } }, hi: ['th'], p: [{ legs: { a: [62, 34], l: [0.42, 1] } }, { legs: { a: [10, 2], l: [0.42, 1] } }], eq: [{ k: 'path', d: 'M44 28H76V72H44Z', c: '#F1F5F9', f: '#F1F5F9', w: 2, z: -1 }, { k: 'pad', at: 'KL', r: 3.4 }, { k: 'pad', at: 'KR', r: 3.4 }] },
+    hipthrust: { n: 'هيب ثرست', v: 'side', base: { leg: { w: [80, 98], b: -1 }, arm: { w: ['P', 3, -4], b: 1 } }, hi: ['th', 'torso'], p: [{ P: [57, 88], t: -62, hd: 6 }, { P: [62, 72], t: -94, hd: 24 }], eq: [{ k: 'path', d: 'M14 77H40M18 79V100M36 79V100', c: '#CBD5E1', w: 5, z: -1 }, { k: 'plate', at: 'P', r: 7.5 }] },
+    pullover: { n: 'بول أوفر', v: 'side', base: { P: [40, 69], t: 90, leg: { w: [22, 98], b: 1 } }, hi: ['torso', 'ua'], p: [{ arm: { a: [178, 178] } }, { arm: { a: [108, 114] } }], eq: [EQ_BENCH, { k: 'db', at: 'W', v: true }] },
+    skull: { n: 'سكل كرشر', v: 'side', base: { P: [40, 69], t: 90, leg: { w: [22, 98], b: 1 } }, hi: ['ua', 'fa'], p: [{ arm: { a: [168, 168] } }, { arm: { a: [160, 62] } }], eq: [EQ_BENCH, { k: 'plate', at: 'W', r: 6 }] }
   };
   // Library exercise → [animation, what it targets]
   const XT = {
@@ -3699,7 +4074,20 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
     rdl: ['rdl', 'الفخذ الخلفي والمؤخرة'], pullup: ['pullup', 'عرض الظهر والبايسبس'], bcurl: ['curl', 'البايسبس'], incline: ['incline', 'الصدر العلوي'],
     katana: ['ohext', 'الرأس الطويل للترايسبس'], brow: ['bentrow', 'سماكة الظهر'], shcurl: ['legcurl', 'الفخذ الخلفي'], mlat: ['lateral', 'الكتف الجانبي'],
     rope: ['pushdown', 'الترايسبس'], dips: ['dip', 'الترايسبس والصدر السفلي'], rdext: ['reverse', 'الكتف الخلفي'], glute45: ['backext', 'المؤخرة وأسفل الظهر'],
-    preacher: ['curlp', 'البايسبس السفلي']
+    preacher: ['curlp', 'البايسبس السفلي'],
+    tbar: ['tbar', 'سماكة منتصف الظهر واللاتس'], hexdl: ['hexdl', 'الفخذ والمؤخرة والظهر بضغط أقل على أسفل الظهر'],
+    hacksq: ['squat', 'الفخذ الأمامي والمؤخرة'], pendsq: ['squat', 'الفخذ الأمامي بعمق كامل'], beltsq: ['squat', 'الأرجل بدون ضغط على الظهر'],
+    smithsq: ['squat', 'الفخذ والمؤخرة على مسار ثابت'], bulgarian: ['lunge', 'الفخذ الأمامي والمؤخرة لكل رجل'],
+    adductor: ['adduct', 'الفخذ الداخلي'], abductor: ['adduct', 'المؤخرة الجانبية والفخذ الخارجي'],
+    hipthrust: ['hipthrust', 'المؤخرة بأقوى انقباض'], ckick: ['kick', 'المؤخرة'], dbrdl: ['rdl', 'الفخذ الخلفي والمؤخرة'], scalf: ['calf', 'السمانة'],
+    inclinedb: ['benchdb', 'الصدر العلوي والكتف الأمامي'], inclinebb: ['bench', 'الصدر العلوي'], pullover: ['pullover', 'الصدر والظهر (اللاتس)'],
+    cablecross: ['fly', 'وسط الصدر وعصرته'], dbflyb: ['fly', 'تمدد الصدر وعصرته'], cgbench: ['bench', 'الترايسبس والصدر'], skull: ['skull', 'الترايسبس كامل'],
+    dbshp: ['shpress', 'الكتف الأمامي والجانبي'], ohp: ['shpress', 'الأكتاف كاملة وثبات الجذع'], arnold: ['shpress', 'الكتف الأمامي والجانبي'],
+    cablelat: ['lateral', 'الكتف الجانبي بشد ثابت'], cablefront: ['front', 'الكتف الأمامي'], facepull: ['facepull', 'الكتف الخلفي والترابيس'],
+    csrow: ['bentrow', 'منتصف الظهر والكتف الخلفي'], altcurl: ['curl', 'البايسبس'], bbcurl: ['curl', 'البايسبس كامل'], ihammer: ['curl', 'البايسبس والساعد بتمدد أكبر'],
+    ropehammer: ['curlc', 'البايسبس والساعد'], dbshrug: ['shrug', 'الترابيس'], bbshrug: ['shrug', 'الترابيس'], wcurl: ['wrist', 'عضلات الساعد السفلية'], hangraise: ['legraise', 'البطن السفلي'],
+    highrow: ['pulldown', 'عرض الظهر ومنتصفه'], vbarpd: ['pulldown', 'اللاتس من تحت'], assistpu: ['pullup', 'عرض الظهر والبايسبس بمساعدة'], sapd: ['pulldown', 'اللاتس لكل جهة'],
+    bbfront: ['front', 'الكتف الأمامي'], declinebb: ['bench', 'الجزء السفلي من الصدر'], sumodl: ['deadlift', 'المؤخرة والفخذ الداخلي والظهر'], dbdl: ['deadlift', 'السلسلة الخلفية بوزن أخف']
   };
   const XL_BY_NAME = {};
   Object.keys(XL).forEach(k => { XL_BY_NAME[String(XL[k][0]).trim().toLowerCase()] = k; });
@@ -3754,7 +4142,13 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
     bridge: [['انسدح على ظهرك والركب مثنية والقدمين قريبة من المؤخرة', 'ادفع من الكعب وارفع حوضك لين يصير جسمك خط من الكتف للركبة', 'اعصر المؤخرة ثانية فوق ونزّل ببطء'], 'لا تقوّس أسفل ظهرك فوق، الرفع من المؤخرة'],
     climber: [['ابدأ بوضعية الضغط واليدين تحت الكتف', 'اسحب ركبة لجهة صدرك ورجّعها', 'بدّل الرجلين بسرعة وبإيقاع ثابت'], 'الحوض منخفض والظهر مستقيم، لا ترفع مؤخرتك'],
     pike: [['ابدأ بوضعية الضغط وارفع حوضك لين يصير جسمك مثل حرف V مقلوب', 'انزل براسك لجهة الأرض بين يدينك بثني الكوع', 'ادفع للأعلى لين تنفرد يدينك'], 'كل ما رفعت حوضك أكثر صار الشغل على الكتف أكثر'],
-    twist: [['وقف والقدمين بعرض الكتف', 'لف جذعك يمين ويسار بهدوء مع الذراعين', 'خلّ الحوض ثابت للأمام'], 'حركة ناعمة بدون قوة']
+    twist: [['وقف والقدمين بعرض الكتف', 'لف جذعك يمين ويسار بهدوء مع الذراعين', 'خلّ الحوض ثابت للأمام'], 'حركة ناعمة بدون قوة'],
+    tbar: [['قف فوق البار ورجولك على جنبه، وانحنِ وظهرك مستقيم', 'اسحب المقبض لجهة صدرك والأكواع للخلف، واعصر لوحي الكتف', 'نزّل ببطء لين تنفرد يدينك'], 'ظهرك ثابت على نفس الزاوية، لا ترفع جسمك وأنت تسحب'],
+    hexdl: [['ادخل وسط الهيكس بار وامسك المقابض على جنبك', 'ادفع الأرض برجولك ووقف مستقيم والظهر ثابت', 'نزّل بنفس المسار وبتحكم'], 'الوزن على منتصف القدم، والصدر مرفوع طول الحركة'],
+    adduct: [['اجلس وظهرك على المسند والوسائد على جنب ركبك', 'ضمّ رجولك (أو افتحها حسب الجهاز) ببطء واعصر ثانية', 'ارجع ببطء بدون ما ترمي الوزن'], 'مدى حركة مريح بدون ألم، والحوض ثابت على المقعد'],
+    hipthrust: [['اسند أعلى ظهرك على البنش والبار على حوضك (حط وسادة)', 'ادفع من الكعب وارفع حوضك لين يصير جسمك خط من الكتف للركبة', 'اعصر المؤخرة فوق ثانية ونزّل ببطء'], 'ذقنك لصدرك والضلوع نازلة، لا تقوّس أسفل ظهرك فوق'],
+    pullover: [['انسدح على البنش وامسك الدمبل فوق صدرك بيدينك', 'نزّله خلف راسك بقوس واسع والكوع مثني شوي لين تحس بتمدد الصدر', 'ارجعه فوق صدرك بنفس القوس'], 'لا تنزل أكثر من اللي يسمح فيه كتفك، والحركة بطيئة'],
+    skull: [['انسدح وامسك البار المتعرج فوق صدرك والذراع مفرودة', 'اثنِ الكوع ونزّل البار لجهة جبهتك والعضد ثابت', 'افرد يدينك للأعلى واعصر الترايسبس'], 'الأكواع للداخل ما تنفتح، وابدأ بوزن خفيف']
   };
   // Exercises whose shared animation needs its own words
   const XC = {
@@ -3765,7 +4159,25 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
     hheel: [['انسدح والركب مثنية وارفع كتفك شوي', 'مد يدك لجهة كعبك يمين ثم يسار', 'كمّل بالتبادل'], 'الكتف مرفوع طول الوقت'],
     hbridge: [['استلقِ على جنبك وارتكز على ساعد واحد', 'ارفع حوضك لين يصير جسمك مستقيم', 'اثبت وبدّل الجهة'], 'الحوض ما ينزل'],
     bwcalf: [['وقف على رجل وحدة ومقدمة القدم على حافة درجة، وامسك الجدار للتوازن', 'ارتفع على أطراف أصابعك لأعلى نقطة واعصر', 'نزّل الكعب ببطء تحت مستوى الدرجة وبدّل الرجل'], 'مدى حركة كامل وبطيء: الجزء الممدود تحت هو الأهم'],
-    abside: [['التمرين الأول: بطن بالجهاز مع الزفير وعصر البطن', 'بعده مباشرة جوانب بالكيبل: مِل للجانب ببطء', 'ارتاح بعد التمرينين مع بعض'], 'سوبر سِت: لا ترتاح بين التمرينين']
+    abside: [['التمرين الأول: بطن بالجهاز مع الزفير وعصر البطن', 'بعده مباشرة جوانب بالكيبل: مِل للجانب ببطء', 'ارتاح بعد التمرينين مع بعض'], 'سوبر سِت: لا ترتاح بين التمرينين'],
+    hacksq: [['ظهرك على مسند الجهاز والأكتاف تحت الوسائد، والقدمين بعرض الكتف', 'انزل ببطء لين الفخذ يوازي المنصة أو أنزل', 'ادفع من منتصف القدم واطلع بدون قفل الركبة'], 'الركب بنفس اتجاه الأصابع، والكعب ثابت على المنصة'],
+    pendsq: [['اركب الجهاز وظهرك على المسند والأكتاف تحت الوسائد', 'انزل بعمق والجهاز يتأرجح معك لين تنثني ركبك بالكامل', 'ادفع من القدم كاملة واطلع'], 'تمرين حديث يركّز على الفخذ الأمامي ويريح الظهر'],
+    beltsq: [['اربط الحزام على حوضك ووقف على المنصة', 'انزل سكوات والصدر مرفوع', 'اطلع بدفع الأرض'], 'ما فيه وزن على ظهرك: مناسب إذا ظهرك يتعب من السكوات'],
+    smithsq: [['البار على أعلى ظهرك والقدمين قدام شوي', 'انزل لين الفخذ يوازي الأرض', 'اطلع بقوة من منتصف القدم'], 'البار يمشي على سكة ثابتة: ركّز على عمق النزول'],
+    bulgarian: [['حط مشط رجلك الخلفية على البنش وخذ خطوة كبيرة للأمام', 'انزل لين الفخذ الأمامي يوازي الأرض', 'ادفع من كعب الرجل الأمامية واطلع'], 'الجذع مستقيم، وكمّل كل عدات رجل وبعدين بدّل'],
+    hangraise: [['تعلّق على البار والذراع مفرودة', 'ارفع رجولك (أو ركبك) لين مستوى الحوض أو أعلى', 'نزّل ببطء بدون ما تتأرجح'], 'لا تستخدم الزخم، الحركة من البطن'],
+    ckick: [['اربط الحزام على كاحلك وامسك الجهاز', 'ادفع رجلك للخلف وللأعلى لين تعصر المؤخرة', 'ارجع ببطء'], 'لا تقوّس أسفل ظهرك، والجذع ثابت'],
+    abductor: [['اجلس والوسائد على الجهة الخارجية من ركبك', 'افتح رجولك للخارج واعصر ثانية', 'ارجع ببطء'], 'مدى حركة مريح والحوض ثابت على المقعد'],
+    csrow: [['انسدح على بطنك على بنش مائل والدمبل بيدينك', 'اسحب الدمبل لجهة خصرك والأكواع للخلف', 'نزّل ببطء لين تنفرد يدينك'], 'صدرك ملتصق بالبنش: ظهرك محمي والشغل كله على عضلات الظهر'],
+    ohp: [['وقف والبار على أعلى صدرك والقدمين بعرض الحوض', 'ادفع البار فوق راسك لين تنفرد يدينك', 'نزّله لأعلى الصدر بتحكم'], 'شد البطن والمؤخرة ولا تميل للخلف'],
+    arnold: [['اجلس والدمبل قدام كتفك وكفوفك لوجهك', 'ادفع للأعلى ولفّ كفوفك للخارج وأنت تطلع', 'نزّل وأنت ترجّع اللفة لين ترجع كفوفك لوجهك'], 'لفة ناعمة وبطيئة، وظهرك على المسند'],
+    inclinedb: [['اجلس على بنش مائل (30–45°) والدمبل على مستوى صدرك', 'ادفع للأعلى لين تنفرد يدينك فوق صدرك', 'نزّل ببطء لين تحس بتمدد الصدر العلوي'], 'لوحي الكتف للخلف، والأكواع بزاوية 45° تقريباً'],
+    cgbench: [['انسدح وامسك البار بعرض الكتف تقريباً', 'نزّله لأسفل الصدر والأكواع قريبة من جسمك', 'ادفع للأعلى لين تنفرد يدينك'], 'لا تضيّق المسكة أكثر من عرض الكتف عشان المعصم'],
+    ihammer: [['اجلس على بنش مائل والدمبل نازل بجنبك والكفوف متقابلة', 'ارفع الدمبل بثني الكوع والكف يبقى على جنب', 'نزّل ببطء لين تنفرد يدك'], 'الميلان يمدد البايسبس أكثر: لا ترفع كتفك'],
+    sumodl: [['وقفة واسعة وأصابع القدم للخارج، وامسك البار بين رجولك', 'افتح ركبك للخارج وادفع الأرض لين توقف مستقيم', 'نزّل البار بنفس المسار وبتحكم'], 'الظهر مستقيم والبار ملاصق لجسمك'],
+    assistpu: [['اختر وزن المساعدة واركب الجهاز بركبك على الوسادة', 'اسحب جسمك لين يوصل ذقنك فوق البار', 'انزل ببطء لين تنفرد يدينك'], 'كل ما قوّيت نقّص وزن المساعدة لين تقدر على العقلة'],
+    highrow: [['اجلس وصدرك على الوسادة وامسك المقابض فوق', 'اسحب المقابض لتحت ولورا والأكواع قريبة من جسمك', 'ارجع ببطء لين تتمدد عضلات الظهر'], 'اعصر لوحي الكتف آخر الحركة'],
+    wcurl: [['اجلس وساعدك على فخذك وكفك للأعلى', 'ارفع البار بثني المعصم للأعلى', 'نزّل ببطء'], 'الحركة من المعصم، والساعد ثابت على الفخذ']
   };
   function exInfo(ex, meta) {
     meta = meta || exMeta(ex);
@@ -3795,6 +4207,117 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
       ${arms(c('triceps'), c('forearms'))}<path d="M22 58h9.5v9.5h-11z" fill="${c('glutes')}"/><path d="M32.5 58H42l1.5 9.5h-11z" fill="${c('glutes')}"/>${legs(c('hams'), c('calves'), 68.5, 24.5)}`;
     return `<svg viewBox="0 0 140 128" class="${cls}" role="img" aria-label="العضلات المستهدفة"><g>${front}</g><g transform="translate(76 0)">${back}</g>
       <text x="32" y="126" text-anchor="middle" font-size="9" font-weight="700" fill="#94A3B8">أمام</text><text x="108" y="126" text-anchor="middle" font-size="9" font-weight="700" fill="#94A3B8">خلف</text></svg>`;
+  }
+
+  /* =========================================================
+     Alternatives: exercises that train the same muscles with the same movement,
+     grouped by equipment (barbell, hex bar, dumbbell, machine, cable, smith, body)
+     ========================================================= */
+  const EQUIP = { barbell: 'بار', hex: 'هيكس بار', dumbbell: 'دمبل', machine: 'جهاز', cable: 'كيبل', smith: 'سميث', body: 'وزن الجسم' };
+  const EQ_ORDER = ['barbell', 'hex', 'dumbbell', 'machine', 'cable', 'smith', 'body'];
+  const EQ_FIX = {
+    hexdl: 'hex', smithsq: 'smith', pushdown: 'cable', rope: 'cable', ohext: 'cable', katana: 'cable', ccurl: 'cable', srow: 'cable',
+    cablecross: 'cable', cablelat: 'cable', cablefront: 'cable', facepull: 'cable', ccrunch: 'cable', sideb: 'cable', rotsh: 'cable',
+    rottr: 'cable', ropehammer: 'cable', ckick: 'cable', tbar: 'barbell', sapd: 'cable'
+  };
+  const equipOf = k => EQ_FIX[k] || (XL[k] ? XL[k][3] : 'machine');
+  const ALT_GROUPS = [
+    ['ضغط صدر مستوي', ['bench', 'dbp', 'cpress', 'dbpress', 'hpush']],
+    ['ضغط صدر عالي', ['inclinebb', 'inclinedb', 'incline']],
+    ['الصدر السفلي', ['declinebb', 'decline', 'dips']],
+    ['تفتيح الصدر', ['cfly', 'cablecross', 'dbflyb', 'dbfly', 'pullover']],
+    ['سحب الظهر من فوق', ['latpd', 'vbarpd', 'highrow', 'sapd', 'pullup', 'assistpu']],
+    ['تجديف الظهر', ['tbar', 'brow', 'srow', 'lrow', 'dbrow1', 'dbrow', 'csrow']],
+    ['الكتف الخلفي', ['rear', 'rdext', 'reardf', 'dbrfly', 'facepull', 'dbface']],
+    ['ضغط الأكتاف', ['ohp', 'dbshp', 'arnold', 'shp', 'bwpike']],
+    ['الكتف الجانبي', ['dblat', 'latr', 'mlat', 'cablelat']],
+    ['الكتف الأمامي', ['bbfront', 'dbfront', 'cablefront']],
+    ['البايسبس', ['bbcurl', 'bcurl', 'altcurl', 'ccurl', 'mcurl', 'preacher', 'conc']],
+    ['الهامر والساعد', ['hammer', 'ihammer', 'ropehammer']],
+    ['الترايسبس للأسفل', ['pushdown', 'rope', 'cgbench', 'hdip', 'dbkick']],
+    ['الترايسبس فوق الرأس', ['skull', 'ohext', 'dbtri', 'katana', 'text']],
+    ['السكوات ودفع الأرجل', ['squat', 'hacksq', 'lpress', 'smithsq', 'pendsq', 'beltsq', 'goblet', 'hprison']],
+    ['الديدلفت', ['deadlift', 'hexdl', 'sumodl', 'dbdl']],
+    ['الرومانيان والفخذ الخلفي', ['rdl', 'dbrdl', 'glute45']],
+    ['الطعنات', ['bulgarian', 'dblunge', 'hlunge']],
+    ['رفرفة خلفي للأرجل', ['lcurl', 'shcurl']],
+    ['المؤخرة', ['hipthrust', 'bwbridge', 'ckick', 'hkick']],
+    ['السمانة', ['scalf', 'calf', 'dbcalf', 'bwcalf']],
+    ['البطن', ['ccrunch', 'abcr', 'situp', 'htoe']],
+    ['رفع الرجلين', ['hangraise', 'legraise']],
+    ['جوانب البطن', ['sideb', 'dbside']],
+    ['الترابيس', ['bbshrug', 'dbshrug', 'rottr']],
+    ['الساعد', ['wcurl', 'wrist']]
+  ];
+  const ALT_OF = {}, FIG_ALT = {};
+  ALT_GROUPS.forEach(([, ks], gi) => ks.forEach(k => {
+    if (!XL[k]) return;
+    if (ALT_OF[k] == null) ALT_OF[k] = gi;
+    const f = XT[k] && XT[k][0];
+    if (f && FIG_ALT[f] == null) FIG_ALT[f] = gi;
+  }));
+  const libKeyOf = ex => XL_BY_NAME[String((ex && ex.name) || '').trim().toLowerCase()] || '';
+  // the movement group of an exercise: by library key, or by its animation for a name the user typed
+  function altGroupOf(ex) {
+    const k = libKeyOf(ex);
+    if (k && ALT_OF[k] != null) return ALT_OF[k];
+    const fig = k && XT[k] ? XT[k][0] : guessMeta(ex && ex.name).fig;
+    return fig && FIG_ALT[fig] != null ? FIG_ALT[fig] : -1;
+  }
+  function altsFor(ex) {
+    const gi = altGroupOf(ex);
+    if (gi < 0) return [];
+    const self = libKeyOf(ex), nm = exKey(ex && ex.name);
+    return ALT_GROUPS[gi][1].filter(k => XL[k] && k !== self && exKey(XL[k][0]) !== nm && exKey(XL[k][1]) !== nm);
+  }
+  // ctx: { act, attrs } turns every row into a swap button; without it rows open the exercise guide
+  function altListHTML(ex, ctx) {
+    const keys = altsFor(ex);
+    if (!keys.length) return '';
+    const by = {};
+    keys.forEach(k => { const e = equipOf(k); (by[e] = by[e] || []).push(k); });
+    const row = k => {
+      const L = XL[k], xt = XT[k];
+      return `<li class="flex items-center gap-2.5 rounded-xl bg-white border border-slate-200 p-1.5 pe-2">
+        <button type="button" data-act="guide-key" data-k="${k}" class="w-14 h-12 rounded-lg bg-slate-50 border border-slate-200 shrink-0 overflow-hidden" aria-label="شرح ${esc(L[0])}">${xt && FIGS[xt[0]] ? figSVG(xt[0], 'w-full h-full', FIG_NOEQ.has(k)) : ''}</button>
+        <span class="min-w-0 flex-1"><span class="block text-[13px] font-bold text-slate-900 leading-snug">${esc(L[0])}</span><span class="block text-[11.5px] text-slate-500 leading-snug">${esc(L[1])}</span></span>
+        ${ctx ? `<button type="button" data-act="${ctx.act}" data-k="${k}" ${ctx.attrs} class="btn-dark h-9 px-3 text-xs shrink-0">${icon('swap', 'w-3.5 h-3.5')} بدّل</button>` : ''}
+      </li>`;
+    };
+    return `<div class="space-y-2.5">${EQ_ORDER.filter(e => by[e]).map(e => `<div>
+        <p class="text-[11.5px] font-extrabold text-slate-500 mb-1.5 flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>${EQUIP[e]}</p>
+        <ul class="grid sm:grid-cols-2 gap-1.5">${by[e].map(row).join('')}</ul>
+      </div>`).join('')}</div>`;
+  }
+  // Swap an exercise on a page for one of its alternatives: same sets and reps, new movement
+  function swapExercise(u, pageId, exId, key) {
+    const page = u.pages.find(p => p.id === pageId);
+    const L = XL[key];
+    if (!page || !L) return false;
+    const i = page.exercises.findIndex(e => e.id === exId);
+    if (i < 0) return false;
+    const old = page.exercises[i];
+    if (page.exercises.some(e => e.id !== exId && exKey(e.name) === exKey(L[0]))) { toast(`«${L[1]}» موجود في هذه الصفحة`, 'اختر بديل ثاني.', 'err'); return false; }
+    const oc = old.cfg || {}, m = exMeta(old);
+    const cfg = { sets: m.sets, repMin: m.repMin, repMax: m.repMax, rest: L[4], mus: L[2].slice(), g: L[3] };
+    if (L[3] !== 'body') cfg.inc = L[3] === 'dumbbell' ? 2 : 2.5;
+    if (L[5]) cfg.note = L[5];
+    if (oc.rpe && !oc.lift) cfg.rpe = oc.rpe;
+    if (oc.focus) cfg.focus = true;
+    if (oc.amrap) cfg.amrap = true;
+    page.exercises[i] = { id: 'e' + uid(), name: L[0], ar: L[1], cfg };
+    if (ui.drafts) { delete ui.drafts[old.id]; saveSessionState(); }
+    // your own program remembers the swap, so editing it later keeps the new exercise
+    const c = page.prog && u.plan && Array.isArray(u.plan.custom) ? u.plan.custom.find(x => x.id === page.prog) : null;
+    const day = c && Array.isArray(c.list) ? c.list[page.day] : null;
+    if (day && Array.isArray(day.ex)) {
+      const sp = day.ex.find(x => (x.k && XL[x.k] && exKey(XL[x.k][0]) === exKey(old.name)) || (x.n && exKey(x.n) === exKey(old.name)));
+      if (sp) { sp.k = key; delete sp.n; }
+    }
+    ui.altOpen = null;
+    saveDB();
+    toast(`بدّلت إلى «${L[1]}»`, `بدل «${old.ar || old.name}» · نفس الجولات والعدات.`);
+    return true;
   }
 
   // ---- set actions ----
@@ -4527,6 +5050,7 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
   function modalView() {
     if (ui.modal === 'finish') return me() ? finishView(me()) : '';
     if (ui.modal === 'guide') return guideView();
+    if (ui.modal === 'picker') return pickerView();
     if (ui.modal !== 'add-page') return '';
     return `<div class="fixed inset-0 z-[80] flex items-end sm:items-center justify-center bg-slate-900/40 backdrop-blur-[2px] gutter" data-act="modal-bg">
       <div role="dialog" aria-modal="true" aria-labelledby="np-title" class="modal-card w-full sm:max-w-lg bg-white rounded-t-3xl sm:rounded-3xl p-5 sm:p-6 shadow-2xl" style="padding-bottom:calc(1.25rem + env(safe-area-inset-bottom,0px))">
@@ -4554,7 +5078,8 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
     const u = me();
     const g = ui.guide || {};
     let ex = null;
-    if (g.exId && u) { const hit = findEx(u, g.exId); if (hit) ex = hit.ex; }
+    let swapPage = null;
+    if (g.exId && u) { const hit = findEx(u, g.exId); if (hit) { ex = hit.ex; swapPage = readOnly ? null : hit.page; } }
     if (!ex && g.key && XL[g.key]) { const L = XL[g.key]; ex = { id: '', name: L[0], ar: L[1], cfg: { mus: L[2], g: L[3] } }; }
     if (!ex) return '';
     const meta = exMeta(ex), info = exInfo(ex, meta);
@@ -4594,6 +5119,11 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
             ${rpe ? `<span class="chip h-8 cursor-default"><span class="num" dir="ltr">RPE ${fmt(rpe, 1)}</span></span>` : ''}
           </div>` : ''}
           ${meta.note ? `<p class="flex items-start gap-2 text-sm text-slate-600">${icon('pin', 'w-4 h-4 shrink-0 mt-0.5')}<span>${esc(meta.note)}</span></p>` : ''}
+          ${altsFor(ex).length ? `<div>
+            <h3 class="font-display font-extrabold text-lg text-slate-900 flex items-center gap-2">${icon('swap', 'w-5 h-5')} بدائل بنفس الفعالية</h3>
+            <p class="text-sm text-slate-500 mt-0.5 mb-2.5">نفس العضلات ونفس الحركة: بالبار أو الدمبل أو الجهاز أو الكيبل أو الهيكس بار.${swapPage ? ' اضغط «بدّل» ويتغير التمرين بنفس الجولات والعدات.' : ' اضغط الصورة وتشوف شرح البديل.'}</p>
+            ${altListHTML(ex, swapPage ? { act: 'ex-swap', attrs: `data-page="${swapPage.id}" data-ex="${ex.id}"` } : null)}
+          </div>` : ''}
         </div>
       </div>
     </div>`;
@@ -4605,8 +5135,10 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
     setTimeout(() => { const el = $('#np-name') || $('#modal-root [data-autofocus]'); if (el) el.focus(); }, 30);
   }
   function closeModal() {
+    const wasPicker = ui.modal === 'picker';
     ui.modal = null;
     $('#modal-root').innerHTML = '';
+    if (wasPicker) { ui.pick = null; renderApp(); }       // show what was added to the day
     if (ui.lastFocus && document.body.contains(ui.lastFocus)) ui.lastFocus.focus();
   }
 
@@ -5114,6 +5646,100 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
       case 'prog-browse': ui.progBrowse = true; ui.progOpen = null; ui.heroOpen = false; renderApp(); window.scrollTo(0, 0); break;
       case 'prog-back': ui.progBrowse = false; ui.confirm = null; renderApp(); window.scrollTo(0, 0); break;
       case 'prog-stop': if (u) stopProgram(u); break;
+      // ---- build your own program ----
+      case 'bd-new': if (u) { closeDrawer(true); bdOpen(u, null); } break;
+      case 'bd-edit': if (u) bdOpen(u, t.dataset.id); break;
+      case 'bd-cancel': ui.builder = null; ui.confirm = null; renderApp(); window.scrollTo(0, 0); break;
+      case 'bd-tpl': {
+        const b = ui.builder; if (!b) break;
+        if (bdHasWork(b)) { ui.confirm = 'bd-tpl:' + t.dataset.v; renderApp(); } else bdApply(t.dataset.v);
+        break;
+      }
+      case 'bd-tpl-ok': bdApply(t.dataset.id); break;
+      case 'bd-week': {
+        const b = ui.builder; if (!b) break;
+        const i = +t.dataset.i, cur = b.week[i], n = b.days.length;
+        b.week[i] = cur === 'r' ? 0 : cur === 'c' ? 'r' : cur + 1 < n ? cur + 1 : 'c';
+        b.touched = true; b.err = '';
+        renderApp();
+        break;
+      }
+      case 'bd-day-add': {
+        const b = ui.builder; if (!b || b.days.length >= 7) break;
+        b.days.push({ t: `اليوم ${b.days.length + 1}`, ex: [] });
+        bdReweek(b); b.err = '';
+        renderApp();
+        break;
+      }
+      case 'bd-day-del': {
+        const b = ui.builder, d = +t.dataset.id; if (!b || !b.days[d] || b.days.length < 2) break;
+        b.days.splice(d, 1);
+        if (b.touched) b.week = b.week.map(x => typeof x !== 'number' ? x : x === d ? 'r' : x > d ? x - 1 : x);
+        else bdReweek(b);
+        b.alt = null; ui.confirm = null; b.err = '';
+        renderApp();
+        break;
+      }
+      case 'bd-add': {
+        if (!ui.builder || !ui.builder.days[+t.dataset.d]) break;
+        ui.pick = { d: +t.dataset.d, q: '', g: '', e: '' };
+        openModal('picker');
+        break;
+      }
+      case 'bd-ex-up': case 'bd-ex-down': case 'bd-ex-del': {
+        const b = ui.builder, day = b && b.days[+t.dataset.d], i = +t.dataset.i;
+        if (!day || !day.ex[i]) break;
+        if (act === 'bd-ex-del') day.ex.splice(i, 1);
+        else { const j = act === 'bd-ex-up' ? i - 1 : i + 1; if (j >= 0 && j < day.ex.length) [day.ex[i], day.ex[j]] = [day.ex[j], day.ex[i]]; }
+        b.alt = null;
+        renderApp();
+        break;
+      }
+      case 'bd-alt': {
+        const b = ui.builder; if (!b) break;
+        const k = `${t.dataset.d}:${t.dataset.i}`;
+        b.alt = b.alt === k ? null : k;
+        renderApp();
+        break;
+      }
+      case 'bd-swap': {
+        const b = ui.builder, day = b && b.days[+t.dataset.d], x = day && day.ex[+t.dataset.i];
+        if (!x || !XL[t.dataset.k]) break;
+        if (day.ex.some(y => y !== x && y.k === t.dataset.k)) { toast(`«${XL[t.dataset.k][1]}» موجود بهذا اليوم`, 'اختر بديل ثاني.', 'err'); break; }
+        x.k = t.dataset.k; delete x.n;
+        b.alt = null;
+        renderApp();
+        toast(`بدّلت إلى «${XL[x.k][1]}»`, 'نفس الجولات والعدات.');
+        break;
+      }
+      case 'bd-save': if (u) bdSave(u, t.dataset.start === '1'); break;
+      case 'bd-del': if (u) bdDelete(u, t.dataset.id); break;
+      case 'pk-add': {
+        const b = ui.builder, P = ui.pick, day = b && P && b.days[P.d], k = t.dataset.k;
+        if (!day || !XL[k]) break;
+        const at = day.ex.findIndex(x => x.k === k);
+        if (at >= 0) day.ex.splice(at, 1);
+        else if (day.ex.length >= 15) { toast('وصلت للحد: 15 تمرين باليوم', '', 'err'); break; }
+        else day.ex.push({ k, sets: 3, reps: [10, 12] });
+        b.err = '';
+        refreshPicker();
+        break;
+      }
+      case 'pk-group': if (ui.pick) { ui.pick.g = t.dataset.v; $('#modal-root').innerHTML = modalView(); } break;
+      case 'pk-eq': if (ui.pick) { ui.pick.e = t.dataset.v; $('#modal-root').innerHTML = modalView(); } break;
+      case 'pk-custom': {
+        const b = ui.builder, P = ui.pick, day = b && P && b.days[P.d], el = $('#pk-name');
+        const name = el ? String(el.value).trim().replace(/\s+/g, ' ').slice(0, 40) : '';
+        if (!day) break;
+        if (!name) { toast('اكتب اسم التمرين أولاً', '', 'err'); if (el) el.focus(); break; }
+        if (day.ex.length >= 15) { toast('وصلت للحد: 15 تمرين باليوم', '', 'err'); break; }
+        day.ex.push({ n: name, sets: 3, reps: [10, 12] });
+        el.value = '';
+        refreshPicker();
+        toast(`أُضيف «${name}»`);
+        break;
+      }
+      case 'pk-done': closeModal(); break;
       case 'prog-reweek': {
         if (!u || !u.plan || !u.plan.active) break;
         u.plan.active.start = today();
@@ -5132,6 +5758,8 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
       }
       case 'diet-toggle': ui.dietOpen = !ui.dietOpen; renderApp(); break;
       case 'ex-guide': ui.guide = { exId: t.dataset.ex }; openModal('guide'); break;
+      case 'ex-alt': ui.altOpen = ui.altOpen === t.dataset.ex ? null : t.dataset.ex; renderApp(); break;
+      case 'ex-swap': if (u && swapExercise(u, t.dataset.page, t.dataset.ex, t.dataset.k)) { if (ui.modal) closeModal(); renderApp(); } break;
       case 'guide-key': ui.guide = { key: t.dataset.k }; openModal('guide'); break;
       case 'diet-add': {
         if (!u || !validProfile(u.profile)) break;
@@ -5229,6 +5857,25 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
       }
       return;
     }
+    if (ui.builder && t.id.startsWith('bd-')) {
+      const b = ui.builder;
+      if (t.id === 'bd-name') { b.name = t.value; return; }
+      const dt = /^bd-dt-(\d+)$/.exec(t.id);
+      if (dt) { const d = b.days[+dt[1]]; if (d) d.t = t.value; return; }
+      const sr = /^bd-(s|r)-(\d+)-(\d+)$/.exec(t.id);
+      if (sr) {
+        const day = b.days[+sr[2]], x = day && day.ex[+sr[3]];
+        if (x) { if (sr[1] === 's') x.sets = clamp(Math.round(+t.value) || 3, 1, 8); else x.reps = repsPair(t.value.split('-').map(Number)); }
+        return;
+      }
+      if (t.id === 'bd-copy' && t.value) {
+        const v = t.value;
+        if (bdHasWork(b)) { ui.confirm = 'bd-tpl:' + v; renderApp(); } else bdApply(v);
+        return;
+      }
+      return;
+    }
+    if (t.id === 'pk-q' && ui.pick) { ui.pick.q = t.value; refreshPicker(); return; }
     if (t.id === 'chat-input') { ui.chatDraft = t.value; t.style.height = 'auto'; t.style.height = Math.min(t.scrollHeight, 128) + 'px'; return; }
     const isRange = t.id.endsWith('-r');
     const base = isRange ? t.id.slice(0, -2) : t.id;
@@ -5266,6 +5913,12 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
     if (file) aiSetPhoto(file);
   });
   document.addEventListener('keydown', e => {
+    if (e.key !== 'Enter' || e.isComposing || !e.target || e.target.id !== 'pk-name') return;
+    e.preventDefault();
+    const b = document.querySelector('[data-act="pk-custom"]');
+    if (b) b.click();
+  });
+  document.addEventListener('keydown', e => {
     if (e.key !== 'Enter' || e.shiftKey || e.isComposing) return;
     const t = e.target;
     if (!t || t.id !== 'chat-input') return;
@@ -5295,7 +5948,7 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
   /* =========================================================
      Write guards, demo accounts, splash
      ========================================================= */
-  const WRITE_ACTS = new Set(['ai-add', 'open-add-page', 'ex-suggest', 'ask-confirm', 'del-ex', 'del-page', 'del-log', 'del-cardio', 'meal-quick', 'del-meal', 'chat-quick', 'del-msg', 'clear-chat', 'del-acc', 'del-all-acc', 'set-done', 'set-undo', 'cfg-save', 'share-finish', 'prog-start', 'prog-switch', 'prog-stop', 'prog-reweek', 'diet-add']);
+  const WRITE_ACTS = new Set(['ai-add', 'open-add-page', 'ex-suggest', 'ask-confirm', 'del-ex', 'del-page', 'del-log', 'del-cardio', 'meal-quick', 'del-meal', 'chat-quick', 'del-msg', 'clear-chat', 'del-acc', 'del-all-acc', 'set-done', 'set-undo', 'cfg-save', 'share-finish', 'prog-start', 'prog-switch', 'prog-stop', 'prog-reweek', 'diet-add', 'ex-swap', 'bd-save', 'bd-del']);
   function guardWrite() {
     if (!readOnly) return true;
     toast('وضع المشاهدة فقط', 'لتسجيل تمارينك اطلب من صاحب الصفحة صلاحية «Contributor».', 'err');
