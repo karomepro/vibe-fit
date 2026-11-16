@@ -10,7 +10,6 @@
   [hidden] { display: none !important; }
 </style>
 <title>Vibe Fit | فايب فيت</title>
-<meta name="claude:viewport-fit-sides" content="cover">
 <meta name="description" content="Vibe Fit — تتبع تمارين المقاومة والديدلفت والمشي والسعرات مع لوحة تنافس يومية.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -342,22 +341,27 @@
   @keyframes ic-spin { to { transform: rotate(180deg); } }
   @keyframes ic-slide { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(-3px); } }
   @keyframes ic-dash { to { stroke-dashoffset: -11.2; } }
-  /* ---- intro: Domain Expansion ---- */
+  /* ---- intro: eyes open with the Domain Expansion → deep space → warp into the site ---- */
   html.intro-on, html.intro-on body { overflow: hidden; }
-  #intro { --dx-y: calc(50% - 44px); position: fixed; inset: 0; z-index: 200; overflow: hidden; cursor: pointer; color: #FFFFFF; background: radial-gradient(120% 90% at 50% 46%, #1E293B 0%, #0F172A 46%, #020617 100%); -webkit-tap-highlight-color: transparent; }
+  #intro { --dx-y: calc(50% - 16px); position: fixed; inset: 0; z-index: 200; overflow: hidden; cursor: pointer; color: #FFFFFF; background: radial-gradient(120% 90% at 50% 46%, #1E293B 0%, #0F172A 46%, #020617 100%); -webkit-tap-highlight-color: transparent; }
   .dx-stage { position: absolute; inset: 0; animation: dx-shake .55s cubic-bezier(.36, .07, .19, .97) .9s both; }
   #intro canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
   .dx-rays, .dx-charge, .dx-void, .dx-rings i { position: absolute; left: 50%; top: var(--dx-y); border-radius: 50%; pointer-events: none; }
   .dx-rings { position: absolute; inset: 0; pointer-events: none; }
-  .dx-rays { width: 160vmax; height: 160vmax; margin: -80vmax 0 0 -80vmax; opacity: 0; background: repeating-conic-gradient(from 0deg, rgba(226, 232, 240, .15) 0deg 4deg, transparent 4deg 15deg); -webkit-mask: radial-gradient(circle, #000 0, rgba(0, 0, 0, .65) 16%, transparent 55%); mask: radial-gradient(circle, #000 0, rgba(0, 0, 0, .65) 16%, transparent 55%); animation: dx-show .8s ease-out .92s forwards, dx-spin 16s linear .92s infinite; }
+  .dx-rays { width: 160vmax; height: 160vmax; margin: -80vmax 0 0 -80vmax; opacity: 0; background: repeating-conic-gradient(from 0deg, rgba(226, 232, 240, .15) 0deg 4deg, transparent 4deg 15deg); -webkit-mask: radial-gradient(circle, #000 0, rgba(0, 0, 0, .65) 16%, transparent 55%); mask: radial-gradient(circle, #000 0, rgba(0, 0, 0, .65) 16%, transparent 55%); animation: dx-show .7s ease-out .92s forwards, dx-spin 16s linear .92s infinite, dx-hide .7s ease-in 1.75s forwards; }
   .dx-charge { width: 230px; height: 230px; margin: -115px 0 0 -115px; opacity: 0; background: conic-gradient(from 0deg, transparent 0 52%, rgba(255, 255, 255, .95) 76%, transparent 79% 100%); -webkit-mask: radial-gradient(circle, transparent 60%, #000 61.5%, #000 66%, transparent 67.5%); mask: radial-gradient(circle, transparent 60%, #000 61.5%, #000 66%, transparent 67.5%); animation: dx-charge .92s cubic-bezier(.55, 0, .75, .4) forwards, dx-hide .25s ease-out .92s forwards; }
   .dx-void { width: 170px; height: 170px; margin: -85px 0 0 -85px; transform: scale(0); background: radial-gradient(circle, #000 0 55%, rgba(255, 255, 255, .96) 59.5%, rgba(226, 232, 240, .5) 63.5%, rgba(148, 163, 184, .14) 68%, rgba(148, 163, 184, 0) 72%); animation: dx-void 1.35s cubic-bezier(.65, 0, .25, 1) .9s forwards; }
+  .dx-space { position: absolute; inset: 0; opacity: 0; pointer-events: none; background: radial-gradient(55% 40% at 26% 30%, rgba(71, 85, 105, .34), transparent 70%), radial-gradient(45% 35% at 78% 72%, rgba(100, 116, 139, .24), transparent 70%), radial-gradient(32% 28% at 72% 20%, rgba(148, 163, 184, .14), transparent 70%); animation: dx-show 1.1s ease-out 1.3s forwards; }
   .dx-rings i { width: 150px; height: 150px; margin: -75px 0 0 -75px; border: 1.5px solid rgba(255, 255, 255, .75); opacity: 0; animation: dx-ring 1.5s cubic-bezier(.1, .6, .3, 1) both; }
   .dx-rings i:nth-child(1) { animation-delay: .9s; }
   .dx-rings i:nth-child(2) { animation-delay: 1.1s; }
   .dx-rings i:nth-child(3) { animation-delay: 1.3s; }
   .dx-flash { position: absolute; inset: 0; background: #FFFFFF; opacity: 0; pointer-events: none; animation: dx-flash .8s ease-out .82s both; }
-  .dx-cap { position: absolute; left: 0; right: 0; top: calc(var(--dx-y) - 59px - 44px); text-align: center; font-family: var(--f-num); font-weight: 800; font-stretch: 112%; font-size: 12px; letter-spacing: .48em; padding-inline-start: .48em; color: #CBD5E1; text-shadow: 0 0 18px rgba(226, 232, 240, .55); animation: dx-cap 1.1s cubic-bezier(.2, .8, .2, 1) .08s both; }
+  .dx-core { position: absolute; inset: 0; transform-origin: 50% var(--dx-y); animation: dx-forward .64s cubic-bezier(.6, 0, .9, .35) 2.32s forwards; }
+  .dx-cap { position: absolute; left: 0; right: 0; top: calc(var(--dx-y) - 149px); text-align: center; font-family: var(--f-num); font-weight: 800; font-stretch: 112%; font-size: 12px; letter-spacing: .48em; padding-inline-start: .48em; color: #CBD5E1; text-shadow: 0 0 18px rgba(226, 232, 240, .55); animation: dx-cap 1.1s cubic-bezier(.2, .8, .2, 1) .08s both; }
+  .dx-eyes { position: absolute; left: 50%; top: calc(var(--dx-y) - 113px); width: 168px; height: 44px; margin-left: -84px; overflow: visible; filter: drop-shadow(0 0 7px rgba(226, 232, 240, .35)); animation: hype-rise .5s ease-out .12s both, dx-eyes-glow 1.8s ease-in-out 1.35s infinite; }
+  .dx-eye-open { transform-box: fill-box; transform-origin: center; animation: dx-eye-open .46s cubic-bezier(.2, 1.6, .4, 1) .9s both, dx-blink .26s ease-in-out 2s; }
+  .dx-eye-shut { opacity: 0; animation: dx-eye-shut .16s ease-out .9s both; }
   .dx-logo { position: absolute; left: 50%; top: var(--dx-y); width: 118px; height: 118px; margin: -59px 0 0 -59px; border-radius: 31px; box-shadow: 0 0 0 1px rgba(255, 255, 255, .2), 0 0 54px rgba(226, 232, 240, .35), 0 30px 60px -22px rgba(0, 0, 0, .85); animation: dx-gather .92s cubic-bezier(.5, 0, .75, 0) both, dx-snap .75s cubic-bezier(.2, 1.6, .35, 1) .92s forwards, dx-glow 1.7s ease-in-out 1.7s infinite; }
   .dx-text { position: absolute; left: 0; right: 0; top: calc(var(--dx-y) + 59px + 22px); display: flex; flex-direction: column; align-items: center; text-align: center; }
   .dx-word { font-family: var(--f-num); font-weight: 900; font-stretch: 125%; font-size: clamp(30px, 9vw, 54px); line-height: 1.05; letter-spacing: .2em; padding-inline-start: .2em; text-shadow: 0 0 26px rgba(255, 255, 255, .35); white-space: nowrap; }
@@ -365,11 +369,17 @@
   .dx-word .dx-sp { width: .3em; animation: none; }
   .dx-sub { margin-top: 10px; font-family: var(--f-display); font-weight: 800; font-size: 18px; color: #CBD5E1; animation: hype-rise .6s ease-out 1.75s both; }
   .dx-tag { margin-top: 6px; font-size: 13px; font-weight: 700; color: #94A3B8; animation: hype-rise .5s ease-out 1.95s both; }
+  .dx-warp-flash { position: absolute; inset: 0; pointer-events: none; opacity: 0; background: radial-gradient(circle at 50% calc(50% - 16px), #FFFFFF 0, rgba(255, 255, 255, .94) 26%, rgba(226, 232, 240, .7) 58%, rgba(148, 163, 184, .4) 100%); animation: dx-warp-flash .62s cubic-bezier(.7, 0, .9, .5) 2.42s forwards; }
   .dx-skip { position: absolute; left: 0; right: 0; bottom: calc(22px + env(safe-area-inset-bottom, 0px)); text-align: center; font-size: 13px; color: #64748B; animation: hype-rise .4s ease-out 1.3s both; }
-  @property --iris { syntax: '<percentage>'; inherits: false; initial-value: 0%; }
-  #intro.dx-out { -webkit-mask: radial-gradient(circle at 50% 46%, transparent var(--iris), #000 calc(var(--iris) + 7%)); mask: radial-gradient(circle at 50% 46%, transparent var(--iris), #000 calc(var(--iris) + 7%)); animation: dx-iris .62s cubic-bezier(.7, 0, .3, 1) forwards, fade-out-plain .22s ease-in .44s forwards; }
-  #intro.dx-out .dx-stage { animation: dx-zoom .62s ease-in forwards; }
-  @keyframes dx-iris { from { --iris: 0%; } to { --iris: 112%; } }
+  #intro.dx-out { animation: fade-out-plain .38s ease-out forwards; }
+  html.intro-arrive #app { animation: app-arrive .75s cubic-bezier(.2, .8, .2, 1) both; }
+  @keyframes dx-eye-open { 0% { transform: scaleY(.05); opacity: 0; } 25% { opacity: 1; } 100% { transform: none; opacity: 1; } }
+  @keyframes dx-eye-shut { from { opacity: 1; } to { opacity: 0; } }
+  @keyframes dx-blink { 0%, 100% { transform: none; } 50% { transform: scaleY(.08); } }
+  @keyframes dx-eyes-glow { 50% { filter: drop-shadow(0 0 14px rgba(241, 245, 249, .75)); } }
+  @keyframes dx-forward { to { transform: scale(2.6); opacity: 0; filter: blur(8px); } }
+  @keyframes dx-warp-flash { 0% { opacity: 0; } 100% { opacity: 1; } }
+  @keyframes app-arrive { from { opacity: .35; transform: scale(1.06); filter: blur(6px); } to { opacity: 1; transform: none; filter: none; } }
   @keyframes dx-gather { 0% { opacity: 0; transform: scale(.35) rotate(-24deg); filter: blur(8px) brightness(.5); } 100% { opacity: .9; transform: scale(.74) rotate(-6deg); filter: blur(0) brightness(.75); } }
   @keyframes dx-snap { 0% { opacity: .9; transform: scale(.74) rotate(-6deg); filter: brightness(.75); } 45% { opacity: 1; transform: scale(1.18) rotate(3deg); filter: brightness(1.35); } 75% { transform: scale(.96) rotate(-1deg); } 100% { opacity: 1; transform: none; filter: none; } }
   @keyframes dx-charge { 0% { opacity: 0; transform: scale(2.6) rotate(0deg); } 25% { opacity: .9; } 100% { opacity: 1; transform: scale(.62) rotate(560deg); } }
@@ -383,7 +393,6 @@
   @keyframes dx-ring { 0% { opacity: .9; transform: scale(.4); } 100% { opacity: 0; transform: scale(9); } }
   @keyframes dx-flash { 0% { opacity: 0; } 12% { opacity: .6; } 100% { opacity: 0; } }
   @keyframes dx-glow { 50% { box-shadow: 0 0 0 1px rgba(255, 255, 255, .3), 0 0 84px rgba(226, 232, 240, .55), 0 30px 60px -22px rgba(0, 0, 0, .85); } }
-  @keyframes dx-zoom { to { transform: scale(1.9); opacity: 0; filter: blur(4px); } }
 
   /* ---- liquid glass: frosted menus over soft drifting light ---- */
   html { background: radial-gradient(1100px 420px at 50% -160px, #E9EEF5 0%, rgba(233, 238, 245, 0) 70%), var(--paper); background-attachment: fixed; }
@@ -447,6 +456,12 @@
   .place-strip .place-name { margin-top: 0; font-size: 14.5px; }
   .place-strip .place-sub, .place-strip .place-count { display: none; }
   @media (max-width: 640px) { .place-strip .place-tile { flex-direction: column; gap: 4px; } .place-strip .place-fig { width: 64px; max-width: 64px; } .place-strip .place-name { flex-direction: row; font-size: 13px; } .place-strip .place-ic { display: none; } }
+  .prog-band { background: var(--tone); color: var(--on); }
+  .prog-band-sub { opacity: .78; }
+  .prog-pill { font-size: 12px; font-weight: 800; white-space: nowrap; border-radius: 999px; padding: 2px 10px; background: color-mix(in srgb, var(--on) 14%, transparent); border: 1px solid color-mix(in srgb, var(--on) 24%, transparent); }
+  .prog-pill.is-mark { background: var(--on); color: var(--tone); border-color: transparent; }
+  .prog-card .wk-train { background: var(--tone); color: var(--on); box-shadow: inset 0 0 0 1px rgba(15, 23, 42, .1); }
+  .nav-it:not(.is-on) .nav-ic.has-tone { background: var(--tone); color: var(--on); border-color: rgba(15, 23, 42, .08); }
   .ptag { display: inline-flex; align-items: center; gap: 3px; font-size: 11.5px; font-weight: 800; color: var(--ink-2); background: rgba(241, 245, 249, .95); border: 1px solid var(--line); border-radius: 999px; padding: 1px 8px 1px 7px; white-space: nowrap; line-height: 1.5; }
   .lib-it { width: 100%; height: 100%; display: flex; flex-direction: column; gap: 6px; text-align: start; padding: 8px; border-radius: 18px; background: rgba(255, 255, 255, .72); border: 1px solid var(--line); transition: transform .2s cubic-bezier(.2, 1.4, .4, 1), box-shadow .2s, border-color .2s; }
   .lib-it:hover { transform: translateY(-2px); border-color: var(--line-2); box-shadow: 0 16px 30px -22px rgba(15, 23, 42, .45); }
@@ -542,6 +557,7 @@
 <div id="hype-root" dir="rtl"></div>
 <div id="toasts" dir="rtl" aria-live="polite" aria-atomic="false"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.118.0/dist/umd/supabase.js"></script>
 <script>
 (() => {
   'use strict';
@@ -611,7 +627,8 @@
     { v: 1.9, label: 'شديد جداً: تمرينان يومياً أو عمل بدني' }
   ];
   const GOALS = { cut: { label: 'خسارة دهون', adj: -500 }, maintain: { label: 'ثبات الوزن', adj: 0 }, bulk: { label: 'زيادة عضل', adj: 500 } };
-  const ADMIN_KEYS = ['kemo fit'];           // usernames (normalised) that get the control panel
+  const ADMIN_KEYS = ['kemo fit'];           // usernames (normalised) that get the control panel; the database checks it too
+  const SHARED_URL = 'https://claude.ai/artifact/KpktNA5iHdKL4hZuPceeWm';   // the Claude link (a separate board with its own data)
   const CHAT_WINDOW = 150;                    // newest messages kept visible and stored
   const QUICK_CHAT = ['💪 يلا يا شباب', '🔥 مين يتحداني اليوم؟', '👏 كفو عليك', '🏋️ خلصت تمريني', '🚶 رايح أمشي الحين'];
   const SLOTS = { breakfast: 'الفطور', lunch: 'الغداء', dinner: 'العشاء', snack: 'سناك' };
@@ -674,6 +691,7 @@
     camera: '<path d="M4 8.5h3.2L9 6h6l1.8 2.5H20v10.5H4Z"/><circle cx="12" cy="13.5" r="3.4"/>',
     image: '<rect x="3.5" y="4.5" width="17" height="15" rx="2.5"/><circle cx="9" cy="10" r="1.6"/><path d="m4.5 17.5 5-4.5 3.5 3 3-2.5 4 3.5"/>',
     sparkle: '<path d="M12 3.5l1.7 4.9 4.8 1.6-4.8 1.7L12 16.5l-1.7-4.8L5.5 10l4.8-1.6L12 3.5Z"/><path d="M18.5 15l.7 1.9 1.8.6-1.8.7-.7 1.8-.6-1.8-1.9-.7 1.9-.6.6-1.9Z"/>',
+    meal: '<circle cx="13.5" cy="12.5" r="6.5"/><circle cx="13.5" cy="12.5" r="3"/><path d="M3.5 4v5a1.5 1.5 0 0 0 3 0V4M5 10.5V20"/>',
     clip: '<rect x="5" y="4.5" width="14" height="16.5" rx="2.5"/><path d="M9 4.5V3h6v1.5M8.5 10h7M8.5 13.5h7M8.5 17h4"/>',
     arrowR: '<path d="M5 12h14M13 6l6 6-6 6"/>',
     target: '<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1" fill="currentColor"/>',
@@ -852,9 +870,9 @@
   let db = { version: 1, users: {} };
   let currentKey = null;
   let view = 'board';
-  // 'local' = this browser's localStorage · 'shared' = the artifact's db, shared by everyone on the page
+  // 'loading' = connecting to Supabase · 'shared' = the Supabase project, the same board on every phone
   let mode = 'loading';
-  let dbh = null, canWrite = null, readOnly = false, isOwnerViewer = false;
+  let readOnly = false;
   let sharedReady = false, sharedStale = false;
   let chatMsgs = [];
   const ui = {
@@ -921,22 +939,26 @@
     const st = dayStats(u, d);
     const unread = view === 'chat' ? 0 : unreadCount();
     const info = planInfo(u);
+    const kc = calLeft(u);
     return [
       { title: 'التنافس', items: [
         { v: 'board', label: 'لوحة التنافس', icon: 'trophy', badge: st.score ? fmt(st.score) : '' },
         { v: 'chat', label: 'دردشة المنافسة', icon: 'chat', badge: unread ? (unread > 99 ? '99+' : fmt(unread)) : '', alert: unread > 0 }
       ].concat(isAdmin() ? [{ v: 'admin', label: 'لوحة التحكم', icon: 'shield' }] : []) },
-      { title: 'البرنامج التدريبي', items: [{ v: 'programs', label: info ? info.prog.name : 'البرامج التدريبية', icon: 'clip', badge: info ? '' : 'جديد', alert: !info }]
+      { title: 'البرنامج التدريبي', items: [{ v: 'programs', label: info ? info.prog.name : 'البرامج التدريبية', icon: 'clip', badge: info ? '' : 'جديد', alert: !info, tone: info ? progTone(info.prog) : null }]
         .concat(u.pages.filter(p => p.prog).map(p => {
           const ps = pageDayStats(u, p.id, d);
           const isToday = !!info && typeof info.slot === 'number' && info.act.pageIds[info.slot] === p.id;
-          return { v: 'page-' + p.id, label: p.name, icon: pageIcon(p), badge: ps.reps ? fmt(ps.reps) : isToday ? 'اليوم' : '', alert: isToday && !ps.reps };
+          return { v: 'page-' + p.id, label: p.name, icon: pageIcon(p), badge: ps.reps ? fmt(ps.reps) : isToday ? 'اليوم' : '', alert: isToday && !ps.reps, tone: progTone(PROG_BY_ID[p.prog]) };
         })) },
       { title: 'صفحات التمارين', add: true, items: [{ v: 'log', label: 'جدول العدات', icon: 'table', badge: st.reps ? fmt(st.reps) : '' }]
         .concat(u.pages.filter(p => !p.prog).map(p => { const ps = pageDayStats(u, p.id, d); return { v: 'page-' + p.id, label: p.name, icon: pageIcon(p), badge: ps.reps ? fmt(ps.reps) : '' }; })) },
-      { title: 'الكارديو والتغذية', items: [
-        { v: 'cardio', label: 'المشي والكارديو', icon: 'route', badge: st.walkMin ? fmt(st.walkMin) + ' د' : '' },
-        { v: 'calories', label: 'السعرات الحرارية', icon: 'flame', badge: st.eaten ? fmt(st.eaten) : '' }
+      { title: 'الكارديو', items: [
+        { v: 'cardio', label: 'المشي والكارديو', icon: 'route', badge: st.walkMin ? fmt(st.walkMin) + ' د' : '' }
+      ] },
+      { title: 'السعرات', items: [
+        { v: 'calories', label: 'رصيد اليوم', icon: 'flame', badge: kc.target ? fmt(kc.left) : '' },
+        { v: 'meals', label: 'تسجيل الوجبات', icon: 'meal', badge: st.eaten ? fmt(st.eaten) : '' }
       ] },
       { title: 'المعرفة', items: [
         { v: 'science', label: 'الدراسات العلمية', icon: 'flask' },
@@ -952,7 +974,7 @@
           ${g.items.map(it => {
             const active = view === it.v;
             return `<li><button data-act="nav" data-v="${it.v}" ${active ? 'aria-current="page"' : ''} class="nav-it ${active ? 'is-on ia' : ''}${active && ui.navAnimNow === it.v ? ' liquid' : ''}">
-              <span class="nav-ic">${icon(it.icon, 'w-[18px] h-[18px]')}</span>
+              <span class="nav-ic${it.tone ? ' has-tone' : ''}"${it.tone ? ` style="--tone:${it.tone.bg};--on:${it.tone.fg}"` : ''}>${icon(it.icon, 'w-[18px] h-[18px]')}</span>
               <span class="truncate flex-1 text-start">${esc(it.label)}</span>
               ${it.badge ? `<span class="nav-badge ${it.alert && !active ? 'is-alert' : ''}">${it.badge}</span>` : ''}
             </button></li>`;
@@ -1054,7 +1076,7 @@
   function authView() {
     const reg = ui.authMode === 'register';
     const top = ranking(today()).filter(r => r.score > 0).slice(0, 3);
-    const loading = mode === 'loading' || (mode === 'shared' && !sharedReady);
+    const loading = mode === 'loading';
     return `<div class="min-h-screen grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">
       <section class="gutter py-10 sm:py-16 flex items-center justify-center">
         <div class="w-full max-w-[400px]">
@@ -1085,13 +1107,18 @@
                 <button type="button" data-act="toggle-pass" class="absolute inset-y-0 end-0 w-12 grid place-items-center text-slate-400 hover:text-slate-700 rounded-xl" aria-label="${ui.showPass ? 'إخفاء' : 'إظهار'} كلمة المرور">${icon(ui.showPass ? 'eyeOff' : 'eye')}</button>
               </div>
             </div>
-            ${loading ? `<p class="text-sm text-slate-600 bg-slate-100 rounded-xl px-3 py-2.5 flex items-center gap-2">${icon('info', 'w-4 h-4 shrink-0')}${sharedStale ? 'تعذّر الوصول إلى الحسابات المشتركة حتى الآن. ستظهر فور وصولها.' : 'جارٍ تحميل الحسابات المشتركة…'}</p>` : ''}
+            ${loading ? `<p class="text-sm text-slate-600 bg-slate-100 rounded-xl px-3 py-2.5 flex items-center gap-2">${icon('info', 'w-4 h-4 shrink-0')}${sharedStale ? 'تعذّر الاتصال بالخادم. تحقق من الإنترنت ثم حدّث الصفحة.' : 'جارٍ الاتصال بالخادم…'}</p>` : ''}
             ${readOnly && !loading ? `<p class="text-sm text-slate-600 bg-slate-100 rounded-xl px-3 py-2.5">لديك صلاحية المشاهدة فقط: تستطيع الدخول ورؤية لوحة التنافس، ولتسجيل تمارينك اطلب من صاحب الصفحة صلاحية «Contributor».</p>` : ''}
             <div id="auth-err" role="alert"></div>
-            <button class="btn-dark w-full h-12 text-base disabled:opacity-50 disabled:cursor-wait" ${loading ? 'disabled' : ''}>${reg ? 'إنشاء الحساب والدخول' : 'دخول'}</button>
+            <button id="auth-btn" class="btn-dark w-full h-12 text-base disabled:opacity-50 disabled:cursor-wait" ${loading || ui.authBusy ? 'disabled' : ''}>${ui.authBusy ? 'لحظة…' : reg ? 'إنشاء الحساب والدخول' : 'دخول'}</button>
           </form>
 
           <p class="mt-4 text-xs text-slate-400 leading-5">${isShared() ? 'الحسابات في هذه الصفحة مشتركة: كل من يفتحها يرى نفس لوحة التنافس وتتحدث أمامه مباشرة.' : mode === 'local' ? (storageOK ? 'البيانات محفوظة في هذا المتصفح فقط.' : 'التخزين المحلي غير متاح في هذا المتصفح، لذلك ستضيع البيانات عند تحديث الصفحة.') : ''}</p>
+          ${mode === 'local' ? `<div class="mt-4 rounded-2xl border border-slate-200 bg-white/70 p-4">
+            <p class="font-display font-extrabold text-slate-900 flex items-center gap-2">${icon('trophy', 'w-5 h-5')} تبي تتنافس مع أصحابك؟</p>
+            <p class="mt-1 text-sm text-slate-500 leading-6">بهذي النسخة كل جوال له حساباته بس. سجّلوا كلكم بالرابط المشترك عشان تشوفون بعض باللوحة والدردشة.</p>
+            <a href="${SHARED_URL}" class="btn-dark h-11 w-full mt-3 ia">${icon('trophy', 'w-4 h-4')} افتح الرابط المشترك</a>
+          </div>` : ''}
         </div>
       </section>
 
@@ -1180,7 +1207,7 @@
           <h2 class="font-display font-extrabold text-lg text-slate-900">لم يبدأوا يومهم بعد</h2>
           ${idle.length ? `<ul class="mt-3 flex flex-wrap gap-2">${idle.map(r => `<li class="inline-flex items-center gap-2 h-10 ps-1 pe-3 rounded-full bg-slate-50 border border-slate-200 text-sm font-bold text-slate-600">${avatar(r.name, 'w-8 h-8 text-xs')}${esc(r.name)}${r.key === u.key ? ' <span class="text-[11px] text-slate-400">(أنت)</span>' : ''}</li>`).join('')}</ul>`
             : `<p class="mt-2 text-sm text-slate-500">كل المتنافسين سجّلوا نشاطاً اليوم.</p>`}
-          <p class="mt-4 text-xs text-slate-400 leading-5">${isShared() ? 'المتنافسون هم كل من أنشأ حساباً في هذه الصفحة، والنتائج تتحدث مباشرة عند الجميع.' : 'المتنافسون هم كل الحسابات المسجّلة في Vibe Fit على هذا المتصفح، والبيانات محفوظة محلياً فيه.'}</p>
+          <p class="mt-4 text-xs text-slate-400 leading-5">${isShared() ? 'المتنافسون هم كل من أنشأ حساباً في هذه الصفحة، والنتائج تتحدث مباشرة عند الجميع.' : 'المتنافسون هم كل الحسابات المسجّلة في Vibe Fit على هذا المتصفح، والبيانات محفوظة محلياً فيه.'}${mode === 'local' ? ` <a href="${SHARED_URL}" class="font-bold text-slate-700 underline underline-offset-2">للمنافسة مع أصحابك افتحوا الرابط المشترك</a>` : ''}</p>
         </div>
       </div>
     </section>`;
@@ -1642,16 +1669,49 @@
     </div>${macroPanel(u, p)}`;
   }
   function defaultSlot() { const h = new Date().getHours(); return h < 11 ? 'breakfast' : h < 16 ? 'lunch' : h < 21 ? 'dinner' : 'snack'; }
+  // what's left of today's target after meals in and exercise out
+  function calLeft(u) {
+    const p = ui.prof || u.profile;
+    const st = dayStats(u, today());
+    const target = validProfile(p) ? dailyTarget(p) : 0;
+    const net = st.eaten - st.burnTotal;
+    return { target, net, left: target ? Math.round(target - net) : 0, st };
+  }
+  function mealsSummaryCard(meals) {
+    return `<div class="card p-5 sm:p-6">
+      <div class="flex items-center justify-between gap-3">
+        <h2 class="font-display font-extrabold text-lg text-slate-900">وجبات اليوم</h2>
+        <button data-act="nav" data-v="meals" class="btn-text">${meals.length ? 'سجّل وجبة ثانية' : 'سجّل أول وجبة'} ${icon('arrowR', 'w-4 h-4 rtl-flip')}</button>
+      </div>
+      <div class="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-2">${Object.keys(SLOTS).map(k => {
+        const ms = meals.filter(m => m.slot === k);
+        return `<div class="rounded-xl px-3 py-2.5 ${ms.length ? 'bg-slate-800 text-white' : 'bg-slate-50 border border-slate-200 text-slate-500'}">
+          <p class="text-[12px] font-bold ${ms.length ? 'text-slate-300' : ''}">${SLOTS[k]}</p>
+          <p class="mt-0.5"><span class="num text-xl font-extrabold">${ms.length ? fmt(sum(ms, m => m.kcal)) : '—'}</span>${ms.length ? ' <span class="text-[11px] text-slate-300">سعرة</span>' : ''}</p>
+        </div>`;
+      }).join('')}</div>
+    </div>`;
+  }
+  // Page 1 of «السعرات»: the day's balance and the daily-needs calculator
   function caloriesView(u) {
     const p = ui.prof || u.profile;
     const d = today();
-    const meals = u.meals.filter(m => m.date === d).sort((a, b) => a.ts - b.ts);
+    const meals = u.meals.filter(m => m.date === d);
     const numVal = v => Number.isFinite(v) ? v : '';
-    const slot = ui.mealSlot || defaultSlot();
     return `<section class="space-y-6 fade-in">
-      ${pageHeader('التغذية', 'السعرات الحرارية', 'احسب احتياجك اليومي، سجّل وجباتك، وقارنها بما حرقته في التمارين والمشي لترى صافي سعراتك.')}
-      <div class="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] items-start">
-        <div class="card p-5 sm:p-6 order-last lg:order-none">
+      ${pageHeader('السعرات', 'رصيد اليوم', 'هدفك اليومي مقابل اللي أكلته واللي حرقته بالتمارين والمشي، وكم باقي لك اليوم.', `<button data-act="nav" data-v="meals" class="btn-dark h-11 ia">${icon('meal', 'w-5 h-5')} سجّل وجبة</button>`)}
+      <div class="grid gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] items-start">
+        <div class="grid gap-4 min-w-0">
+          <div class="card p-5 sm:p-6">
+            <div class="flex items-baseline justify-between gap-3 mb-4">
+              <h2 class="font-display font-extrabold text-lg text-slate-900">رصيد اليوم</h2>
+              <span class="text-xs text-slate-400">${esc(longDate(d))}</span>
+            </div>
+            <div id="balance">${balanceHTML(u)}</div>
+          </div>
+          ${mealsSummaryCard(meals)}
+        </div>
+        <div class="card p-5 sm:p-6">
           <h2 class="font-display font-extrabold text-lg text-slate-900">احتياجك اليومي</h2>
           <p class="text-sm text-slate-500">معادلة Mifflin–St Jeor للأيض الأساسي، مضروبة في مستوى نشاطك.</p>
           ${u.profile.set ? '' : `<p class="mt-3 text-xs bg-slate-100 rounded-lg px-3 py-2 text-slate-600">القيم الحالية افتراضية. أدخل بياناتك واحفظها لتصبح الحسابات أدق.</p>`}
@@ -1674,15 +1734,20 @@
             <button class="btn-dark col-span-3 h-11">${icon('check', 'w-4 h-4')} احفظ بياناتي</button>
           </form>
         </div>
-        <div class="grid gap-4">
-          ${aiCardHTML()}
-          <div class="card p-5 sm:p-6">
-            <div class="flex items-baseline justify-between gap-3 mb-4">
-              <h2 class="font-display font-extrabold text-lg text-slate-900">رصيد اليوم</h2>
-              <span class="text-xs text-slate-400">${esc(longDate(d))}</span>
-            </div>
-            <div id="balance">${balanceHTML(u)}</div>
-          </div>
+      </div>
+    </section>`;
+  }
+  // Page 2 of «السعرات»: log meals (photo/description, quick picks, by hand)
+  function mealsView(u) {
+    const d = today();
+    const meals = u.meals.filter(m => m.date === d).sort((a, b) => a.ts - b.ts);
+    const slot = ui.mealSlot || defaultSlot();
+    const c = calLeft(u);
+    const side = `<button data-act="nav" data-v="calories" class="chip h-10 ia">${icon('flame', 'w-4 h-4')} ${!c.target ? 'احسب احتياجك اليومي' : c.left >= 0 ? `باقي لك اليوم <b class="num text-slate-900">${fmt(c.left)}</b> سعرة` : `تجاوزت هدفك بـ <b class="num text-slate-900">${fmt(-c.left)}</b> سعرة`}</button>`;
+    return `<section class="space-y-6 fade-in">
+      ${pageHeader('السعرات', 'تسجيل الوجبات', 'صوّر وجبتك أو اكتبها، أو اختر من الاقتراحات السريعة، وكل وجبة تنحسب برصيد اليوم على طول.', side)}
+      <div class="grid gap-4 lg:grid-cols-2 items-start">
+        <div class="min-w-0">${aiCardHTML()}</div>
           <div class="card p-5 sm:p-6">
             <h2 class="font-display font-extrabold text-lg text-slate-900">سجل الوجبات اليوم</h2>
             <form data-form="meal" class="mt-4 grid grid-cols-2 sm:grid-cols-[minmax(0,1.7fr)_minmax(0,.8fr)_minmax(0,.9fr)_auto] gap-2 items-end" novalidate>
@@ -1704,7 +1769,6 @@
               </div>`;
             }).join('') : `<p class="mt-4 text-sm text-slate-400">لم تسجّل وجبات اليوم بعد. أضف وجبة أو اختر من الاقتراحات السريعة.</p>`}
           </div>
-        </div>
       </div>
     </section>`;
   }
@@ -2442,6 +2506,23 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
   ];
   const PROG_BY_ID = {};
   PROGRAMS.forEach(p => { PROG_BY_ID[p.id] = p; });
+  // Each program gets its own shade of the site's slate: lighter for fewer days, darker for more
+  const SLATE = ['#F1F5F9', '#E2E8F0', '#CBD5E1', '#94A3B8', '#64748B', '#475569', '#334155', '#1E293B', '#0F172A', '#020617'];
+  const PROG_ORDER = ['cal3', 'bb3', 'db3', 'body4', 'db4', 'bb4', 'ul4', 'bulk4', 'home5', 'bb5', 'full5', 'cut5', 'ppl6', 'pl4', 'pl5'];
+  const progIdx = p => { const i = PROG_ORDER.indexOf(p.id); return i < 0 ? 99 : i; };
+  function slateAt(t) {
+    const x = clamp(t, 0, 1) * (SLATE.length - 1), i = Math.min(SLATE.length - 2, Math.floor(x)), f = x - i;
+    const rgb = [1, 3, 5].map(k => Math.round(parseInt(SLATE[i].slice(k, k + 2), 16) * (1 - f) + parseInt(SLATE[i + 1].slice(k, k + 2), 16) * f));
+    const L = rgb.map(v => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }).reduce((a, v, k) => a + v * [0.2126, 0.7152, 0.0722][k], 0);
+    const dark = (L + 0.05) / 0.0589 >= 1.05 / (L + 0.05);      // whichever text colour reads better on it
+    return { bg: '#' + rgb.map(v => v.toString(16).padStart(2, '0')).join(''), fg: dark ? '#0F172A' : '#FFFFFF', light: dark };
+  }
+  function progTone(p) {
+    if (!p) return slateAt(0.5);
+    if (p.style === 'pl') return slateAt(p.id === 'pl4' ? 0.55 : 0.93);
+    const bb = PROG_ORDER.filter(id => PROG_BY_ID[id] && PROG_BY_ID[id].style === 'bb');
+    return slateAt(0.12 + Math.max(0, bb.indexOf(p.id)) / Math.max(1, bb.length - 1) * 0.84);
+  }
 
   // Wizard vocabulary
   const LEVELS = { beginner: ['مبتدئ', 'أقل من 6 شهور تمرين منتظم'], intermediate: ['متوسط', 'من 6 شهور إلى سنتين'], advanced: ['متقدم', 'أكثر من سنتين وأوزانك تتطور'] };
@@ -2915,7 +2996,7 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
   function weekMini(p) {
     return `<div class="grid grid-cols-7 gap-1" aria-label="توزيع الأسبوع">${p.week.map(s => {
       const train = typeof s === 'number';
-      const cls = train ? 'bg-slate-800 text-white' : s === 'c' ? 'bg-slate-200 text-slate-700' : 'bg-slate-50 text-slate-400 border border-slate-200';
+      const cls = train ? 'bg-slate-800 text-white wk-train' : s === 'c' ? 'bg-slate-200 text-slate-700' : 'bg-slate-50 text-slate-400 border border-slate-200';
       const title = train ? `اليوم ${s + 1}: ${p.list[s].t}` : s === 'c' ? (p.cardio ? `${p.cardio.t} ${p.cardio.m} دقيقة` : 'كارديو') : 'راحة';
       return `<span class="h-8 rounded-lg grid place-items-center text-[10.5px] font-bold ${cls}" title="${esc(title)}">${train ? `<span class="num text-[13px]">${s + 1}</span>` : s === 'c' ? 'كارديو' : 'راحة'}</span>`;
     }).join('')}</div>`;
@@ -2953,18 +3034,23 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
     const act = u.plan && u.plan.active;
     const isActive = !!act && act.id === p.id;
     const focus = ctx && ctx.style === 'bb' && p.style === 'bb' ? (ctx.focus || []).filter(f => f !== 'all') : [];
-    const tags = [`${p.per} أيام بالأسبوع`, p.levels.map(l => LEVELS[l][0]).join(' / ')]
+    const tags = [p.levels.map(l => LEVELS[l][0]).join(' / ')]
       .concat(p.style === 'bb' ? p.goals.map(g => PGOALS[g] ? PGOALS[g][0].split(' ')[0] : '') : [p.sub]);
     const switching = ui.confirm === 'switch:' + p.id;
-    return `<article class="card p-4 sm:p-5 ${rec ? 'ring-2 ring-slate-800' : ''}">
-      <div class="flex items-start justify-between gap-3">
+    const T = progTone(p);
+    return `<article class="card prog-card overflow-hidden ${rec ? 'ring-2 ring-slate-800' : ''}" style="--tone:${T.bg};--on:${T.fg}">
+      <div class="prog-band px-4 sm:px-5 pt-3.5 pb-3 flex items-start justify-between gap-3">
         <div class="min-w-0">
-          <p class="text-xs font-bold text-slate-500">${STYLE_LABEL[p.style]}${p.sub ? ` · ${esc(p.sub)}` : ''}</p>
-          <h3 class="font-display font-extrabold text-xl text-slate-900 leading-snug">${esc(p.name)}</h3>
+          <p class="text-xs font-bold prog-band-sub">${STYLE_LABEL[p.style]}${p.sub ? ` · ${esc(p.sub)}` : ''}</p>
+          <h3 class="font-display font-extrabold text-xl leading-snug">${esc(p.name)}</h3>
         </div>
-        ${isActive ? '<span class="tag-dark">برنامجك الحالي</span>' : rec ? '<span class="tag-dark">⭐ الأنسب لك</span>' : ''}
+        <div class="flex flex-col items-end gap-1.5 shrink-0">
+          <span class="prog-pill"><span class="num">${p.per}</span> أيام بالأسبوع</span>
+          ${isActive ? '<span class="prog-pill is-mark">برنامجك الحالي</span>' : rec ? '<span class="prog-pill is-mark">⭐ الأنسب لك</span>' : ''}
+        </div>
       </div>
-      <p class="mt-1.5 text-sm text-slate-600 leading-6">${esc(p.blurb)}</p>
+      <div class="px-4 sm:px-5 pb-4 sm:pb-5 pt-3">
+      <p class="text-sm text-slate-600 leading-6">${esc(p.blurb)}</p>
       <div class="mt-3 flex flex-wrap items-center gap-1.5">${tags.filter(Boolean).map(t => `<span class="text-[11.5px] font-bold rounded-full px-2.5 py-1 bg-slate-100 text-slate-600">${esc(t)}</span>`).join('')}</div>
       <p class="mt-2 flex flex-wrap items-center gap-1.5 text-[12px] font-bold text-slate-500">ينفع: ${placeTags(progPlaces(p))}</p>
       <div class="mt-3">${weekMini(p)}</div>
@@ -2978,6 +3064,7 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
           <button data-act="prog-open" data-id="${p.id}" aria-expanded="${open}" class="btn-ghost h-10 text-sm">${open ? 'إخفاء الجدول' : 'عرض الجدول كامل'}</button>
         </div>`}
       ${open ? `<div class="mt-4">${progDetail(p, focus)}</div>` : ''}
+      </div>
     </article>`;
   }
   function recHero(u, p, a) {
@@ -3088,7 +3175,7 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
     } else if (![4, 5].includes(ctx.days)) ctx.days = (ctx.days || 4) >= 5 ? 5 : 4;
     const recId = recommendId(ctx);
     const hero = !!a && a.style === tab;
-    const rank = arr => arr.map(p => ({ p, s: p.id === recId ? 999 : progScore(p, ctx) })).sort((m, n) => n.s - m.s).map(m => m.p);
+    const rank = arr => arr.slice().sort((m, n) => m.per - n.per || progIdx(m) - progIdx(n));      // fewer days first, light → dark
     const all = progsAt(place, tab).filter(p => !(hero && p.id === recId));
     const own = rank(all.filter(p => progPlaces(p)[0] === place));
     const also = rank(all.filter(p => progPlaces(p)[0] !== place));
@@ -4541,7 +4628,7 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
      Render
      ========================================================= */
   function resolveView(u) {
-    if (['board', 'cardio', 'calories', 'chat', 'programs', 'log', 'science', 'news'].includes(view)) return view;
+    if (['board', 'cardio', 'calories', 'meals', 'chat', 'programs', 'log', 'science', 'news'].includes(view)) return view;
     if (view === 'admin' && isAdmin()) return view;
     if (view.startsWith('page-') && u.pages.some(p => 'page-' + p.id === view)) return view;
     return 'board';
@@ -4552,6 +4639,7 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
     if (view === 'admin') return adminView(u);
     if (view === 'cardio') return cardioView(u);
     if (view === 'calories') return caloriesView(u);
+    if (view === 'meals') return mealsView(u);
     if (view === 'programs') return programsView(u);
     if (view === 'log') return logView(u);
     if (view === 'science') return scienceView(u);
@@ -4564,7 +4652,7 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
     const u = me();
     if (!u) {
       renderBar();
-      const waiting = mode === 'loading' || (mode === 'shared' && !sharedReady);
+      const waiting = mode === 'loading' || (!!authUid && !sharedReady);
       app.innerHTML = waiting && readLS(SESSION_KEY) ? splashView() : authView();
       return;
     }
@@ -4575,6 +4663,7 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
     if (view === 'chat') markChatSeen();
     const main = mainView(u);
     const note = mode === 'local' && !storageOK ? 'التخزين المحلي غير متاح في هذا المتصفح، لذلك ستضيع البيانات عند تحديث الصفحة.'
+      : offlineSince ? 'ما فيه اتصال الحين: تغييراتك محفوظة على جوالك وبتنرفع للوحة أول ما يرجع النت.'
       : readOnly ? 'وضع المشاهدة فقط: تستطيع متابعة لوحة التنافس، ولتسجيل تمارينك اطلب من صاحب الصفحة صلاحية «Contributor».'
       : sharedStale ? 'تعذّر الوصول إلى البيانات المشتركة الآن، وقد لا تكون النتائج محدّثة.' : '';
     app.innerHTML = `${headerView(u)}
@@ -4624,40 +4713,108 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
     if (isNew) toast(`أهلاً بك في Vibe Fit، ${u.username}`, 'تم إنشاء حسابك. سجّل أول تمرين لتدخل لوحة التنافس.');
     else toast(`أهلاً بعودتك، ${u.username}`, 'بياناتك محمّلة وجاهزة.');
   }
-  function doLogin(name, pass) {
-    if (mode === 'loading' || (mode === 'shared' && !sharedReady)) return setAuthError('لحظة، جارٍ تحميل الحسابات…');
+  function setAuthBusy(on) {
+    ui.authBusy = on;
+    const b = $('#auth-btn');
+    if (b) {
+      b.disabled = on || mode === 'loading';
+      b.textContent = on ? 'لحظة…' : (ui.authMode === 'register' ? 'إنشاء الحساب والدخول' : 'دخول');
+    }
+  }
+  function authNotReady() {
+    if (sb && mode === 'shared') return false;
+    setAuthError(sharedStale ? 'تعذّر الاتصال بالخادم. تحقق من الإنترنت ثم حدّث الصفحة.' : 'لحظة، جارٍ الاتصال بالخادم…');
+    return true;
+  }
+  // After Supabase accepts the password: load the shared board, then open this user's account.
+  async function enterAs(user, isNew) {
+    resetShared();
+    authUid = user.id;
+    fullLoad();
+    startLive();
+    const ok = await whenReady(20000);
+    if (authUid !== user.id) return;
+    if (!ok) {
+      endSession();
+      setAuthError('تعذّر تحميل لوحة التنافس. تحقق من الإنترنت وحاول مرة ثانية.');
+      return;
+    }
+    const k = myKey();
+    if (!k || !db.users[k]) {
+      endSession();
+      setAuthError('ما لقينا حسابك في اللوحة. أنشئ حساباً جديداً.');
+      return;
+    }
+    startSession(db.users[k], isNew);
+  }
+  async function doLogin(name, pass) {
+    if (ui.authBusy || authNotReady()) return;
     const key = userKey(name);
     if (!key) return setAuthError('اكتب اسم المستخدم.');
     if (!pass) return setAuthError('اكتب كلمة المرور.');
-    const u = db.users[key];
-    if (!u) return setAuthError(`لا يوجد حساب باسم «${name.trim()}». تأكد من الاسم أو أنشئ حساباً جديداً.`);
-    if (u.pass !== hashPass(key, pass)) return setAuthError('كلمة المرور غير صحيحة. حاول مرة أخرى.');
-    startSession(u, false);
+    if (!(window.crypto && crypto.subtle)) return setAuthError('افتح الموقع من رابطه الآمن (https) عشان تسجّل دخولك.');
+    setAuthError('');
+    setAuthBusy(true);
+    try {
+      const pw = await loginPass(key, pass);
+      const { data, error } = await sb.auth.signInWithPassword({ email: await loginEmail(key), password: pw });
+      if (error || !data || !data.user) {
+        if (isNetErr(error)) return setAuthError('تعذّر الاتصال بالخادم. تحقق من الإنترنت وحاول مرة ثانية.');
+        if (error && error.status === 429) return setAuthError('محاولات كثيرة. انتظر دقيقة ثم حاول مرة ثانية.');
+        let exists = true;
+        try { const r = await sb.rpc('vf_name_exists', { k: key }); if (!r.error) exists = !!r.data; } catch (e) { /* keep the password message */ }
+        return setAuthError(exists ? 'كلمة المرور غير صحيحة. حاول مرة أخرى.' : `لا يوجد حساب باسم «${name.trim()}». تأكد من الاسم أو أنشئ حساباً جديداً.`);
+      }
+      await enterAs(data.user, false);
+    } catch (e) {
+      setAuthError('تعذّر تسجيل الدخول الآن. حاول مرة ثانية.');
+    } finally {
+      setAuthBusy(false);
+    }
   }
-  function doRegister(name, pass) {
-    if (mode === 'loading' || (mode === 'shared' && !sharedReady)) return setAuthError('لحظة، جارٍ تحميل الحسابات…');
-    if (readOnly) return setAuthError('لديك صلاحية المشاهدة فقط، لذلك لا يمكنك إنشاء حساب. اطلب من صاحب الصفحة صلاحية «Contributor».');
+  async function doRegister(name, pass) {
+    if (ui.authBusy || authNotReady()) return;
     const n = name.trim().replace(/\s+/g, ' ').slice(0, 30);
     if (!n) return setAuthError('اكتب اسم المستخدم.');
-    const key = userKey(n);
-    if (db.users[key]) return setAuthError(`اسم المستخدم «${n}» مستخدم بالفعل. اختر اسماً آخر أو سجّل الدخول.`);
     if (!pass) return setAuthError('اكتب أي كلمة مرور.');
-    const u = makeUser(n, pass);
-    db.users[key] = u;
-    saveDB(u);
-    startSession(u, true);
+    if (!(window.crypto && crypto.subtle)) return setAuthError('افتح الموقع من رابطه الآمن (https) عشان تنشئ حسابك.');
+    const key = userKey(n);
+    setAuthError('');
+    setAuthBusy(true);
+    try {
+      const pw = await loginPass(key, pass);
+      const draft = makeUser(n, pass);
+      let res, body = {};
+      try {
+        res = await fetch(SB_URL + '/functions/v1/vf-register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY },
+          body: JSON.stringify({ username: n, password: pw, profile: draft.profile, pages: draft.pages })
+        });
+        body = await res.json().catch(() => ({}));
+      } catch (e) {
+        return setAuthError('تعذّر الاتصال بالخادم. تحقق من الإنترنت وحاول مرة ثانية.');
+      }
+      if (res.status === 409 || body.error === 'taken') return setAuthError(`اسم المستخدم «${n}» مستخدم بالفعل. اختر اسماً آخر أو سجّل الدخول.`);
+      if (!res.ok) return setAuthError('تعذّر إنشاء الحساب الآن. حاول مرة ثانية بعد قليل.');
+      const { data, error } = await sb.auth.signInWithPassword({ email: await loginEmail(key), password: pw });
+      if (error || !data || !data.user) { return setAuthError('تم إنشاء حسابك، لكن تعذّر الدخول الآن. اضغط «تسجيل الدخول» وحاول مرة ثانية.'); }
+      await enterAs(data.user, true);
+    } catch (e) {
+      setAuthError('تعذّر إنشاء الحساب الآن. حاول مرة ثانية بعد قليل.');
+    } finally {
+      setAuthBusy(false);
+    }
   }
   function logout() {
+    if (offlineSince && (pendingW.size || inflight.size)) {
+      toast('انتظر شوي قبل الخروج', 'ما فيه اتصال، وآخر تغييراتك ما انرفعت للوحة بعد. اخرج بعد ما يرجع النت.', 'err');
+      return;
+    }
     const name = me() ? me().username : '';
-    rest = null;
-    closeHype();
-    currentKey = null;
-    writeLS(SESSION_KEY, null);
     ui.authMode = 'login'; ui.confirm = null; ui.prof = null;
-    closeDrawer(true);
     ui.wiz = null; ui.progBrowse = false; ui.progOpen = null; ui.heroOpen = false; ui.maxDraft = null;
-    if (ui.modal) closeModal();
-    renderApp();
+    endSession();
     window.scrollTo(0, 0);
     try { history.replaceState(null, '', location.pathname + location.search); } catch (e) { /* ignore */ }
     toast('تم تسجيل الخروج', name ? `إلى اللقاء يا ${name}. بياناتك محفوظة.` : '');
@@ -5153,23 +5310,39 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
       </div>
     </div>`;
   }
-  function restoreSession() {
-    const saved = readLS(SESSION_KEY);
-    if (saved && db.users[saved]) currentKey = saved;
-  }
-
   /* =========================================================
-     Shared store (artifact db)
-       accounts/{accId}           username, password hash, profile, pages
-       days/{accId}_{YYYY-MM-DD}  that account's logs, cardio and meals for one day
+     Shared store: the Supabase project "Kemo Fit Project"
+       accounts  one row per account: username, key, profile, pages, plan
+       days      {accId}_{YYYY-MM-DD}: that account's logs, cardio and meals for one day
+       chat      competition messages; the server stamps who sent them and when
+     Sign-in is Supabase Auth. The username maps to a private login e-mail and the
+     password is stretched on the phone, so any username and password still work.
+     Row Level Security lets everyone read the board and only the owner write their rows.
      ========================================================= */
+  const SB_URL = 'https://vygspsfsymerfxwbsxnf.supabase.co';
+  const SB_KEY = 'sb_publishable_6X5slpMfTPFgDamhEFMd2g_Sn9B1QJ2';
+  const LOGIN_DOMAIN = 'users.vibefit.invalid';
+  let sb = null;                  // Supabase client
+  let authUid = null;             // the signed-in auth user
+  let serverAdmin = null;         // admin rights as the database sees them (null = not asked yet)
+  let sessionGen = 0;             // bumps on sign-out, so late replies from the old session are ignored
   const remote = { accounts: new Map(), days: new Map() };
+  let remoteVer = new Map();      // path -> server version (ms) of the copy held in `remote`
+  const accOwner = new Map();     // accId -> auth user id
   const known = new Map();        // path -> canonical JSON last seen or written (null = absent)
   const pendingW = new Map();     // path -> payload waiting to be sent
   const unconfirmed = new Map();  // path -> latest local payload not yet confirmed by the store
   const inflight = new Set();
   let accountsLoaded = false, daysLoaded = false, renderPending = false;
+  let loadGen = 0, loadEvents = null, lastLoad = 0;
+  let liveCh = null, liveGen = 0, liveUp = false;
+  let readyWaiters = [], offlineSince = 0, flushTimer = 0, remoteTimer = 0, dataDirty = false, chatDirty = false;
   const sharedCutoff = shiftDate(today(), -120);
+  const COLS = {
+    accounts: 'id,user_id,key,username,created_at,profile,pages,plan,updated_at',
+    days: 'id,acc,date,logs,cardio,meals,updated_at',
+    chat: 'id,acc,name,text,ts,kind'
+  };
   const clone = o => JSON.parse(JSON.stringify(o));
   const toArr = v => Array.isArray(v) ? v.filter(Boolean) : (v && typeof v === 'object' ? Object.values(v).filter(Boolean) : []);
   const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -5178,9 +5351,22 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
     if (v && typeof v === 'object') return '{' + Object.keys(v).filter(k => v[k] !== undefined && v[k] !== null && !(Array.isArray(v[k]) && !v[k].length)).sort().map(k => JSON.stringify(k) + ':' + stable(v[k])).join(',') + '}';
     return JSON.stringify(v === undefined ? null : v);
   }
+  async function sha256hex(s) {
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
+    return Array.from(new Uint8Array(buf), b => b.toString(16).padStart(2, '0')).join('');
+  }
+  const loginEmail = async key => 'vf' + (await sha256hex('vibefit-user|' + key)).slice(0, 40) + '@' + LOGIN_DOMAIN;
+  const loginPass = async (key, pass) => 'Vf#1' + await sha256hex('vibefit-pass|' + key + '|' + pass);
+  const accFromRow = r => ({ username: r.username, key: r.key, createdAt: Number(r.created_at) || 0, profile: r.profile || {}, pages: toArr(r.pages), plan: r.plan || null });
+  const dayFromRow = r => ({ acc: r.acc, date: String(r.date).slice(0, 10), logs: toArr(r.logs), cardio: toArr(r.cardio), meals: toArr(r.meals) });
+  const chatFromRow = r => ({ id: String(r.id), acc: r.acc, name: r.name, text: r.text, ts: Number(r.ts), kind: r.kind === 'event' ? 'event' : 'msg' });
+  const verOf = r => Date.parse(r && r.updated_at) || 0;
+  const splitPath = path => { const i = path.indexOf('/'); return [path.slice(0, i), path.slice(i + 1)]; };
+  const isNetErr = e => !!e && (e.status === 0 || e.status === 502 || e.status === 503 || e.status === 504 || /failed to fetch|fetch failed|networkerror|network request|load failed|timed? ?out/i.test(String(e.message || e)));
+  const isAuthErr = e => !!e && (e.status === 401 || /PGRST30[0-9]|jwt/i.test(String(e.code || '') + ' ' + String(e.message || '')));
+
   function accountPayload(u) {
-    const p = { username: u.username, key: u.key, pass: u.pass, createdAt: u.createdAt || Date.now(), profile: u.profile, pages: u.pages, plan: u.plan || null };
-    return clone(p);
+    return clone({ username: u.username, key: u.key, createdAt: u.createdAt || Date.now(), profile: u.profile, pages: u.pages, plan: u.plan || null });
   }
   function dayPayload(u, date) {
     const pick = arr => arr.filter(x => x.date === date);
@@ -5188,6 +5374,7 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
     if (!logs.length && !cardio.length && !meals.length) return null;
     return clone({ acc: u.accId, date, logs, cardio, meals });
   }
+  function markKnown(path, data) { if (!unconfirmed.has(path)) known.set(path, data ? stable(data) : null); }
   function queueWrite(path, payload, force = false) {
     const s = payload ? stable(payload) : null;
     if (!force && (known.has(path) ? known.get(path) : null) === s) return;
@@ -5199,37 +5386,92 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
   async function pump(path) {
     if (inflight.has(path)) return;
     inflight.add(path);
+    const gen = sessionGen;
     try {
-      while (pendingW.has(path)) {
+      while (pendingW.has(path) && gen === sessionGen) {
         const payload = pendingW.get(path);
         pendingW.delete(path);
-        const ok = await writeOnce(path, payload);
-        if (!ok) { pendingW.delete(path); unconfirmed.delete(path); break; }
+        const r = await writeOnce(path, payload, gen);
+        if (gen !== sessionGen) return;
+        if (r === 'offline') {                        // keep it and send it when the network is back
+          if (!pendingW.has(path)) pendingW.set(path, payload);
+          scheduleFlush();
+          return;
+        }
+        if (!r) { pendingW.delete(path); unconfirmed.delete(path); break; }
       }
       if (!pendingW.has(path)) unconfirmed.delete(path);
     } finally {
       inflight.delete(path);
     }
   }
-  async function writeOnce(path, payload, retried = false) {
-    try {
-      const ref = dbh.doc(path);
-      if (payload) await ref.set(payload); else await ref.delete();
-      return true;
-    } catch (e) {
-      const code = e && e.code;
-      if (code === 'unavailable' && !retried) { await sleep(400 + Math.random() * 800); return writeOnce(path, payload, true); }
+  async function writeOnce(path, payload, gen) {
+    const [col, id] = splitPath(path);
+    for (let attempt = 0; attempt < 3; attempt++) {
+      let res;
+      try {
+        if (col === 'accounts') {
+          if (!payload) return true;                  // accounts are removed by the admin function only
+          res = await sb.from('accounts').update({ profile: payload.profile || {}, pages: payload.pages || [], plan: payload.plan || null }).eq('id', id).select('id,updated_at');
+          if (!res.error && !(res.data && res.data.length)) res = { error: { code: 'not_found', message: 'not found' }, status: 404 };
+        } else if (payload) {
+          res = await sb.from('days').upsert({ id, acc: payload.acc, date: payload.date, logs: payload.logs || [], cardio: payload.cardio || [], meals: payload.meals || [] }, { onConflict: 'id' }).select('id,updated_at');
+        } else {
+          res = await sb.from('days').delete().eq('id', id);
+        }
+      } catch (e) {
+        res = { error: { message: String((e && e.message) || e) }, status: 0 };
+      }
+      if (gen !== sessionGen) return true;
+      const err = res && res.error;
+      if (!err) {
+        // hold what was written until the live feed echoes the same version back (no flicker)
+        if (payload) { if (col === 'days' || remote.accounts.has(id)) remote[col].set(id, clone(payload)); }
+        else remote[col].delete(id);
+        const v = verOf(Array.isArray(res.data) ? res.data[0] : null);
+        if (payload && v) remoteVer.set(path, Math.max(v, remoteVer.get(path) || 0));
+        if (!payload) remoteVer.delete(path);
+        backOnline();
+        return true;
+      }
+      err.status = res.status;
+      if (isNetErr(err)) {
+        if (attempt < 1) { await sleep(600 + Math.random() * 900); continue; }
+        return 'offline';
+      }
+      if (isAuthErr(err) && attempt < 2) {
+        try { await sb.auth.refreshSession(); } catch (e) { /* the next attempt decides */ }
+        continue;
+      }
       known.delete(path);
-      if ((code === 'invalid_argument' && canWrite !== true) || code === 'not_granted' || code === 'revoked') {
-        if (!readOnly) { readOnly = true; toast('لا يمكنك الحفظ في هذه اللوحة', 'لتسجيل تمارينك اطلب من صاحب الصفحة صلاحية «Contributor».', 'err'); }
-      } else if (code === 'quota_exceeded') {
-        toast('امتلأت مساحة البيانات المشتركة', 'اطلب من المشرف مسح الدردشة أو حذف حسابات غير مستخدمة ثم حاول مجدداً.', 'err');
+      if (err.code === '42501' || err.code === 'not_found') {
+        toast('لا يمكنك الحفظ في هذه اللوحة', 'سجّل خروجك ثم ادخل بحسابك من جديد.', 'err');
+      } else if (err.code === '23514') {
+        toast('البيانات أكبر من المسموح', 'احذف بعض السجلات القديمة ثم حاول مجدداً.', 'err');
       } else {
         toast('تعذّر حفظ آخر تغيير', 'تحقق من اتصالك ثم أعد المحاولة.', 'err');
       }
       setTimeout(() => { rebuildFromRemote(); renderApp(); }, 0);
       return false;
     }
+    return 'offline';
+  }
+  function scheduleFlush() {
+    if (!offlineSince) {
+      offlineSince = Date.now();
+      toast('ما فيه اتصال الحين', 'تغييراتك محفوظة على جوالك، وبنرفعها أول ما يرجع النت.', 'err');
+      requestRender();
+    }
+    if (flushTimer) return;
+    flushTimer = setTimeout(() => { flushTimer = 0; flushPending(); }, 6000);
+  }
+  function flushPending() { Array.from(pendingW.keys()).forEach(p => pump(p)); }
+  function backOnline() {
+    if (!offlineSince) return;
+    offlineSince = 0;
+    flushPending();
+    toast('رجع الاتصال', 'انحفظت تغييراتك في اللوحة.');
+    requestRender();
   }
   function syncUser(u) {
     if (!u.accId) u.accId = accIdOf(u.key);
@@ -5244,7 +5486,7 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
   function rebuildFromRemote() {
     const accs = new Map(remote.accounts), days = new Map(remote.days);
     unconfirmed.forEach((payload, path) => {
-      const [col, id] = path.split('/');
+      const [col, id] = splitPath(path);
       const m = col === 'accounts' ? accs : days;
       if (payload) m.set(id, payload); else m.delete(id);
     });
@@ -5270,15 +5512,193 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
     });
     db.users = users;
   }
-  function absorb(col, snap) {
-    const map = new Map();
-    snap.docs.forEach(d => { if (d.exists) map.set(d.id, d.data()); });
-    const prefix = col + '/';
-    Array.from(known.keys()).forEach(path => {
-      if (path.startsWith(prefix) && !map.has(path.slice(prefix.length)) && !unconfirmed.has(path)) known.set(path, null);
+
+  // ---- live feed: rows arrive through Supabase Realtime; a full load fills any gap ----
+  function putRow(col, r) {
+    const path = col + '/' + r.id;
+    const v = verOf(r);
+    if ((remoteVer.get(path) || 0) > v) return;              // older than the copy we hold
+    if (col === 'days' && String(r.date).slice(0, 10) < sharedCutoff) return;
+    const data = col === 'accounts' ? accFromRow(r) : dayFromRow(r);
+    remote[col].set(r.id, data);
+    remoteVer.set(path, v);
+    if (col === 'accounts' && r.user_id) accOwner.set(r.id, r.user_id);
+    markKnown(path, data);
+  }
+  function putChat(r) {
+    const m = chatFromRow(r);
+    chatMsgs = sanitizeChat(chatMsgs.filter(x => x.id !== m.id).concat([m]));
+  }
+  function applyEvent(col, p) {
+    const type = p && p.eventType;
+    if (col === 'chat') {
+      if (type === 'DELETE') {
+        const id = p.old && p.old.id;
+        if (id != null) chatMsgs = chatMsgs.filter(m => m.id !== String(id));
+      } else if (p.new && p.new.id != null) {
+        if (typeof p.new.text !== 'string') refetchRow('chat', p.new.id);
+        else putChat(p.new);
+      }
+      return;
+    }
+    if (type === 'DELETE') {
+      const id = p.old && p.old.id;
+      if (id == null) return;
+      const path = col + '/' + id;
+      const at = Date.parse(p.commit_timestamp) || 0;
+      if (at && (remoteVer.get(path) || 0) > at) return;    // the row came back after this delete
+      remote[col].delete(id);
+      remoteVer.delete(path);
+      if (col === 'accounts') accOwner.delete(id);
+      markKnown(path, null);
+      return;
+    }
+    const r = p.new;
+    if (!r || r.id == null) return;
+    const need = col === 'accounts' ? ['key', 'username', 'profile', 'pages'] : ['acc', 'date', 'logs', 'cardio', 'meals'];
+    if (need.some(k => !(k in r))) { refetchRow(col, r.id); return; }   // too big for the live feed: fetch it
+    putRow(col, r);
+  }
+  async function refetchRow(col, id) {
+    const sg = sessionGen;
+    try {
+      const { data, error } = await sb.from(col).select(COLS[col]).eq('id', id).maybeSingle();
+      if (sg !== sessionGen || error || !data) return;
+      if (col === 'chat') { putChat(data); chatDirty = true; } else { putRow(col, data); dataDirty = true; }
+      scheduleRemote();
+    } catch (e) { /* the next full load catches up */ }
+  }
+  async function fetchAll(table, filter) {
+    const out = [], step = 1000;
+    for (let from = 0; ; from += step) {
+      let q = sb.from(table).select(COLS[table]);
+      if (filter) q = filter(q);
+      const res = await q.order('id').range(from, from + step - 1);
+      if (res.error) { res.error.status = res.status; throw res.error; }
+      out.push(...res.data);
+      if (res.data.length < step) return out;
+    }
+  }
+  async function fullLoad() {
+    if (!sb || !authUid) return;
+    const gen = ++loadGen, sg = sessionGen;
+    loadEvents = [];
+    try {
+      const [accs, days, chat] = await Promise.all([
+        fetchAll('accounts'),
+        fetchAll('days', q => q.gte('date', sharedCutoff)),
+        sb.from('chat').select(COLS.chat).order('ts', { ascending: false }).limit(CHAT_WINDOW)
+      ]);
+      if (gen !== loadGen || sg !== sessionGen) return;
+      if (chat.error) { chat.error.status = chat.status; throw chat.error; }
+      const evs = loadEvents || [];
+      loadEvents = null;
+      remote.accounts = new Map(); remote.days = new Map(); remoteVer = new Map(); accOwner.clear();
+      accs.forEach(r => putRow('accounts', r));
+      days.forEach(r => putRow('days', r));
+      chatMsgs = sanitizeChat(chat.data.map(chatFromRow));
+      evs.forEach(([col, p]) => applyEvent(col, p));          // changes that arrived while loading
+      Array.from(known.keys()).forEach(path => {
+        const [col, id] = splitPath(path);
+        if (remote[col] && !remote[col].has(id)) markKnown(path, null);
+      });
+      lastLoad = Date.now();
+      accountsLoaded = daysLoaded = true;
+      dataDirty = chatDirty = false;
+      onRemote();
+      if (view === 'chat') refreshChat();
+    } catch (e) {
+      if (gen !== loadGen || sg !== sessionGen) return;
+      loadEvents = null;
+      if (isAuthErr(e)) { try { await sb.auth.refreshSession(); } catch (x) { /* retried below */ } }
+      if (!sharedStale) { sharedStale = true; if (me()) requestRender(); else renderApp(); }
+      setTimeout(() => { if (gen === loadGen && sg === sessionGen) fullLoad(); }, 5000);
+    }
+  }
+  function scheduleRemote() {
+    if (remoteTimer) return;
+    remoteTimer = setTimeout(() => {
+      remoteTimer = 0;
+      if (loadEvents) return;                                    // a full load is running and renders when done
+      const d = dataDirty, c = chatDirty;
+      dataDirty = chatDirty = false;
+      if (d) onRemote();
+      if (c) refreshChat();
+    }, 60);
+  }
+  function startLive() {
+    stopLive();
+    const gen = ++liveGen;
+    const ch = sb.channel('vibefit-live-' + gen);
+    ['accounts', 'days', 'chat'].forEach(t => ch.on('postgres_changes', { event: '*', schema: 'public', table: t }, p => {
+      if (gen !== liveGen) return;
+      if (loadEvents) loadEvents.push([t, p]);
+      applyEvent(t, p);
+      if (t === 'chat') chatDirty = true; else dataDirty = true;
+      scheduleRemote();
+    }));
+    ch.subscribe(status => {
+      if (gen !== liveGen) return;
+      if (status === 'SUBSCRIBED') {
+        liveUp = true;
+        fullLoad();                                               // catch up on anything missed while the feed was down
+      } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') {
+        liveUp = false;
+        setTimeout(() => { if (gen === liveGen && !liveUp && authUid) startLive(); }, 8000);
+      }
     });
-    map.forEach((data, id) => { const path = prefix + id; if (!unconfirmed.has(path)) known.set(path, stable(data)); });
-    remote[col] = map;
+    liveCh = ch;
+  }
+  function stopLive() {
+    liveGen++;
+    liveUp = false;
+    if (liveCh && sb) { try { sb.removeChannel(liveCh); } catch (e) { /* already closed */ } }
+    liveCh = null;
+  }
+  function myKey() {
+    if (!authUid) return null;
+    for (const [id, owner] of accOwner) {
+      if (owner === authUid) { const a = remote.accounts.get(id); return a ? a.key : null; }
+    }
+    return null;
+  }
+  function whenReady(ms) {
+    if (sharedReady) return Promise.resolve(true);
+    return new Promise(res => {
+      const t = setTimeout(() => res(false), ms);
+      readyWaiters.push(() => { clearTimeout(t); res(true); });
+    });
+  }
+  async function refreshAdmin() {
+    const sg = sessionGen;
+    try {
+      const { data, error } = await sb.rpc('vf_is_admin');
+      if (sg === sessionGen && !error) { serverAdmin = !!data; requestRender(); }
+    } catch (e) { /* keep the username rule */ }
+  }
+  // Forget everything from the current sign-in (used on sign-out and when an account disappears).
+  function resetShared() {
+    sessionGen++; loadGen++;
+    stopLive();
+    authUid = null; serverAdmin = null; currentKey = null;
+    writeLS(SESSION_KEY, null);
+    remote.accounts = new Map(); remote.days = new Map(); remoteVer = new Map(); accOwner.clear();
+    known.clear(); pendingW.clear(); unconfirmed.clear(); inflight.clear();
+    loadEvents = null; accountsLoaded = daysLoaded = false; sharedReady = false; sharedStale = false;
+    offlineSince = 0;
+    if (flushTimer) { clearTimeout(flushTimer); flushTimer = 0; }
+    readyWaiters = [];
+    db.users = {}; chatMsgs = [];
+  }
+  function endSession(msg) {
+    rest = null;
+    closeHype();
+    if (ui.modal) closeModal();
+    closeDrawer(true);
+    resetShared();
+    if (sb) sb.auth.signOut({ scope: 'local' }).catch(() => {});
+    renderApp();
+    if (msg) toast(msg, '', 'err');
   }
   function isTyping() {
     const a = document.activeElement;
@@ -5299,33 +5719,27 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
     sharedReady = true;
     sharedStale = false;
     rebuildFromRemote();
-    if (first) { restoreSession(); renderApp(); return; }
-    if (currentKey && !db.users[currentKey]) {
-      currentKey = null; writeLS(SESSION_KEY, null); renderApp();
-      toast('لم يعد هذا الحساب موجوداً في اللوحة', '', 'err');
+    if (first) {
+      const k = myKey();
+      if (k) { currentKey = k; writeLS(SESSION_KEY, k); refreshAdmin(); }
+      readyWaiters.splice(0).forEach(f => f());
+      if (!k && !ui.authBusy) { endSession('لم يعد هذا الحساب موجوداً في اللوحة'); return; }
+      renderApp();
       return;
     }
+    if (currentKey && !db.users[currentKey]) { endSession('لم يعد هذا الحساب موجوداً في اللوحة'); return; }
     requestRender();
   }
-  function listen(col, build, retried = false) {
-    if (!dbh) return;
-    liveSubs.push(build().onSnapshot(snap => {
-      absorb(col, snap);
-      if (col === 'accounts') accountsLoaded = true; else daysLoaded = true;
-      onRemote();
-    }, err => {
-      const code = err && err.code;
-      if (code === 'unavailable' && !retried) { setTimeout(() => listen(col, build, true), 2000); return; }
-      if (code === 'revoked') readOnly = true;
-      sharedStale = true;
-      renderApp();
-    }));
-  }
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && authUid && Date.now() - lastLoad > 20000) fullLoad();
+  });
+  window.addEventListener('online', () => { if (authUid) { flushPending(); fullLoad(); } });
+  setInterval(() => { if (authUid && !liveUp && Date.now() - lastLoad > 60000) fullLoad(); }, 30000);
 
   /* =========================================================
      Admin (Kemo Fit) & competition chat
      ========================================================= */
-  const isAdmin = () => { const u = me(); return !!u && ADMIN_KEYS.includes(u.key); };
+  const isAdmin = () => { const u = me(); if (!u) return false; return serverAdmin === null ? ADMIN_KEYS.includes(u.key) : serverAdmin; };
   const seenKey = () => 'vibefit.chatSeen.' + (me() ? me().key : '');
   function sanitizeChat(arr) {
     return (Array.isArray(arr) ? arr : [])
@@ -5357,79 +5771,68 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
   }
   function sendChat(text, kind = 'msg') {
     const u = me();
-    if (!u || readOnly) return false;
+    if (!u || readOnly || !sb) return false;
     const t = String(text || '').replace(/\r/g, '').trim().slice(0, 500);
     if (!t) return false;
-    const msg = { acc: u.accId || accIdOf(u.key), name: u.username, text: t, ts: Date.now(), kind };
-    const id = 'm' + msg.ts + '-' + uid();
+    const id = 'm' + Date.now() + '-' + uid();
+    const sg = sessionGen;
     ui.chatStick = true;
-    if (isShared()) {
-      dbh.collection('chat').doc(id).set(msg).then(pruneChat).catch(e => {
-        const code = e && e.code;
-        if ((code === 'invalid_argument' && canWrite !== true) || code === 'not_granted' || code === 'revoked') readOnly = true;
-        toast('تعذّر إرسال الرسالة', code === 'quota_exceeded' ? 'امتلأت مساحة البيانات. اطلب من المشرف مسح الدردشة.' : 'تحقق من اتصالك ثم أعد المحاولة.', 'err');
-      });
-    } else {
-      db.chat = sanitizeChat((db.chat || []).concat([Object.assign({ id }, msg)]));
-      chatMsgs = db.chat.slice();
-      saveDB();
+    const failed = net => {
+      if (sg !== sessionGen) return;
+      toast('تعذّر إرسال الرسالة', net ? 'تحقق من اتصالك ثم أعد المحاولة.' : 'حاول مرة ثانية بعد قليل.', 'err');
+      const el = $('#chat-input');
+      if (kind === 'msg' && el && !el.value) { el.value = t; ui.chatDraft = t; }
+    };
+    sb.from('chat').insert({ id, text: t, kind }).select(COLS.chat).single().then(res => {
+      if (sg !== sessionGen) return;
+      if (res.error || !res.data) { if (res.error) res.error.status = res.status; failed(isNetErr(res.error)); return; }
+      putChat(res.data);
       refreshChat();
-    }
+    }, () => failed(true));
     return true;
   }
-  // Keep the shared chat bounded: whoever sends removes a few messages older than the visible window.
-  function pruneChat() {
-    if (!isShared() || chatMsgs.length < CHAT_WINDOW) return;
-    const oldest = chatMsgs[0].ts;
-    dbh.collection('chat').where('ts', '<', oldest).limit(25).get()
-      .then(s => s.docs.reduce((p, d) => p.then(() => dbh.collection('chat').doc(d.id).delete().catch(() => {})), Promise.resolve()))
-      .catch(() => {});
-  }
   function deleteMsg(id) {
-    if (!isAdmin()) return;
-    if (isShared()) {
-      dbh.collection('chat').doc(id).delete().then(() => toast('حُذفت الرسالة')).catch(() => toast('تعذّر حذف الرسالة', 'حاول مرة أخرى.', 'err'));
-    } else {
-      db.chat = (db.chat || []).filter(m => m.id !== id); chatMsgs = db.chat.slice(); saveDB(); refreshChat(); toast('حُذفت الرسالة');
-    }
+    if (!isAdmin() || !sb) return;
+    sb.from('chat').delete().eq('id', id).select('id').then(res => {
+      if (res.error || !res.data || !res.data.length) { toast('تعذّر حذف الرسالة', 'حاول مرة أخرى.', 'err'); return; }
+      chatMsgs = chatMsgs.filter(m => m.id !== id);
+      refreshChat();
+      toast('حُذفت الرسالة');
+    }, () => toast('تعذّر حذف الرسالة', 'حاول مرة أخرى.', 'err'));
   }
   async function clearChat() {
-    if (!isAdmin()) return;
+    if (!isAdmin() || !sb) return;
     ui.confirm = null;
-    if (isShared()) {
-      renderApp();
-      toast('جارٍ مسح الدردشة…');
-      try {
-        for (let round = 0; round < 20; round++) {
-          const s = await dbh.collection('chat').limit(200).get();
-          if (s.empty) break;
-          for (const d of s.docs) await dbh.collection('chat').doc(d.id).delete();
-        }
-        toast('مُسحت الدردشة', 'كل رسائل المنافسة حُذفت.');
-      } catch (e) {
-        toast('تعذّر مسح كل الرسائل', 'حاول مرة أخرى.', 'err');
-      }
+    renderApp();
+    toast('جارٍ مسح الدردشة…');
+    let res;
+    try { res = await sb.rpc('vf_admin_clear_chat'); } catch (e) { res = { error: e }; }
+    if (res.error) {
+      toast('تعذّر مسح كل الرسائل', 'حاول مرة أخرى.', 'err');
     } else {
-      db.chat = []; chatMsgs = []; saveDB(); toast('مُسحت الدردشة', 'كل رسائل المنافسة حُذفت.');
+      chatMsgs = [];
+      toast('مُسحت الدردشة', 'كل رسائل المنافسة حُذفت.');
     }
     renderApp();
   }
   function deleteAccount(key) {
     const u = me();
     const t = db.users[key];
-    if (!isAdmin() || !t || t.key === u.key) return false;
-    if (isShared()) {
-      const acc = t.accId || accIdOf(t.key);
-      queueWrite('accounts/' + acc, null, true);
-      Array.from(remote.days.keys()).filter(id => id.startsWith(acc + '_')).forEach(id => queueWrite('days/' + id, null, true));
-      dbh.collection('days').where('acc', '==', acc).get()
-        .then(s => s.docs.forEach(d => queueWrite('days/' + d.id, null, true)))
-        .catch(() => {});
-      rebuildFromRemote();
-    } else {
-      delete db.users[key];
-      saveDB();
-    }
+    if (!isAdmin() || !t || !u || t.key === u.key || !sb) return false;
+    const acc = t.accId || accIdOf(t.key);
+    const sg = sessionGen;
+    const failed = () => {
+      if (sg !== sessionGen) return;
+      toast(`تعذّر حذف حساب «${t.username}»`, 'حاول مرة ثانية.', 'err');
+      fullLoad();
+    };
+    sb.rpc('vf_admin_delete_account', { target: acc }).then(res => { if (res.error) failed(); }, failed);
+    // drop it here right away; the live feed confirms the delete on every phone
+    remote.accounts.delete(acc); accOwner.delete(acc); remoteVer.delete('accounts/' + acc); markKnown('accounts/' + acc, null);
+    Array.from(remote.days.keys()).filter(id => id.startsWith(acc + '_')).forEach(id => {
+      remote.days.delete(id); remoteVer.delete('days/' + id); markKnown('days/' + id, null);
+    });
+    rebuildFromRemote();
     return true;
   }
   function chatListHTML(u) {
@@ -5573,41 +5976,35 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
       </div>
     </section>`;
   }
-  function listenChat(retried = false) {
-    if (!dbh) return;
-    liveSubs.push(dbh.collection('chat').orderBy('ts', 'desc').limit(CHAT_WINDOW).onSnapshot(snap => {
-      chatMsgs = sanitizeChat(snap.docs.filter(d => d.exists).map(d => Object.assign({}, d.data(), { id: d.id })));
-      refreshChat();
-    }, err => {
-      if (err && err.code === 'unavailable' && !retried) setTimeout(() => listenChat(true), 2000);
-    }));
+  // Two eyes over the hand sign: shut while the domain charges, wide open the moment it expands
+  function eyesSVG() {
+    const almond = (cx, cy) => `M${cx - 31} ${cy}C${cx - 17} ${cy - 19} ${cx + 17} ${cy - 19} ${cx + 31} ${cy}C${cx + 17} ${cy + 14} ${cx - 17} ${cy + 14} ${cx - 31} ${cy}Z`;
+    const eye = (cx, cy, tilt, id) => `<g transform="rotate(${tilt} ${cx} ${cy})">
+        <g class="dx-eye-open">
+          <path d="${almond(cx, cy)}" fill="#F8FAFC"/>
+          <g clip-path="url(#${id})">
+            <circle cx="${cx}" cy="${cy + 1}" r="11.5" fill="url(#dxIris)"/>
+            <circle cx="${cx}" cy="${cy + 1}" r="4.8" fill="#0F172A"/>
+            <circle cx="${cx - 4}" cy="${cy - 3}" r="2.6" fill="#FFFFFF"/>
+            <circle cx="${cx + 4.2}" cy="${cy + 4.5}" r="1.2" fill="#FFFFFF" opacity=".8"/>
+          </g>
+          <path d="M${cx - 33} ${cy + 1}C${cx - 17} ${cy - 20} ${cx + 17} ${cy - 20} ${cx + 33} ${cy + 1}" fill="none" stroke="#E2E8F0" stroke-width="3.4" stroke-linecap="round"/>
+        </g>
+        <path class="dx-eye-shut" d="M${cx - 31} ${cy}C${cx - 16} ${cy + 11} ${cx + 16} ${cy + 11} ${cx + 31} ${cy}${[-18, -6, 6, 18].map(dx => `M${cx + dx} ${cy + 8}l${dx > 0 ? 2 : -2} 5`).join('')}" fill="none" stroke="#CBD5E1" stroke-width="2.6" stroke-linecap="round"/>
+      </g>`;
+    return `<svg class="dx-eyes" viewBox="0 0 168 44" aria-hidden="true">
+      <defs>
+        <radialGradient id="dxIris" cx="50%" cy="42%" r="60%"><stop offset="0" stop-color="#E2E8F0"/><stop offset=".45" stop-color="#94A3B8"/><stop offset=".8" stop-color="#475569"/><stop offset="1" stop-color="#1E293B"/></radialGradient>
+        <clipPath id="dxEyeL"><path d="${almond(36, 24)}"/></clipPath>
+        <clipPath id="dxEyeR"><path d="${almond(132, 24)}"/></clipPath>
+      </defs>
+      ${eye(36, 24, 5, 'dxEyeL')}${eye(132, 24, -5, 'dxEyeR')}
+    </svg>`;
   }
-
-  const liveSubs = [];                   // unsubscribe handles of the live listeners
-
   /* =========================================================
-     Boot
-     ========================================================= */
-  function bootLocal() {
-    mode = 'local';
-    db = loadDB();
-    const demoKeys = Object.keys(db.users || {}).filter(k => db.users[k] && db.users[k].seed);
-    if (demoKeys.length) { demoKeys.forEach(k => { delete db.users[k]; }); saveDB(); }
-    chatMsgs = sanitizeChat(db.chat || []);
-    restoreSession();
-    renderApp();
-    initAI();
-    window.addEventListener('storage', e => {
-      if (e.key === DB_KEY && e.newValue) {
-        try { db = JSON.parse(e.newValue); chatMsgs = sanitizeChat(db.chat || []); if (!db.users[currentKey]) currentKey = null; renderApp(); } catch (err) { /* ignore */ }
-      }
-    });
-  }
-
-  /* =========================================================
-     Intro: Domain Expansion — the hand sign snaps in, a void opens around it
-     with streaking stars, the name appears, then the app is revealed.
-     Plays every time the page opens; tap to skip.
+     Intro: the hand sign charges with its eyes shut, the eyes open as the domain
+     expands into deep space, then the stars rush past at warp speed and the site
+     arrives. Plays every time the page opens; tap to skip.
      ========================================================= */
   function playIntro() {
     let reduce = false;
@@ -5617,11 +6014,15 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
     el.setAttribute('aria-hidden', 'true');
     const word = Array.from('VIBE FIT').map((c, i) => c === ' ' ? '<span class="dx-sp"> </span>' : `<span style="--i:${i}">${c}</span>`).join('');
     el.innerHTML = `<div class="dx-stage">
-        <div class="dx-rays"></div><div class="dx-void"></div><div class="dx-rings"><i></i><i></i><i></i></div><canvas></canvas><div class="dx-charge"></div><div class="dx-flash"></div>
-        <p class="dx-cap" dir="ltr">DOMAIN EXPANSION</p>
-        ${logo('dx-logo')}
-        <div class="dx-text"><p class="dx-word" dir="ltr">${word}</p><p class="dx-sub">فايب فيت</p><p class="dx-tag">سجّل · نافس · تطوّر</p></div>
+        <div class="dx-rays"></div><div class="dx-void"></div><div class="dx-space"></div><div class="dx-rings"><i></i><i></i><i></i></div><canvas></canvas><div class="dx-charge"></div><div class="dx-flash"></div>
+        <div class="dx-core">
+          <p class="dx-cap" dir="ltr">DOMAIN EXPANSION</p>
+          ${eyesSVG()}
+          ${logo('dx-logo')}
+          <div class="dx-text"><p class="dx-word" dir="ltr">${word}</p><p class="dx-sub">فايب فيت</p><p class="dx-tag">سجّل · نافس · تطوّر</p></div>
+        </div>
       </div>
+      <div class="dx-warp-flash"></div>
       <p class="dx-skip">اضغط للتخطي</p>`;
     document.body.appendChild(el);
     document.documentElement.classList.add('intro-on');
@@ -5630,23 +6031,30 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
       if (done) return;
       done = true;
       el.classList.add('dx-out');
-      setTimeout(() => { cancelAnimationFrame(raf); el.remove(); document.documentElement.classList.remove('intro-on'); }, reduce ? 0 : 640);
+      if (!reduce) document.documentElement.classList.add('intro-arrive');
+      setTimeout(() => { cancelAnimationFrame(raf); el.remove(); document.documentElement.classList.remove('intro-on'); }, reduce ? 0 : 380);
+      setTimeout(() => document.documentElement.classList.remove('intro-arrive'), 1100);
     };
     el.addEventListener('click', finish);
     if (reduce) { setTimeout(finish, 900); return; }
     const cv = el.querySelector('canvas');
     const ctx = cv && cv.getContext ? cv.getContext('2d') : null;
+    const T_SNAP = 0.92, T_WARP = 2.32;
     if (ctx) {
       const dpr = Math.min(2, window.devicePixelRatio || 1);
       const W = cv.width = Math.round(window.innerWidth * dpr), H = cv.height = Math.round(window.innerHeight * dpr);
-      const cx = W / 2, cy = H / 2 - 44 * dpr, far = Math.hypot(W, H) * 0.6;
-      const spawn = s => { s.a = Math.random() * Math.PI * 2; s.r = (6 + Math.random() * 40) * dpr; s.v = (0.7 + Math.random() * 2.4) * dpr; s.w = (0.5 + Math.random() * 1.5) * dpr; return s; };
-      const stars = Array.from({ length: 170 }, () => spawn({}));
+      const cx = W / 2, cy = H / 2 - 16 * dpr, far = Math.hypot(W, H) * 0.6;
       // charge: particles spiral in toward the hand sign before the domain opens
       const inward = Array.from({ length: 110 }, () => ({ a: Math.random() * Math.PI * 2, r: (0.45 + Math.random() * 0.75) * far, p: 1.4 + Math.random() * 1.2, w: (0.6 + Math.random() * 1.3) * dpr, sw: 0.5 + Math.random() * 0.9 }));
+      // space: a 3D starfield around the hand sign that drifts, twinkles, then jumps to warp speed
+      const DEPTH = 1000, F = Math.max(W, H) * 0.45;
+      const reset = (st, z) => { st.x = (Math.random() * 2 - 1) * W * 0.9; st.y = (Math.random() * 2 - 1) * H * 0.9; st.z = z; st.pz = z; st.tw = Math.random() * 6.283; st.r = (0.45 + Math.random() * 1.25) * dpr; return st; };
+      const stars = Array.from({ length: 320 }, () => reset({}, DEPTH * (0.08 + Math.random() * 0.92)));
       const t0 = performance.now();
+      let last = t0;
       const frame = now => {
-        const t = (now - t0) / 1000;
+        const t = (now - t0) / 1000, dt = Math.min(0.05, Math.max(0, (now - last) / 1000));
+        last = now;
         ctx.clearRect(0, 0, W, H);
         ctx.lineCap = 'round';
         if (t < 0.95) {
@@ -5662,57 +6070,68 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
             ctx.stroke();
           });
         }
-        if (t > 0.9) {
-          const k = Math.min(1, (t - 0.9) / 0.5);
-          stars.forEach(s => {
-            const r0 = s.r;
-            s.v *= 1.045; s.r += s.v * k;
-            ctx.strokeStyle = `rgba(241, 245, 249, ${Math.min(0.95, 0.22 + s.r / far).toFixed(3)})`;
-            ctx.lineWidth = s.w;
-            ctx.beginPath();
-            const tail = Math.max(0, r0 - s.v * 2.2 * k);       // streaks stretch as they speed up
-            ctx.moveTo(cx + Math.cos(s.a) * tail, cy + Math.sin(s.a) * tail);
-            ctx.lineTo(cx + Math.cos(s.a) * s.r, cy + Math.sin(s.a) * s.r);
-            ctx.stroke();
-            if (s.r > far * 1.8) spawn(s);
+        if (t > T_SNAP) {
+          const appear = Math.min(1, (t - T_SNAP) / 0.45);
+          const warp = Math.max(0, t - T_WARP);
+          const speed = 120 + Math.pow(Math.min(1, warp / 0.6), 3) * 9000;      // depth units per second
+          stars.forEach(st => {
+            st.pz = st.z;
+            st.z -= speed * dt;
+            if (st.z < 4) { reset(st, DEPTH); return; }
+            const sx = cx + st.x * F / st.z, sy = cy + st.y * F / st.z;
+            if (sx < -60 || sx > W + 60 || sy < -60 || sy > H + 60) { reset(st, DEPTH); return; }
+            const near = 1 - st.z / DEPTH;
+            const a = appear * Math.min(1, 0.18 + near * 1.15) * (warp > 0 ? 1 : 0.6 + 0.4 * Math.sin(t * 6 + st.tw));
+            if (warp > 0.015) {                                  // warp: each star streaks past from where it was
+              ctx.strokeStyle = `rgba(241, 245, 249, ${a.toFixed(3)})`;
+              ctx.lineWidth = st.r * (0.8 + near * 2.2);
+              ctx.beginPath();
+              ctx.moveTo(cx + st.x * F / st.pz, cy + st.y * F / st.pz);
+              ctx.lineTo(sx, sy);
+              ctx.stroke();
+            } else {
+              ctx.fillStyle = `rgba(241, 245, 249, ${a.toFixed(3)})`;
+              ctx.beginPath();
+              ctx.arc(sx, sy, st.r * (0.5 + near * 1.7), 0, 6.283);
+              ctx.fill();
+            }
           });
         }
         if (!done) raf = requestAnimationFrame(frame);
       };
       raf = requestAnimationFrame(frame);
     }
-    setTimeout(finish, 2750);
+    setTimeout(finish, 2980);
   }
   async function boot() {
     playIntro();
     const h = location.hash ? decodeURIComponent(location.hash.slice(1)) : '';
     if (h) view = h;
-    const C = window.claude;
-    if (!C || typeof C.use !== 'function') { bootLocal(); return; }
-    renderApp();                              // loading state while the viewer answers
-    let handle = null;
-    try { handle = await C.use('db'); } catch (e) { handle = null; }
-    if (!handle) { bootLocal(); return; }
-    dbh = handle;
-    mode = 'shared';
-    try {
-      const user = await C.use('user');
-      if (user) {
-        const [cw, own] = await Promise.all([
-          user.can('data.write').catch(() => null),
-          user.isOwner().catch(() => false)
-        ]);
-        canWrite = cw;
-        readOnly = cw === false;
-        isOwnerViewer = !!own;
-      }
-    } catch (e) { /* no viewer identity: keep inputs, let a refused write decide */ }
-    renderApp();
-    listen('accounts', () => dbh.collection('accounts'));
-    listen('days', () => dbh.collection('days').where('date', '>=', sharedCutoff));
-    listenChat();
     initAI();
-    setTimeout(() => { if (!sharedReady) { sharedStale = true; renderApp(); } }, 10000);
+    renderApp();                              // splash or a "connecting" login form
+    const lib = window.supabase;
+    if (!lib || typeof lib.createClient !== 'function') { sharedStale = true; renderApp(); return; }
+    try {
+      sb = lib.createClient(SB_URL, SB_KEY, {
+        auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false, storageKey: 'vibefit.auth.v1' }
+      });
+    } catch (e) {
+      sb = null; sharedStale = true; renderApp(); return;
+    }
+    sb.auth.onAuthStateChange(event => {
+      // the session ended somewhere else (expired, revoked or the account was removed)
+      if (event === 'SIGNED_OUT' && authUid) setTimeout(() => { if (authUid) endSession('انتهت جلستك. سجّل دخولك من جديد.'); }, 0);
+    });
+    let session = null;
+    try { const r = await sb.auth.getSession(); session = r && r.data ? r.data.session : null; } catch (e) { session = null; }
+    mode = 'shared';
+    if (!session || !session.user) { writeLS(SESSION_KEY, null); renderApp(); return; }
+    authUid = session.user.id;
+    if (!readLS(SESSION_KEY)) writeLS(SESSION_KEY, '1');   // show the splash, not the login form, while the board loads
+    renderApp();
+    fullLoad();
+    startLive();
+    setTimeout(() => { if (authUid && !sharedReady) { sharedStale = true; renderApp(); } }, 10000);
   }
   boot();
 })();
