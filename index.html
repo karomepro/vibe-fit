@@ -1895,7 +1895,7 @@
     }
     const j = await r.json().catch(() => ({}));
     if (r.ok && j.result) return j.result;
-    const map = { not_configured: 'not_configured', bad_key: 'bad_key', rate_limited: 'rate_limited', daily_limit: 'daily_limit', bad_image: 'image_rejected', refused: 'refused', invalid_json: 'invalid_json', empty: 'empty_completion', auth: 'session_expired' };
+    const map = { busy: 'busy', not_configured: 'not_configured', bad_key: 'bad_key', rate_limited: 'rate_limited', daily_limit: 'daily_limit', bad_image: 'image_rejected', refused: 'refused', invalid_json: 'invalid_json', empty: 'empty_completion', auth: 'session_expired' };
     throw { code: map[j.error] || 'upstream' };
   }
   function prepImage(file) {
@@ -1960,6 +1960,7 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
       bad_key: 'مفتاح Gemini غير صحيح أو موقوف، والمشرف يحتاج يحدّثه.',
       daily_limit: 'وصلت حدك اليومي (40 تحليل). جرّب بكرة.',
       upstream: 'خدمة الذكاء الاصطناعي ما ردّت الحين. حاول بعد شوي.',
+      busy: 'الذكاء الاصطناعي عليه ضغط الحين عند قوقل. جرّب بعد دقيقة.',
       images_unavailable: 'إرسال الصور غير متاح هنا. اكتب وصف الوجبة بدلاً منها.',
       not_granted: 'لم يُسمح للصفحة باستخدام الذكاء الاصطناعي.',
       sampling_disabled: 'الذكاء الاصطناعي غير متاح لحسابك.'

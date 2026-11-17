@@ -10,7 +10,8 @@ const CORS = {
 };
 const DAILY = 40;                                    // analyses per person per day (per running instance)
 const used = new Map<string, number>();
-const MODELS = [Deno.env.get("GEMINI_MODEL"), "gemini-3.8-flash", "gemini-flash-latest", "gemini-3.6-flash"]
+// first choice, then the "latest" aliases and older flash models when one is missing or busy
+const MODELS = [Deno.env.get("GEMINI_MODEL"), "gemini-3.8-flash", "gemini-flash-lite-latest", "gemini-3.5-flash-lite", "gemini-flash-latest", "gemini-3.6-flash"]
   .filter((m, i, a): m is string => !!m && a.indexOf(m) === i);
 
 function json(status: number, body: unknown) {
@@ -67,19 +68,26 @@ Deno.serve(async (req) => {
   if (image) parts.push({ inline_data: { mime_type: mime, data: image } });
   const payload = JSON.stringify({ contents: [{ role: "user", parts }], generationConfig: { responseMimeType: "application/json", temperature: 0.2 } });
 
+  let busy = false;
+  const started = Date.now();
   for (const model of MODELS) {
+    const left = 100000 - (Date.now() - started);         // stay inside the function's time limit (150 s)
+    if (left < 8000) { busy = true; break; }
     let r: Response;
     try {
       r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
         method: "POST", headers: { "Content-Type": "application/json", "x-goog-api-key": key }, body: payload,
+        signal: AbortSignal.timeout(Math.min(35000, left)),
       });
     } catch (e) {
       console.error("fetch", model, String(e));
-      return json(502, { error: "upstream" });
+      busy = true;                                         // timed out or dropped: try the next model
+      continue;
     }
     if (r.status === 404) { console.error("model not found", model); continue; }       // try the next model name
     const j = await r.json().catch(() => ({}));
     const msg = String(j?.error?.message || "");
+    if (r.status === 503 || r.status === 500) { console.error("busy", model, r.status, msg); busy = true; continue; }   // overloaded: next model
     if (r.status === 429) return json(429, { error: "rate_limited" });
     if ((r.status === 400 || r.status === 403) && /api key|API_KEY|permission/i.test(msg)) { console.error("key", r.status, msg); return json(503, { error: "bad_key" }); }
     if (r.status === 400 && /image|inline|mime|base64/i.test(msg)) return json(400, { error: "bad_image" });
@@ -92,5 +100,5 @@ Deno.serve(async (req) => {
     if (!result || typeof result !== "object") return json(502, { error: "invalid_json" });
     return json(200, { ok: true, model, result });
   }
-  return json(502, { error: "no_model" });
+  return json(busy ? 503 : 502, { error: busy ? "busy" : "no_model" });
 });
