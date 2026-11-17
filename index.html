@@ -544,6 +544,64 @@
   .toast .t2 { font-size: .875rem; }
   .stepper .unit { font-size: 11.5px; }
   .hype-tap { font-size: 13px; }
+
+  /* ---- home, the CBUM page and the bottom tab bar ---- */
+  .jump { scroll-margin-top: calc(84px + env(safe-area-inset-top, 0px)); }
+  .btn-glass { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; background: rgba(255, 255, 255, .1); border: 1px solid rgba(255, 255, 255, .24); color: #FFFFFF; font-weight: 800; border-radius: 12px; padding: 0 1.1rem; white-space: nowrap; transition: background .15s; }
+  .btn-glass:hover { background: rgba(255, 255, 255, .18); }
+  .home-hero { position: relative; overflow: hidden; border-radius: 28px; background: radial-gradient(130% 140% at 100% 0%, #334155 0%, #1E293B 42%, #0F172A 100%); box-shadow: 0 30px 60px -36px rgba(15, 23, 42, .8); }
+  .home-hero::before { content: ""; position: absolute; inset: 0; background: repeating-radial-gradient(circle at 8% 0%, transparent 0 54px, rgba(148, 163, 184, .08) 54px 55px); pointer-events: none; }
+  .home-hero::after { content: ""; position: absolute; bottom: -50%; right: -12%; width: 62%; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle, rgba(255, 255, 255, .11), transparent 65%); pointer-events: none; }
+  .hm-ring { --p: 0; position: relative; width: 104px; height: 104px; border-radius: 50%; display: grid; place-items: center; background: conic-gradient(#FFFFFF calc(var(--p) * 1%), rgba(255, 255, 255, .14) 0); }
+  .hm-ring > div { width: 88px; height: 88px; border-radius: 50%; background: #1A2433; display: grid; place-content: center; text-align: center; }
+  @media (min-width: 640px) { .hm-ring { width: 128px; height: 128px; } .hm-ring > div { width: 108px; height: 108px; } }
+  .hm-plan { border-radius: 20px; background: rgba(255, 255, 255, .08); border: 1px solid rgba(255, 255, 255, .16); }
+  .hm-tile { display: block; border-radius: 20px; padding: 14px 14px 12px; background: rgba(255, 255, 255, .88); border: 1px solid rgba(226, 232, 240, .9); box-shadow: 0 1px 2px rgba(15, 23, 42, .04), 0 14px 34px -26px rgba(15, 23, 42, .28); transition: transform .15s, border-color .15s, box-shadow .15s; }
+  .hm-tile:hover { transform: translateY(-2px); border-color: var(--line-2); box-shadow: 0 1px 2px rgba(15, 23, 42, .05), 0 22px 40px -26px rgba(15, 23, 42, .38); }
+  .hm-tile-ic { width: 38px; height: 38px; border-radius: 12px; display: grid; place-items: center; background: var(--ink); color: #FFFFFF; }
+  .hm-bar { display: block; height: 6px; border-radius: 999px; background: var(--line); overflow: hidden; }
+  .hm-bar i { display: block; height: 100%; border-radius: inherit; background: var(--ink); }
+  .hm-row { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 14px; color: var(--ink); }
+  .hm-row:nth-child(odd) { background: rgba(241, 245, 249, .7); }
+  .hm-row.is-me { background: var(--ink); color: #FFFFFF; }
+  .hm-chat { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 16px; border: 1px solid var(--line); background: rgba(255, 255, 255, .8); transition: border-color .15s; }
+  .hm-chat:hover { border-color: var(--mute); }
+  .hm-mini { width: 64px; height: 56px; border-radius: 14px; overflow: hidden; background: linear-gradient(180deg, #F1F5F9, #FFFFFF); flex-shrink: 0; }
+  .hm-link { display: block; transition: transform .15s, border-color .15s; }
+  .hm-link:hover { transform: translateY(-2px); border-color: var(--line-2); }
+  .cb-medal { width: 150px; height: 150px; border-radius: 40px; place-content: center; text-align: center; background: linear-gradient(160deg, rgba(255, 255, 255, .16), rgba(255, 255, 255, .04)); border: 1px solid rgba(255, 255, 255, .2); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .25); }
+  .cb-medal .num { font-size: 56px; font-weight: 900; line-height: 1; }
+  .cb-medal span:last-child { font-family: var(--f-num); font-size: 12px; font-weight: 700; letter-spacing: .06em; color: #CBD5E1; margin-top: 6px; }
+  .cb-fact { border-radius: 16px; padding: 10px 12px; background: rgba(255, 255, 255, .07); border: 1px solid rgba(255, 255, 255, .13); }
+  .cb-num { width: 34px; height: 34px; border-radius: 11px; display: grid; place-items: center; background: var(--ink); color: #FFFFFF; font-family: var(--f-num); font-weight: 800; flex-shrink: 0; }
+  .cb-fig { width: 84px; height: 78px; border-radius: 16px; overflow: hidden; background: linear-gradient(180deg, #F1F5F9, #FFFFFF); border: 1px solid var(--line); flex-shrink: 0; transition: border-color .15s, transform .15s; }
+  .cb-fig:hover { border-color: var(--mute); transform: translateY(-1px); }
+  @media (min-width: 640px) { .cb-fig { width: 104px; height: 92px; } }
+  .cb-rx { display: inline-flex; align-items: center; gap: 4px; font-weight: 800; font-size: 13px; color: var(--ink); background: rgba(241, 245, 249, .95); border: 1px solid var(--line); border-radius: 999px; padding: 2px 10px; white-space: nowrap; }
+  .cb-src { display: inline-flex; align-items: center; gap: 4px; font-size: 12.5px; font-weight: 700; color: var(--ink-2); padding: 3px 9px; border-radius: 999px; border: 1px solid var(--line); background: rgba(255, 255, 255, .8); vertical-align: middle; }
+  .cb-src:hover { color: var(--ink); border-color: var(--mute); }
+  .cb-step { position: relative; border-radius: 18px; border: 1px solid var(--line); background: rgba(248, 250, 252, .9); padding: 10px; }
+  .cb-step-fig { display: block; width: 84px; height: 74px; border-radius: 14px; overflow: hidden; background: #FFFFFF; border: 1px solid var(--line); flex-shrink: 0; }
+  @media (min-width: 640px) {
+    .cb-step-fig { width: 100%; height: 120px; }
+    .cb-step:not(:last-child)::after { content: "←"; position: absolute; z-index: 1; top: 50%; inset-inline-end: -17px; transform: translateY(-50%); width: 22px; height: 22px; border-radius: 999px; background: var(--ink); color: #FFFFFF; font-size: 13px; line-height: 22px; text-align: center; }
+  }
+  .cb-day { border-radius: 14px; padding: 8px 8px 10px; background: var(--ink); color: #FFFFFF; min-height: 74px; }
+  .cb-day.is-rest { background: rgba(241, 245, 249, .95); color: var(--ink-2); border: 1px dashed var(--line-2); }
+  .tabbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 42; padding: 6px max(8px, env(safe-area-inset-left, 0px)) calc(6px + env(safe-area-inset-bottom, 0px));
+    background: linear-gradient(180deg, rgba(255, 255, 255, .78), rgba(255, 255, 255, .94)); -webkit-backdrop-filter: blur(22px) saturate(1.8); backdrop-filter: blur(22px) saturate(1.8);
+    border-top: 1px solid rgba(226, 232, 240, .9); box-shadow: 0 -10px 30px -22px rgba(15, 23, 42, .45); }
+  .tabbar-in { max-width: 560px; margin: 0 auto; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 2px; }
+  .tab-it { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 4px 2px 2px; border-radius: 14px; color: #64748B; font-family: var(--f-display); font-weight: 800; font-size: 11.5px; line-height: 1.2; min-height: 52px; }
+  .tab-ic { position: relative; width: 50px; height: 30px; border-radius: 999px; display: grid; place-items: center; transition: background .2s, color .2s; }
+  .tab-it:active .tab-ic { transform: scale(.94); }
+  .tab-it.is-on { color: var(--ink); }
+  .tab-it.is-on .tab-ic { background: var(--ink); color: #FFFFFF; }
+  .tab-dot { position: absolute; top: -4px; inset-inline-end: 4px; min-width: 18px; height: 18px; padding: 0 4px; border-radius: 999px; background: var(--ink); color: #FFFFFF; font-size: 10.5px; font-weight: 800; display: grid; place-items: center; border: 2px solid #FFFFFF; }
+  .tab-it.is-on .tab-dot { background: #FFFFFF; color: var(--ink); border-color: var(--ink); }
+  body.has-bar .tabbar { display: none; }
+  @media (min-width: 1024px) { .tabbar { display: none; } }
+  @media (max-width: 1023.98px) { body.has-tabs:not(.has-bar) #toasts { padding-bottom: calc(86px + env(safe-area-inset-bottom, 0px)); } }
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation: none !important; transition: none !important; }
   }
@@ -880,7 +938,7 @@
      ========================================================= */
   let db = { version: 1, users: {} };
   let currentKey = null;
-  let view = 'board';
+  let view = 'home';
   // 'loading' = connecting to Supabase · 'shared' = the Supabase project, the same board on every phone
   let mode = 'loading';
   let readOnly = false;
@@ -952,35 +1010,51 @@
     const info = planInfo(u);
     const kc = calLeft(u);
     return [
-      { title: 'التنافس', items: [
-        { v: 'board', label: 'لوحة التنافس', icon: 'trophy', badge: st.score ? fmt(st.score) : '' },
-        { v: 'chat', label: 'دردشة المنافسة', icon: 'chat', badge: unread ? (unread > 99 ? '99+' : fmt(unread)) : '', alert: unread > 0 }
-      ].concat(isAdmin() ? [{ v: 'admin', label: 'لوحة التحكم', icon: 'shield' }] : []) },
-      { title: 'البرنامج التدريبي', items: [{ v: 'programs', label: info ? info.prog.name : 'البرامج التدريبية', icon: 'clip', badge: info ? '' : 'جديد', alert: !info, tone: info ? progTone(info.prog) : null }]
+      { title: '', items: [{ v: 'home', label: 'الرئيسية', icon: 'home', badge: st.score ? fmt(st.score) : '' }] },
+      { title: 'التمرين', add: true, items: [{ v: 'programs', label: info ? info.prog.name : 'البرامج التدريبية', icon: 'clip', badge: info ? '' : 'ابدأ', alert: !info, tone: info ? progTone(info.prog) : null }]
         .concat(u.pages.filter(p => p.prog).map(p => {
           const ps = pageDayStats(u, p.id, d);
           const isToday = !!info && typeof info.slot === 'number' && info.act.pageIds[info.slot] === p.id;
           return { v: 'page-' + p.id, label: p.name, icon: pageIcon(p), badge: ps.reps ? fmt(ps.reps) : isToday ? 'اليوم' : '', alert: isToday && !ps.reps, tone: progTone(getProg(u, p.prog)) };
-        })) },
-      { title: 'صفحات التمارين', add: true, items: [{ v: 'log', label: 'جدول العدات', icon: 'table', badge: st.reps ? fmt(st.reps) : '' }]
+        }))
+        .concat([{ v: 'log', label: 'جدول العدات', icon: 'table', badge: st.reps ? fmt(st.reps) : '' }])
         .concat(u.pages.filter(p => !p.prog).map(p => { const ps = pageDayStats(u, p.id, d); return { v: 'page-' + p.id, label: p.name, icon: pageIcon(p), badge: ps.reps ? fmt(ps.reps) : '' }; })) },
-      { title: 'الكارديو', items: [
-        { v: 'cardio', label: 'المشي والكارديو', icon: 'route', badge: st.walkMin ? fmt(st.walkMin) + ' د' : '' }
-      ] },
-      { title: 'السعرات', items: [
-        { v: 'calories', label: 'رصيد اليوم', icon: 'flame', badge: kc.target ? fmt(kc.left) : '' },
+      { title: 'النشاط والأكل', items: [
+        { v: 'cardio', label: 'المشي والكارديو', icon: 'route', badge: st.walkMin ? fmt(st.walkMin) + ' د' : '' },
+        { v: 'calories', label: 'رصيد السعرات', icon: 'flame', badge: kc.target ? fmt(kc.left) : '' },
         { v: 'meals', label: 'تسجيل الوجبات', icon: 'meal', badge: st.eaten ? fmt(st.eaten) : '' }
       ] },
+      { title: 'التنافس', items: [
+        { v: 'board', label: 'لوحة التنافس', icon: 'trophy', badge: st.score ? fmt(st.score) : '' },
+        { v: 'chat', label: 'دردشة المنافسة', icon: 'chat', badge: unread ? (unread > 99 ? '99+' : fmt(unread)) : '', alert: unread > 0 }
+      ].concat(isAdmin() ? [{ v: 'admin', label: 'لوحة التحكم', icon: 'shield' }] : []) },
       { title: 'المعرفة', items: [
+        { v: 'cbum', label: 'طريقة CBUM', icon: 'star', badge: readLS(CBUM_SEEN) ? '' : 'جديد', alert: !readLS(CBUM_SEEN) },
         { v: 'science', label: 'الدراسات العلمية', icon: 'flask' },
         { v: 'news', label: 'أخبار الأبطال والبطولات', icon: 'news' }
       ] }
     ];
   }
+  // Phones & tablets: the five main places one tap away (hidden while a workout session bar is up)
+  function tabBarHTML(u) {
+    const tp = todayPlan(u);
+    const unread = view === 'chat' ? 0 : unreadCount();
+    const tabs = [
+      { v: 'home', label: 'الرئيسية', icon: 'home', on: view === 'home' },
+      { v: tp.page ? 'page-' + tp.page.id : 'programs', label: 'التمرين', icon: 'dumbbell', on: view === 'programs' || view === 'log' || view.startsWith('page-') },
+      { v: 'meals', label: 'الأكل', icon: 'meal', on: view === 'meals' || view === 'calories' },
+      { v: 'board', label: 'التنافس', icon: 'trophy', on: ['board', 'chat', 'admin'].includes(view), badge: unread },
+      { act: 'drawer-open', label: 'المزيد', icon: 'menu', on: ['cardio', 'science', 'news', 'cbum'].includes(view) }
+    ];
+    return `<nav class="tabbar" aria-label="التنقل السريع"><div class="tabbar-in">${tabs.map(t => `<button type="button" ${t.act ? `data-act="${t.act}" aria-haspopup="dialog"` : `data-act="nav" data-v="${t.v}"`} class="tab-it ${t.on ? 'is-on' : ''}"${t.on && !t.act ? ' aria-current="page"' : ''}>
+      <span class="tab-ic">${icon(t.icon, 'w-[22px] h-[22px]')}${t.badge ? `<span class="tab-dot num">${t.badge > 9 ? '9+' : t.badge}</span>` : ''}</span>
+      <span class="tab-lb">${t.label}</span>
+    </button>`).join('')}</div></nav>`;
+  }
   function navListHTML(u) {
     return `<nav class="space-y-6" aria-label="الأقسام">${navGroups(u).map(g => `
       <div>
-        <p class="px-3 mb-2 text-[11.5px] font-extrabold text-slate-400">${g.title}</p>
+        ${g.title ? `<p class="px-3 mb-2 text-[11.5px] font-extrabold text-slate-400">${g.title}</p>` : ''}
         <ul class="space-y-1">
           ${g.items.map(it => {
             const active = view === it.v;
@@ -1060,7 +1134,7 @@
       <div class="gutter mx-auto max-w-7xl h-16 flex items-center justify-between gap-2">
         <div class="flex items-center gap-2.5 min-w-0">
         <button data-act="drawer-open" class="menu-btn" aria-label="القائمة" aria-haspopup="dialog" aria-expanded="${ui.drawer ? 'true' : 'false'}">${icon('menu', 'w-[22px] h-[22px]')}</button>
-        <button data-act="nav" data-v="board" class="brand flex items-center gap-3 min-w-0 rounded-xl" aria-label="Vibe Fit — لوحة التنافس">
+        <button data-act="nav" data-v="home" class="brand flex items-center gap-3 min-w-0 rounded-xl" aria-label="Vibe Fit — الرئيسية">
           ${logo('w-10 h-10 shrink-0 brand-logo')}
           <span class="flex flex-col items-start leading-none">
             <span class="wordmark text-[17px] text-slate-800" dir="ltr">Vibe Fit</span>
@@ -1150,6 +1224,165 @@
         </div>
       </section>
     </div>`;
+  }
+
+  /* =========================================================
+     View: Home — today at a glance: score and rank, today's workout, the day's numbers
+     (each one opens its page), the top of the board, chat, a CBUM tip and the latest knowledge.
+     ========================================================= */
+  const greeting = () => { const h = new Date().getHours(); return h >= 4 && h < 12 ? 'صباح الخير' : 'مساء الخير'; };
+  const dayNo = () => Math.floor(parseKey(today()).getTime() / 86400000);
+  function todayPlan(u) {
+    const info = planInfo(u);
+    if (!info) return { kind: 'none' };
+    const { act, prog, slot } = info;
+    if (typeof slot === 'number') {
+      const page = dayPage(u, act, slot);
+      return { kind: 'lift', prog, page, done: !!page && u.logs.some(l => l.date === today() && l.pageId === page.id), title: `اليوم ${slot + 1} · ${prog.list[slot].t}` };
+    }
+    if (slot === 'c') { const c = prog.cardio || LIGHT_CARDIO; return { kind: 'cardio', prog, title: `${c.t} ${c.m} دقيقة` }; }
+    return { kind: 'rest', prog, title: 'يوم راحة 😌' };
+  }
+  function homeHero(u) {
+    const d = today();
+    const rk = ranking(d);
+    const active = rk.filter(r => r.score > 0);
+    const mine = rk.find(r => r.key === u.key) || { score: 0, streak: 0 };
+    const pos = mine.score > 0 ? active.indexOf(mine) + 1 : 0;
+    const lead = active.length ? active[0].score : 0;
+    const pctv = mine.score > 0 ? Math.round(mine.score / Math.max(1, lead) * 100) : 0;
+    const tp = todayPlan(u);
+    const sub = !mine.score ? (tp.kind === 'lift' ? 'تمرين اليوم جاهز، وأول عدة تدخلك لوحة التنافس.' : 'سجّل أول نشاط اليوم وادخل لوحة التنافس.')
+      : pos === 1 ? 'أنت متصدر اليوم. حافظ على الصدارة 🔥' : `أنت ${pos <= 3 ? MED[pos - 1] + ' ' : ''}المركز ${pos} من ${active.length}. باقي لك ${fmt(Math.max(0, lead - mine.score + 1))} نقطة على الصدارة.`;
+    let plan;
+    if (tp.kind === 'lift') plan = { ic: 'dumbbell', eyebrow: `${esc(tp.prog.name)} · تمرين اليوم`, title: esc(tp.title), btn: tp.page ? `<button data-act="nav" data-v="page-${tp.page.id}" class="btn-light h-11 shrink-0">${icon(tp.done ? 'check' : 'dumbbell', 'w-5 h-5')} ${tp.done ? 'كمّل التمرين' : 'ابدأ التمرين'}</button>` : '' };
+    else if (tp.kind === 'cardio') plan = { ic: 'route', eyebrow: `${esc(tp.prog.name)} · يوم كارديو`, title: esc(tp.title), btn: `<button data-act="nav" data-v="cardio" class="btn-light h-11 shrink-0">${icon('route', 'w-5 h-5')} سجّل الكارديو</button>` };
+    else if (tp.kind === 'rest') plan = { ic: 'moon', eyebrow: `${esc(tp.prog.name)} · اليوم`, title: esc(tp.title), note: 'الاستشفاء يبني العضل. مشي خفيف يكفي.', btn: `<button data-act="nav" data-v="cardio" class="btn-glass h-11 shrink-0">${icon('route', 'w-5 h-5')} سجّل مشي خفيف</button>` };
+    else plan = { ic: 'clip', eyebrow: 'برنامجك التدريبي', title: 'ما اخترت برنامج للحين', note: 'جاوب أسئلة سريعة ونرشح لك جدول، أو جرّب جدول CBUM.', btn: `<span class="flex flex-wrap gap-2 shrink-0"><button data-act="nav" data-v="programs" class="btn-light h-11">${icon('clip', 'w-5 h-5')} اختر برنامجك</button><button data-act="nav" data-v="cbum" class="btn-glass h-11">طريقة CBUM</button></span>` };
+    return `<section class="home-hero p-5 sm:p-7 text-white">
+      <div class="relative flex items-start justify-between gap-4">
+        <div class="min-w-0">
+          <p class="text-sm text-slate-300">${esc(longDate(d))}</p>
+          <h1 class="mt-1 font-display font-extrabold text-[28px] sm:text-[38px] leading-tight">${greeting()}، <span class="break-words">${esc(u.username)}</span></h1>
+          <p class="mt-1.5 text-slate-300 leading-7">${sub}</p>
+          ${mine.streak >= 2 ? `<p class="mt-2 inline-flex items-center gap-1.5 text-sm font-bold bg-white/10 border border-white/15 rounded-full px-3 py-1">🔥 سلسلة <span class="num">${mine.streak}</span> أيام متتالية</p>` : ''}
+        </div>
+        <div class="hm-ring shrink-0" style="--p:${pctv}" role="img" aria-label="نقاطك اليوم ${fmt(mine.score)}">
+          <div><span class="num text-[30px] sm:text-[36px] font-extrabold leading-none">${fmt(mine.score)}</span><span class="block text-[11px] text-slate-300 mt-1">نقطة اليوم</span></div>
+        </div>
+      </div>
+      <div class="relative mt-5 hm-plan flex flex-wrap items-center gap-3 p-3.5 sm:p-4">
+        <span class="w-11 h-11 rounded-2xl bg-white text-slate-900 grid place-items-center shrink-0 ia">${icon(plan.ic, 'w-5 h-5')}</span>
+        <div class="flex-1 min-w-[11rem]">
+          <p class="text-[12px] font-bold text-slate-300">${plan.eyebrow}</p>
+          <p class="font-display font-extrabold text-lg leading-snug">${plan.title}</p>
+          ${plan.note ? `<p class="text-[13px] text-slate-300">${plan.note}</p>` : ''}
+        </div>
+        ${plan.btn}
+      </div>
+      <div class="relative">${weekBars(u, true)}</div>
+    </section>`;
+  }
+  function homeTile(t) {
+    return `<button type="button" data-act="nav" data-v="${t.v}" class="hm-tile text-start">
+      <span class="flex items-center justify-between gap-2">
+        <span class="hm-tile-ic">${icon(t.icon, 'w-5 h-5')}</span>
+        <span class="text-[12px] font-bold text-slate-400 inline-flex items-center gap-1">${t.cta}${icon('chevL', 'w-3.5 h-3.5')}</span>
+      </span>
+      <span class="block mt-3 text-[13px] font-bold text-slate-500">${t.label}</span>
+      <span class="flex items-baseline gap-1.5 mt-0.5"><span class="num text-[30px] font-extrabold leading-tight text-slate-900">${t.value}</span><span class="text-xs text-slate-400">${t.unit || ''}</span></span>
+      ${t.bar != null ? `<span class="hm-bar mt-2" aria-hidden="true"><i style="width:${Math.round(clamp(t.bar, 0, 1) * 100)}%"></i></span>` : ''}
+      <span class="block mt-1.5 text-[12px] text-slate-500 leading-5">${t.note}</span>
+    </button>`;
+  }
+  function homeTiles(u) {
+    const st = dayStats(u, today());
+    const kc = calLeft(u);
+    const tp = todayPlan(u);
+    const nMeals = u.meals.filter(m => m.date === today()).length;
+    return `<div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      ${homeTile({ v: tp.page ? 'page-' + tp.page.id : 'log', icon: 'dumbbell', label: 'التمرين', value: fmt(st.reps), unit: 'عدة', cta: 'سجّل', note: st.sets ? `${fmt(st.sets)} ${arN(st.sets, 'جولة', 'جولتين', 'جولات', 'جولة')} · ${fmt(st.exercises)} ${arN(st.exercises, 'تمرين', 'تمرينين', 'تمارين', 'تمرين')}` : 'ما سجّلت جولات اليوم' })}
+      ${homeTile({ v: 'cardio', icon: 'route', label: 'المشي والكارديو', value: fmt(st.walkMin), unit: 'دقيقة', cta: 'سجّل', note: st.cardioKcal ? `${fmt(st.cardioKcal)} سعرة حركة` : 'خطوات، مشي، جري أو سير' })}
+      ${homeTile({ v: 'calories', icon: 'flame', label: 'رصيد السعرات', value: kc.target ? fmt(kc.left) : '—', unit: kc.target ? 'متبقي' : '', cta: 'افتح', bar: kc.target ? Math.max(0, kc.net) / kc.target : null, note: kc.target ? `من هدف ${fmt(Math.round(kc.target))} سعرة` : 'حدّد هدفك اليومي' })}
+      ${homeTile({ v: 'meals', icon: 'meal', label: 'الأكل', value: fmt(st.eaten), unit: 'سعرة', cta: 'سجّل', note: nMeals ? `${fmt(nMeals)} ${arN(nMeals, 'وجبة', 'وجبتين', 'وجبات', 'وجبة')} اليوم` : 'صوّر وجبتك ونحسبها لك' })}
+    </div>`;
+  }
+  function homeBoard(u) {
+    const rk = ranking(today());
+    const active = rk.filter(r => r.score > 0);
+    const top = active.slice(0, 5);
+    const mineAt = active.findIndex(r => r.key === u.key);
+    const rows = top.map((r, i) => [r, i]);
+    if (mineAt >= 5) rows.push([active[mineAt], mineAt]);
+    const unread = unreadCount();
+    const last = chatMsgs.filter(m => m.kind !== 'event').slice(-1)[0];
+    return `<section class="card p-5 sm:p-6 flex flex-col">
+      <div class="flex items-center justify-between gap-3">
+        <h2 class="font-display font-extrabold text-xl text-slate-900 flex items-center gap-2">${icon('trophy', 'w-5 h-5')} ترتيب اليوم</h2>
+        <button data-act="nav" data-v="board" class="btn-text">اللوحة كاملة ${icon('arrowR', 'w-4 h-4 rtl-flip')}</button>
+      </div>
+      ${rows.length ? `<ol class="mt-3 space-y-1.5">${rows.map(([r, i]) => {
+        const me_ = r.key === u.key;
+        return `<li class="hm-row ${me_ ? 'is-me' : ''}">
+          <span class="w-8 text-center shrink-0 ${i < 3 ? 'text-xl' : 'num font-extrabold text-slate-400'}">${i < 3 ? MED[i] : i + 1}</span>
+          ${avatar(r.name, 'w-8 h-8 text-sm', me_)}
+          <span class="min-w-0 flex-1"><span class="block font-bold truncate">${esc(r.name)}${me_ ? ' <span class="text-[12px] font-bold opacity-70">(أنت)</span>' : ''}</span>${r.streak >= 2 ? `<span class="block text-[11px] opacity-70">🔥 <span class="num">${r.streak}</span> أيام</span>` : ''}</span>
+          <span class="num text-xl font-extrabold">${fmt(r.score)}</span>
+        </li>`;
+      }).join('')}</ol>` : `<p class="mt-3 rounded-xl bg-slate-50 border border-dashed border-slate-300 px-4 py-5 text-center text-slate-500">ما أحد سجّل اليوم للحين. سجّل أول نشاط وخذ الصدارة.</p>`}
+      <button data-act="nav" data-v="chat" class="hm-chat mt-4 text-start">
+        <span class="w-10 h-10 rounded-xl bg-slate-800 text-white grid place-items-center shrink-0">${icon('chat', 'w-5 h-5')}</span>
+        <span class="min-w-0 flex-1"><span class="block font-bold text-slate-900">دردشة المنافسة</span><span class="block text-[13px] text-slate-500 truncate">${last ? `${esc(last.name)}: ${esc(last.text)}` : 'قل للشباب وش سويت اليوم'}</span></span>
+        ${unread ? `<span class="nav-badge is-alert">${unread > 99 ? '99+' : fmt(unread)}</span>` : icon('chevL', 'w-4 h-4 text-slate-400')}
+      </button>
+    </section>`;
+  }
+  function homeCbum() {
+    const tip = CBUM_RULES[dayNo() % CBUM_RULES.length];
+    return `<div class="grid gap-4">
+      <article class="news-hero p-5 sm:p-6 text-white">
+        <span class="relative news-tag ia">${icon('trophy', 'w-4 h-4')} مدرسة الأبطال</span>
+        <h2 class="relative mt-3 font-display font-extrabold text-2xl leading-tight">تمرّن على طريقة <span dir="ltr">CBUM</span></h2>
+        <p class="relative mt-1.5 text-slate-300 leading-7">بطل الكلاسيك فيزيك بأولمبيا 6 مرات: قواعده، وأفضل تمارينه لكل عضلة مع الشرح، وجدول على طريقته.</p>
+        <div class="relative mt-4 flex gap-2" aria-hidden="true">${['tbar', 'inclinedb', 'hacksq', 'mlat'].map(k => `<span class="hm-mini">${cbFig(k)}</span>`).join('')}</div>
+        <button data-act="nav" data-v="cbum" class="relative btn-light h-11 mt-4">${icon('star', 'w-5 h-5')} اكتشف طريقته</button>
+      </article>
+      <article class="card p-5">
+        <p class="eyebrow">نصيحة اليوم من CBUM</p>
+        <h3 class="font-display font-extrabold text-lg text-slate-900 leading-snug">${esc(tip.t)}</h3>
+        <p class="mt-1 text-slate-600 leading-7">${esc(tip.d)}</p>
+        <p class="sci-take mt-3 text-slate-800 leading-7"><b>طبّقها: </b>${esc(tip.a)}</p>
+      </article>
+    </div>`;
+  }
+  function homeKnow() {
+    const n = NEWS[0];
+    const s = SCIENCE[dayNo() % SCIENCE.length];
+    return `<div class="grid gap-4 md:grid-cols-2">
+      <button type="button" data-act="nav" data-v="news" class="card hm-link p-5 text-start">
+        <span class="sci-cat">${icon('news', 'w-4 h-4')}أخبار الأبطال</span>
+        <span class="block mt-2.5 font-display font-extrabold text-lg text-slate-900 leading-snug">${esc(n.t)}</span>
+        <span class="block mt-0.5 text-[13px] text-slate-500">${esc(n.when)}</span>
+        <span class="mt-3 inline-flex items-center gap-1 text-sm font-bold text-slate-800">كل الأخبار ${icon('arrowR', 'w-4 h-4 rtl-flip')}</span>
+      </button>
+      <button type="button" data-act="nav" data-v="science" class="card hm-link p-5 text-start">
+        <span class="sci-cat">${icon('flask', 'w-4 h-4')}دراسة اليوم</span>
+        <span class="block mt-2.5 font-display font-extrabold text-lg text-slate-900 leading-snug">${esc(s.t)}</span>
+        <span class="block mt-1 text-[14px] text-slate-600 leading-6">${esc(s.a)}</span>
+        <span class="mt-3 inline-flex items-center gap-1 text-sm font-bold text-slate-800">كل الدراسات ${icon('arrowR', 'w-4 h-4 rtl-flip')}</span>
+      </button>
+    </div>`;
+  }
+  function homeView(u) {
+    return `<section class="space-y-6 fade-in">
+      ${homeHero(u)}
+      ${homeTiles(u)}
+      <div class="grid gap-4 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] items-start">
+        ${homeBoard(u)}
+        ${homeCbum()}
+      </div>
+      ${homeKnow()}
+    </section>`;
   }
 
   /* =========================================================
@@ -2658,6 +2891,16 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
         { t: 'Upper · الجزء العلوي', ex: [px('hpush', 4, [10, 15]), px('bwpike', 3, [6, 10]), px('hdip', 3, [10, 15]), px('hpush1', 3, [6, 10]), px('plank', 3, 40), px('hsuper', 3, 12)] },
         { t: 'Lower · الجزء السفلي', ex: [px('hprison', 4, [15, 20]), px('hlunge', 3, 12), px('bwbridge', 3, [15, 20]), px('hjump', 3, 10), px('bwcalf', 3, 15), px('legraise', 3, 12)] }
       ] },
+    { id: 'cbum5', style: 'bb', name: 'جدول على طريقة CBUM', per: 5, place: 'gym', goals: ['bulk', 'fit'], levels: ['intermediate', 'advanced'],
+      blurb: 'مستوحى من تقسيمة كريس بمستيد (بطل الكلاسيك فيزيك 6 مرات) بتمارينه المفضلة: ترايسِت الظهر، والصدر العلوي، وعرض الأكتاف، والهاك سكوات. النزول بطيء 3 ثواني، والشدة بآخر جولة.',
+      warm: WARM_GYM, week: [0, 1, 2, 'r', 3, 4, 'r'],
+      list: [
+        { t: 'صدر + ترايسبس + كتف خلفي', ex: [px('cfly', 2, [12, 15]), px('inclinedb', 4, [8, 12]), px('incline', 3, [8, 12]), px('cablecross', 3, [10, 15]), px('pushdown', 3, [10, 12]), px('katana', 3, [10, 12]), px('reardf', 3, [15, 20])] },
+        { t: 'ظهر + بايسبس', ex: [px('latpd', 3, [10, 12]), px('tbar', 3, [8, 12]), px('srow', 3, [8, 12]), px('highrow', 3, [10, 12]), px('csrow', 3, [8, 12]), px('bbcurl', 3, [8, 12]), px('hammer', 3, [10, 12]), px('preacher', 3, [10, 12])] },
+        { t: 'فخذ أمامي + سمانة', ex: [px('lext', 3, [12, 15]), px('hacksq', 4, [8, 12]), px('lpress', 3, [10, 12]), px('bulgarian', 3, [8, 10]), px('scalf', 4, [10, 15])] },
+        { t: 'أكتاف + ذراعين', ex: [px('dbshp', 4, [8, 10]), px('mlat', 6, [8, 12]), px('cablelat', 2, [8, 10]), px('shp', 3, [8, 12]), px('pushdown', 3, [10, 12]), px('ohext', 3, [10, 12]), px('ccurl', 3, [10, 12]), px('conc', 2, [10, 12])] },
+        { t: 'فخذ خلفي + مؤخرة + سمانة', ex: [px('lcurl', 4, [10, 12]), px('shcurl', 3, [10, 12]), px('rdl', 3, [8, 10]), px('hipthrust', 3, [8, 12]), px('calf', 4, [12, 15])] }
+      ] },
     { id: 'pl4', style: 'pl', name: 'باورلفتنق 4 أيام', sub: 'RPE تصاعدي', per: 4, place: 'gym', goals: ['strength'], levels: ['beginner', 'intermediate'],
       blurb: 'سكوات وبنش، ديدلفت متوقف، بنش تيمبو، وديدلفت. الشدة ترتفع كل أسبوع: RPE يبدأ من 5 (والتمارين المساعدة من 6) ويزيد 1 كل أسبوع لمدة 4 أسابيع.',
       warm: WARM_PL, week: [0, 1, 'r', 2, 3, 'r', 'r'], rpeStep: 1, block: 4,
@@ -2717,7 +2960,7 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
   const getProg = (u, id) => PROG_BY_ID[id] || myPrograms(u).find(p => p.id === id) || null;
   // Each program gets its own shade of the site's slate: lighter for fewer days, darker for more
   const SLATE = ['#F1F5F9', '#E2E8F0', '#CBD5E1', '#94A3B8', '#64748B', '#475569', '#334155', '#1E293B', '#0F172A', '#020617'];
-  const PROG_ORDER = ['cal3', 'bb3', 'db3', 'body4', 'db4', 'bb4', 'ul4', 'bulk4', 'home5', 'bb5', 'full5', 'cut5', 'ppl6', 'pl4', 'pl5'];
+  const PROG_ORDER = ['cal3', 'bb3', 'db3', 'body4', 'db4', 'bb4', 'ul4', 'bulk4', 'home5', 'bb5', 'full5', 'cut5', 'cbum5', 'ppl6', 'pl4', 'pl5'];
   const progIdx = p => { const i = PROG_ORDER.indexOf(p.id); return i < 0 ? 99 : i; };
   function slateAt(t) {
     const x = clamp(t, 0, 1) * (SLATE.length - 1), i = Math.min(SLATE.length - 2, Math.floor(x)), f = x - i;
@@ -2982,8 +3225,8 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
     plan.active = { id, start: today(), at: Date.now(), pageIds };
     ui.progBrowse = false; ui.progOpen = null; ui.heroOpen = false; ui.confirm = null; ui.wiz = null;
     saveDB();
-    renderApp();
-    window.scrollTo(0, 0);
+    if (view !== 'programs') setView('programs');            // started from the CBUM page: show the new plan
+    else { renderApp(); window.scrollTo(0, 0); }
     const info = planInfo(u);
     const slot = info ? info.slot : 'r';
     toast(`بدأ برنامج «${prog.name}» 🔥`, typeof slot === 'number' ? `تمرين اليوم: اليوم ${slot + 1} · ${prog.list[slot].t}` : 'صفحات أيام البرنامج جاهزة في القائمة.');
@@ -5163,6 +5406,185 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
   }
 
   /* =========================================================
+     View: Chris Bumstead (CBUM): his training rules, his signature exercises by muscle with
+     how he does them, the back tri-set, his off-season split and a program built on it.
+     Summarised from bodybuilding sites' reports of his videos and interviews (sources listed).
+     ========================================================= */
+  const CBUM_SRC = {
+    wiki: ['ويكيبيديا: كريس بمستيد', 'https://en.wikipedia.org/wiki/Chris_Bumstead'],
+    retire: ['FitnessVolt: لقبه السادس واعتزاله (2024)', 'https://fitnessvolt.com/chris-bumstead-wins-2024-classic-physique-olympia'],
+    triset: ['FitnessVolt: ترايسِت الظهر اللي فاز فيه (2026)', 'https://fitnessvolt.com/chris-bumstead-tri-set-workout-that-won-him-olympia/'],
+    giback: ['Generation Iron: يوم الظهر والبايسبس (2026)', 'https://generationiron.com/chris-bumstead-back-workout-2/'],
+    back23: ['FitnessVolt: يوم ظهر بتحضير أولمبيا 2023', 'https://fitnessvolt.com/chris-bumstead-back-workout-2023-olympia-prep/'],
+    chest: ['FitnessVolt: يوم صدر قبل أولمبيا 2023', 'https://fitnessvolt.com/chris-bumstead-chest-day/'],
+    joocy: ['FitnessVolt: تمرين الصدر «Joocy Chest»', 'https://fitnessvolt.com/chris-bumstead-chest-workout/'],
+    arms: ['BarBend: تمارينه المفضلة للذراع', 'https://barbend.com/chris-bumstead-favorite-arm-exercises'],
+    armsh: ['FitnessVolt: أكتاف وذراعين قبل أولمبيا 2022', 'https://fitnessvolt.com/cbum-kalecinski-arms-shoulders-workout/'],
+    guide: ['Gym College: دليل تمارين CBUM', 'https://gymcollege.substack.com/p/exclusive-cbum-workout-guide'],
+    legs: ['Breaking Muscle: يوم الأرجل قبل أولمبيا 2022', 'https://breakingmuscle.com/chris-bumstead-leg-day-2022-mr-olympia/'],
+    bennett: ['BarBend: نصائح المدرب جو بينيت لأرجله', 'https://barbend.com/news/chris-bumstead-leg-workout-tips-coach-joe-bennett/'],
+    methods: ['Dr. Muscle: أساليبه في التمرين', 'https://dr-muscle.com/chris-bumstead-training-methods-program-workouts-for-muscle-mass/'],
+    split: ['PrimeBeast: تقسيمته في الأوف سيزن 2024', 'https://primebeast-newsletter.beehiiv.com/p/chris-bumstead-workout-diet-program-2024']
+  };
+  const CBUM_FACTS = [['6', 'ألقاب كلاسيك فيزيك متتالية'], ['2019–2024', 'من أول لقب لآخر لقب'], ['رقم قياسي', 'أكثر بطل فاز بالفئة']];
+  // His rules: what he does (d), how you apply it (a), source (s)
+  const CBUM_RULES = [
+    { t: 'حس بالعضلة قبل الوزن', d: 'أهم شي عنده إنه يحس العضلة المستهدفة تشتغل على كامل الحركة (الاتصال العقلي العضلي). الوزن وسيلة، مو هدف.', a: 'إذا ما حسيت بالعضلة، خفّف الوزن شوي وبطّئ الحركة لين تحسها تشتغل.', s: 'methods' },
+    { t: 'النزول البطيء', d: 'النزول عنده متحكم فيه، تقريباً من 3 إلى 5 ثواني، عشان يطوّل وقت الشد على العضلة. والطلوع قوي ومتحكم.', a: 'عدّ 3 ثواني بالنزول بكل عدة، ولا تخلي الوزن يطيح.', s: 'methods' },
+    { t: 'تمدد كامل', d: 'يختار تمارين تمدد العضلة لآخرها، مثل تفتيح الكيبل جالس اللي يقول إنه يعطيه مدى كامل وتمدد كامل للصدر.', a: 'انزل لآخر نقطة تقدر تتحكم فيها. العدة الكاملة أهم من الوزن الثقيل.', s: 'chest' },
+    { t: 'اعصر بالقمة', d: 'بتمارين العزل مثل جهاز الفراشة يعصر العضلة بآخر الحركة لحظة قبل ما يرجع.', a: 'وقّف ثانية كاملة وأنت عاصر، بعدين ارجع ببطء.', s: 'joocy' },
+    { t: 'زِد العدات قبل الوزن', d: 'يتطور بالتدريج: يزيد العدات أول، وإذا وصل لأعلى المدى بكل الجولات يزيد الوزن.', a: 'مثال: 3 جولات × 8–12. لما تسوي 12 بكل الجولات، زِد الوزن شوي وارجع لـ8.', s: 'methods' },
+    { t: 'الشدة بآخر جولة', d: 'ما يكسر نفسه كل جولة. يخلي الأساليب القوية لآخر جولة: دروب سِت، أو راحة 15 ثانية وتكمل (Rest-pause)، أو عدات جزئية مع وقفات.', a: 'استخدم أسلوب واحد بآخر جولة من تمرينين بس بكل يوم.', s: 'bennett' },
+    { t: 'راحة قصيرة بالترايسِت', d: 'بالترايسِت يسوي 3 تمارين ورا بعض لنفس العضلة، والراحة بينها قليلة. ويقول إن الراحة القصيرة مهمة.', a: 'جرّبها بالظهر: تي بار، ثم سحب بالجهاز، ثم سحب عالي، وبعدها ارتاح دقيقتين.', s: 'triset' },
+    { t: 'تقسيمة ثابتة وتمارين تتغير', d: 'ما يمشي على ورقة حرفياً: هيكل الأسبوع ثابت، والتمارين تتبدل من مرة لمرة حسب إحساسه وجاهزية جسمه.', a: 'ثبّت أيامك، وبدّل تمرين أو اثنين كل كم أسبوع من «البدائل بنفس الفعالية».', s: 'split' }
+  ];
+  const CBUM_MUS = { back: 'الظهر', chest: 'الصدر', shoulders: 'الأكتاف', legs: 'الأرجل', arms: 'الذراعين' };
+  // His signature exercises: why it matters to him (w), how he does it (h), sets × reps (r), source (s)
+  const CBUM_EX = {
+    back: [
+      { k: 'tbar', w: 'أول تمرين بالترايسِت اللي قال إنه فاز فيه بالأولمبيا 6 مرات. يبني سماكة الظهر كامل.', h: 'صدرك مرفوع وظهرك مستقيم، اسحب المقبض لأسفل صدرك بالكوع، ونزّل ببطء لين تحس اللاتس تتمدد.', r: '3 × 8–12', s: 'triset' },
+      { k: 'srow', w: 'ثاني تمرين بالترايسِت: سحب بالجهاز بقبضة من فوق يركّز على منتصف الظهر.', h: 'اسحب بالكوع للخلف مو باليد، واعصر لوحي الكتف لحظة، وارجع لين تتمدد.', r: '3 × 8–12', s: 'triset' },
+      { k: 'highrow', w: 'ثالث تمرين بالترايسِت: سحب من فوق يكمّل على اللاتس وأعلى الظهر وهي متعبة.', h: 'صدرك ملاصق للمسند، اسحب لين يوصل الكوع جنب جسمك، ولا ترفع أكتافك.', r: '3 × 10–12', s: 'triset' },
+      { k: 'latpd', w: 'يفتتح فيه يوم الظهر، أحياناً بقبضة معكوسة (من تحت) وأحياناً بقبضة واسعة محايدة لعرض الظهر.', h: 'انزل بالكوع لجنبك وصدرك لفوق، ولا تميل للخلف كثير.', r: '3 × 10–12', s: 'back23' },
+      { k: 'csrow', w: 'تجديف بالدمبل مسنود على بنش مائل: يلغي الغش بالجسم ويعزل منتصف الظهر.', h: 'صدرك على المسند، اسحب الدمبل لجهة الورك، ونزّل لين تتمدد كامل.', r: '3 × 8–12', s: 'back23' },
+      { k: 'reardf', w: 'يختم فيه يوم الظهر: 100 عدة للكتف الخلفي.', h: 'وزن خفيف، ارفع للجنب بالكوع، والحركة من الكتف مو من الظهر.', r: '100 عدة', s: 'giback' }
+    ],
+    chest: [
+      { k: 'inclinedb', w: 'تمرينه الأساسي للصدر العلوي، وكثير يسويه بقبضة محايدة (هامر). إذا وصل للفشل بدري يكمّل بدروب سِت.', h: 'بنش على 30 درجة تقريباً، نزّل الدمبل لجنب أعلى صدرك بتمدد كامل، وادفع بدون ما تقفل الكوع.', r: '4 × 8–12', s: 'chest' },
+      { k: 'incline', w: 'بعد الدمبل يكمّل بالضغط العالي بالجهاز: يقدر يقرّب من الفشل بأمان بدون مساعد.', h: 'ظهرك ملاصق للمسند، الكوع تحت مستوى الكتف شوي، والنزول بطيء.', r: '3 × 8–12', s: 'chest' },
+      { k: 'cablecross', w: 'يسويه جالس، ويقول إنه يعطيه مدى كامل وتمدد كامل للصدر، ويخليه للحين قوي بالضغط.', h: 'خلّ الذراع والكيبل على خط واحد مع طرف صدرك، ظهرك مقوّس شوي، وجيب يدينك لقدام كأنك تحضن شجرة.', r: '3 × 10–15', s: 'chest' },
+      { k: 'cfly', w: 'جهاز الفراشة: يستخدمه تسخين، أو إنهاك قبل الضغط، أو ختام للتمرين، لأنه يعزل الصدر ويخليه يعصره بآخر العدة.', h: 'اعصر بالنص لحظة وارجع ببطء. إذا تعبت، كمّل بعدات جزئية.', r: '3 × 12–15', s: 'joocy' }
+    ],
+    shoulders: [
+      { k: 'dbshp', w: 'ضغط الأكتاف بالدمبل جالس هو تمرين الكتلة للأكتاف عنده، ويضيف بعده ضغط بالجهاز.', h: 'انزل لين الدمبل بمستوى الأذن، وادفع لفوق بدون قفل الكوع.', r: '3–4 × 8–10', s: 'armsh' },
+      { k: 'mlat', w: 'عرض الأكتاف سر شكل الكلاسيك. بأحد برامجه يسوي الرفرفة الجانبية بالجهاز 7 جولات × 8–12.', h: 'ارفع بالكوع مو باليد، ووقّف عند مستوى الكتف، ونزّل ببطء.', r: '7 × 8–12', s: 'guide' },
+      { k: 'cablelat', w: 'رفرفة جانبي بالكيبل بيد وحدة بعد الجهاز: شد ثابت من أول الحركة لآخرها.', h: 'وقف جنب الكيبل، ابدأ من قدام جسمك، وارفع لين مستوى الكتف.', r: '2 × 8–10 لكل يد', s: 'guide' },
+      { k: 'shp', w: 'ضغط الأكتاف بالجهاز بعد الدمبل: يدفع لقرب الفشل بأمان.', h: 'المقابض بمستوى الأذن، وادفع بدون ما ترفع أكتافك لأذنك.', r: '3 × 8–12', s: 'armsh' }
+    ],
+    legs: [
+      { k: 'hacksq', w: 'غالباً يبدأ فيه يوم الأرجل. أول جولة بدون أوزان عشان يحس بالحركة، وبعدين يزيد.', h: 'رجولك بنص المنصة، انزل عميق وظهرك ملاصق للمسند، وادفع من كامل القدم.', r: '4 × 8–12', s: 'legs' },
+      { k: 'lpress', w: 'أحياناً ثقيل، وأحياناً برجل وحدة. ويغيّر مكان القدم حسب العضلة اللي يبيها.', h: 'لا تقفل الركبة فوق، ولا تخلي أسفل ظهرك يرتفع عن المسند تحت.', r: '3 × 10–12', s: 'legs' },
+      { k: 'bulgarian', w: 'سكوات بلغاري بدمبلات ثقيلة، وينقال إنه حسّن وقفاته من الخلف.', h: 'الرجل الخلفية على البنش، انزل لتحت ببطء، والجذع مايل شوي لقدام عشان المؤخرة.', r: '3 × 8–10 لكل رجل', s: 'legs' },
+      { k: 'lext', w: 'تسخين قبل الهاك سكوات، أو سوبر سِت مع البلغاري.', h: 'اعصر الفخذ فوق ثانية، ونزّل ببطء.', r: '3 × 12–15', s: 'legs' },
+      { k: 'lcurl', w: 'رفرفة خلفي منسدح برجل وحدة عشان يركّز على كل رجل لحالها، مع وقفات وعدات جزئية.', h: 'حوضك ملاصق للمسند، اسحب لآخر الحركة، ونزّل ببطء.', r: '3 × 10–12 لكل رجل', s: 'bennett' },
+      { k: 'shcurl', w: 'رفرفة خلفي جالس: من أساسيات يوم الفخذ الخلفي عنده.', h: 'ثبّت فخذك تحت المسند، واسحب لآخر الحركة.', r: '3 × 10–12', s: 'bennett' }
+    ],
+    arms: [
+      { k: 'pushdown', w: 'يفتتح يوم الذراع بسوبر سِت: ترايسبس كيبل لتحت، وعلى طول تمرين خلف الرأس بدون راحة.', h: 'الكوع ثابت جنب جسمك، افرد ذراعك كامل واعصر تحت.', r: '3 × 10–12', s: 'arms' },
+      { k: 'katana', w: 'ترايسبس خلف الرأس بالكيبل بيد وحدة: يمدد الرأس الطويل للترايسبس.', h: 'الكوع جنب راسك، انزل لين تتمدد، وافرد لقدام.', r: '3 × 10–12 لكل يد', s: 'armsh' },
+      { k: 'bbcurl', w: 'أول تمرين بترايسِت البايسبس بيوم الظهر، بالبار المتعرج.', h: 'الكوع ثابت جنبك ولا تهز جسمك، ونزّل ببطء لين تفرد ذراعك.', r: '3 × 8–12', s: 'giback' },
+      { k: 'hammer', w: 'ثاني تمرين بالترايسِت: هامر للبايسبس والساعد.', h: 'قبضة محايدة، ارفع لين الكتف ونزّل ببطء.', r: '3 × 10–12', s: 'giback' },
+      { k: 'preacher', w: 'ثالث تمرين بالترايسِت: بريتشر بالجهاز أو البار يعزل البايسبس كامل.', h: 'ظهر ذراعك على المسند، ونزّل لين تتمدد بدون ما تقفل الكوع.', r: '3 × 10–12', s: 'giback' }
+    ]
+  };
+  const CBUM_TRISET = ['tbar', 'srow', 'highrow'];
+  const CBUM_SPLIT = [['صدر + ترايسبس + كتف خلفي', 1], ['ظهر + بايسبس', 1], ['فخذ أمامي + سمانة', 1], ['راحة', 0], ['أكتاف', 1], ['ذراعين', 1], ['صدر + ظهر', 1], ['فخذ خلفي + مؤخرة + سمانة', 1], ['راحة', 0]];
+  const CBUM_SEEN = 'vibefit.cbum.seen';
+  const cbSrc = k => CBUM_SRC[k] ? `<a href="${esc(CBUM_SRC[k][1])}" target="_blank" rel="noopener noreferrer" class="cb-src">${icon('ext', 'w-3.5 h-3.5')}${esc(CBUM_SRC[k][0].split(':')[0])}</a>` : '';
+  const cbFig = (k, cls = 'w-full h-full') => { const xt = XT[k]; return xt && FIGS[xt[0]] ? figSVG(xt[0], cls, FIG_NOEQ.has(k)) : ''; };
+  function sectionHead(eyebrow, title, desc, id) {
+    return `<div${id ? ` id="${id}"` : ''} class="jump"><p class="eyebrow">${eyebrow}</p><h2 class="font-display font-extrabold text-2xl sm:text-[28px] text-slate-900 leading-tight">${title}</h2>${desc ? `<p class="mt-1 text-slate-500">${desc}</p>` : ''}</div>`;
+  }
+  // "3 × 8–12 لكل يد": the numbers left-to-right, the words after them
+  const rxHTML = r => { const m = String(r).match(/^([\d\s×–-]+)(.*)$/); return m ? `<span dir="ltr" class="num">${esc(m[1].trim())}</span>${m[2] ? ' ' + esc(m[2].trim()) : ''}` : esc(r); };
+  function cbumExCard(x) {
+    const L = XL[x.k];
+    if (!L) return '';
+    return `<article class="card cb-ex p-4 sm:p-5">
+      <div class="flex items-center gap-3.5">
+        <button type="button" data-act="guide-key" data-k="${x.k}" class="cb-fig" aria-label="شرح ${esc(L[0])}">${cbFig(x.k)}</button>
+        <div class="min-w-0 flex-1">
+          <h3 class="font-display font-extrabold text-lg text-slate-900 leading-snug"><span dir="ltr">${esc(L[0])}</span></h3>
+          <p class="text-[13px] font-bold text-slate-500">${esc(L[1])}</p>
+          <span class="cb-rx mt-1.5">${rxHTML(x.r)}</span>
+        </div>
+      </div>
+      <p class="mt-3 text-slate-700 leading-7"><b class="text-slate-900">ليش عنده: </b>${esc(x.w)}</p>
+      <p class="mt-1.5 text-slate-600 leading-7"><b class="text-slate-900">طريقته: </b>${esc(x.h)}</p>
+      <div class="mt-3 flex flex-wrap items-center gap-2">
+        <button type="button" data-act="guide-key" data-k="${x.k}" class="chip h-9">${icon('target', 'w-4 h-4')} الشرح والبدائل</button>
+        ${cbSrc(x.s)}
+      </div>
+    </article>`;
+  }
+  function cbumView(u) {
+    const mus = CBUM_MUS[ui.cbumMus] ? ui.cbumMus : 'back';
+    const prog = PROG_BY_ID.cbum5;
+    const srcKeys = Object.keys(CBUM_SRC);
+    return `<section class="space-y-10 fade-in">
+      <article class="news-hero cb-hero p-5 sm:p-8 text-white">
+        <div class="relative grid gap-6 lg:grid-cols-[minmax(0,1fr)_auto] items-center">
+          <div class="min-w-0">
+            <span class="news-tag ia">${icon('trophy', 'w-4 h-4')} مدرسة الأبطال</span>
+            <h1 class="mt-3 font-display font-extrabold text-[30px] sm:text-[42px] leading-tight">طريقة <span dir="ltr">CBUM</span> في التمرين</h1>
+            <p class="mt-2 text-slate-300 leading-7 max-w-2xl">كريس بمستيد فاز بلقب الكلاسيك فيزيك في مستر أولمبيا 6 سنين ورا بعض، من 2019 إلى 2024، وهذا أكثر عدد ألقاب بتاريخ الفئة. اعتزل المنافسة بعد لقبه السادس في أكتوبر 2024. هنا قواعده في التمرين، وأفضل تمارينه لكل عضلة وكيف يسويها، وبرنامج مستوحى من تقسيمته.</p>
+            <div class="mt-5 flex flex-wrap gap-2">
+              <button type="button" data-act="cb-jump" data-to="cb-ex" class="btn-light h-11">${icon('dumbbell', 'w-5 h-5')} أفضل تمارينه</button>
+              <button type="button" data-act="cb-jump" data-to="cb-prog" class="btn-glass h-11">${icon('calendar', 'w-5 h-5')} برنامج على طريقته</button>
+            </div>
+          </div>
+          <div class="cb-medal hidden sm:grid" aria-hidden="true"><span class="num" dir="ltr">6×</span><span>Classic Olympia</span></div>
+        </div>
+        <dl class="relative mt-6 grid grid-cols-3 gap-2">${CBUM_FACTS.map(f => `<div class="cb-fact"><dt class="num text-[17px] sm:text-[28px] font-extrabold leading-tight"><span dir="ltr" class="whitespace-nowrap">${f[0]}</span></dt><dd class="text-[12px] sm:text-[13px] text-slate-300 leading-5">${f[1]}</dd></div>`).join('')}</dl>
+      </article>
+
+      <div class="space-y-4">
+        ${sectionHead('قواعده', 'ثمان قواعد مشى عليها CBUM', 'مبادئ تقدر تطبقها من بكرة، مهما كان مستواك.', 'cb-rules')}
+        <ol class="grid gap-3 md:grid-cols-2">${CBUM_RULES.map((r, i) => `<li class="card p-4 sm:p-5">
+          <div class="flex items-start gap-3">
+            <span class="cb-num">${i + 1}</span>
+            <div class="min-w-0 flex-1">
+              <h3 class="font-display font-extrabold text-lg text-slate-900 leading-snug">${esc(r.t)}</h3>
+              <p class="mt-1 text-slate-600 leading-7">${esc(r.d)}</p>
+            </div>
+          </div>
+          <p class="sci-take mt-3 text-slate-800 leading-7"><b>طبّقها: </b>${esc(r.a)}</p>
+          <div class="mt-2.5">${cbSrc(r.s)}</div>
+        </li>`).join('')}</ol>
+      </div>
+
+      <div class="space-y-4">
+        ${sectionHead('أفضل تمارينه', 'التمارين اللي بنت جسم البطل', 'اختر العضلة. اضغط الصورة أو «الشرح والبدائل» وتشوف الحركة الصحيحة والعضلات وبدائل بنفس الفعالية.', 'cb-ex')}
+        <div class="flex gap-2 overflow-x-auto no-scrollbar scroll-fade -mx-1 px-1 py-1" role="group" aria-label="العضلة">${Object.keys(CBUM_MUS).map(k => `<button type="button" data-act="cbum-mus" data-v="${k}" aria-pressed="${mus === k}" class="chip ${mus === k ? 'chip-on' : ''}">${CBUM_MUS[k]} <span class="num opacity-60">${CBUM_EX[k].length}</span></button>`).join('')}</div>
+        <div class="grid gap-3 lg:grid-cols-2 items-start">${CBUM_EX[mus].map(cbumExCard).join('')}</div>
+      </div>
+
+      <article class="card p-5 sm:p-6">
+        <p class="eyebrow">السر اللي قاله بنفسه</p>
+        <h2 class="font-display font-extrabold text-2xl text-slate-900 leading-tight">الترايسِت اللي فاز فيه 6 مرات</h2>
+        <p class="mt-1 text-slate-500 leading-7">ثلاث تمارين للظهر ورا بعض بدون راحة تقريباً، وبعدها ارتاح وعيدها. يقول إنه يسويها بحجم يزيد تدريجياً، وإن الراحة القصيرة بينها مهمة.</p>
+        <ol class="mt-4 grid gap-3 sm:grid-cols-3">${CBUM_TRISET.map((k, i) => `<li class="cb-step">
+          <button type="button" data-act="guide-key" data-k="${k}" class="w-full text-start flex sm:flex-col items-center sm:items-stretch gap-3">
+            <span class="cb-step-fig">${cbFig(k)}</span>
+            <span class="min-w-0"><span class="block text-[12px] font-extrabold text-slate-500">التمرين ${i + 1}</span><span class="block font-display font-extrabold text-slate-900 leading-snug" dir="ltr">${esc(XL[k][0])}</span><span class="block text-[13px] text-slate-500">${esc(XL[k][1])}</span></span>
+          </button>
+        </li>`).join('')}</ol>
+        <p class="mt-3 text-[13px] text-slate-500 leading-6">حسب تقارير فيديو له في نوفمبر 2026. التقارير تختلف شوي بالتمرين الثاني (سحب بقبضة عليا أو سحب بالجهاز)، والفكرة نفسها. ${cbSrc('triset')} ${cbSrc('giback')}</p>
+      </article>
+
+      <article class="card p-5 sm:p-6">
+        <p class="eyebrow">تقسيمته</p>
+        <h2 class="font-display font-extrabold text-2xl text-slate-900 leading-tight">دورة 9 أيام في الأوف سيزن</h2>
+        <p class="mt-1 text-slate-500 leading-7">كل عضلة تتمرن مرة إلى مرتين بالدورة، والصدر والظهر يرجعون مع بعض باليوم السابع.</p>
+        <ol class="mt-4 grid grid-cols-3 sm:grid-cols-9 gap-2">${CBUM_SPLIT.map((d, i) => `<li class="cb-day ${d[1] ? '' : 'is-rest'}"><span class="num text-[12px] font-extrabold opacity-70">${i + 1}</span><span class="block text-[13px] font-bold leading-5 mt-0.5">${esc(d[0])}</span></li>`).join('')}</ol>
+        <div class="mt-3">${cbSrc('split')}</div>
+      </article>
+
+      <div class="space-y-4">
+        ${sectionHead('برنامج على طريقته', prog ? esc(prog.name) : '', 'نفس فكرة تقسيمته، مضغوطة لأسبوع 7 أيام بتمارينه المفضلة. ابدأه وبينزل بصفحات تمارينك مع الجولات والعدات.', 'cb-prog')}
+        ${prog ? `<div class="max-w-2xl">${progCard(u, prog, false, null)}</div>` : ''}
+      </div>
+
+      <div class="space-y-3">
+        <p class="text-[13px] text-slate-500 leading-6 flex items-start gap-2">${icon('info', 'w-4 h-4 shrink-0 mt-1')}<span>هذا ملخص من تقارير مواقع كمال الأجسام عن فيديوهاته ومقابلاته، والتفاصيل تختلف من سنة لسنة. هو محترف ومعه فريق كامل، وبفترة تحضير البطولة كان يسوي كارديو من ساعة لساعتين يومياً. خذ المبادئ، وابدأ بحجم تمرين يناسب مستواك.</span></p>
+        <details class="card p-4"><summary class="cursor-pointer font-bold text-slate-800 select-none">المصادر (<span class="num">${srcKeys.length}</span>)</summary>
+          <ul class="mt-3 grid gap-1.5 sm:grid-cols-2">${srcKeys.map(k => `<li><a href="${esc(CBUM_SRC[k][1])}" target="_blank" rel="noopener noreferrer" class="inline-flex items-start gap-1.5 text-sm text-slate-700 hover:text-slate-900 leading-6">${icon('ext', 'w-4 h-4 shrink-0 mt-1')}<span>${esc(CBUM_SRC[k][0])}</span></a></li>`).join('')}</ul>
+        </details>
+      </div>
+    </section>`;
+  }
+
+  /* =========================================================
      Modal: add page
      ========================================================= */
   function modalView() {
@@ -5278,10 +5700,10 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
      Render
      ========================================================= */
   function resolveView(u) {
-    if (['board', 'cardio', 'calories', 'meals', 'chat', 'programs', 'log', 'science', 'news'].includes(view)) return view;
+    if (['home', 'board', 'cardio', 'calories', 'meals', 'chat', 'programs', 'log', 'science', 'news', 'cbum'].includes(view)) return view;
     if (view === 'admin' && isAdmin()) return view;
     if (view.startsWith('page-') && u.pages.some(p => 'page-' + p.id === view)) return view;
-    return 'board';
+    return 'home';
   }
   function mainView(u) {
     view = resolveView(u);
@@ -5294,13 +5716,16 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
     if (view === 'log') return logView(u);
     if (view === 'science') return scienceView(u);
     if (view === 'news') return newsView(u);
+    if (view === 'cbum') return cbumView(u);
+    if (view === 'board') return boardView(u);
     if (view.startsWith('page-')) return workoutView(u, u.pages.find(p => 'page-' + p.id === view));
-    return boardView(u);
+    return homeView(u);
   }
   function renderApp() {
     const app = $('#app');
     const u = me();
     if (!u) {
+      document.body.classList.remove('has-tabs');
       renderBar();
       const waiting = mode === 'loading' || (!!authUid && !sharedReady);
       app.innerHTML = waiting && readLS(SESSION_KEY) ? splashView() : authView();
@@ -5321,7 +5746,9 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
       <div class="gutter mx-auto max-w-7xl pt-6 pb-28 lg:grid lg:grid-cols-[250px_minmax(0,1fr)] lg:gap-8">
         <aside class="hidden lg:block"><div class="sticky space-y-6 glass side-glass" style="top:calc(5.5rem + env(safe-area-inset-top,0px))">${sidebarView(u)}</div></aside>
         <main id="view" class="min-w-0" tabindex="-1">${main}</main>
-      </div>`;
+      </div>
+      ${tabBarHTML(u)}`;
+    document.body.classList.add('has-tabs');
     const list = $('#chat-list');
     if (list) list.scrollTop = (ui.chatStick || prevChatTop == null) ? list.scrollHeight : prevChatTop;
     ui.navAnimNow = null;
@@ -5336,6 +5763,7 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
     if (changed && v === 'log') { ui.logDate = today(); ui.logEdit = false; }
     if (changed && v === 'programs') ui.progBrowse = false;
     if (changed && v === 'chat') ui.chatStick = true;
+    if (v === 'cbum') writeLS(CBUM_SEEN, '1');
     renderApp();
     if (changed) {
       window.scrollTo(0, 0);
@@ -5359,7 +5787,7 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
     ui.authName = ''; ui.showPass = false;
     ui.wiz = null; ui.progBrowse = false; ui.progOpen = null; ui.heroOpen = false; ui.maxDraft = null; ui.dietOpen = false; ui.progTab = null;
     view = '';
-    setView('board');
+    setView('home');
     if (isNew) toast(`أهلاً بك في Vibe Fit، ${u.username}`, 'تم إنشاء حسابك. سجّل أول تمرين لتدخل لوحة التنافس.');
     else toast(`أهلاً بعودتك، ${u.username}`, 'بياناتك محمّلة وجاهزة.');
   }
@@ -5537,6 +5965,8 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
     if (WRITE_ACTS.has(act) && !guardWrite()) return;
     switch (act) {
       case 'nav': if (u) { closeDrawer(true); setView(t.dataset.v); } break;
+      case 'cbum-mus': ui.cbumMus = t.dataset.v; renderApp(); break;
+      case 'cb-jump': { const el = document.getElementById(t.dataset.to); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); break; }
       case 'drawer-open': if (u) openDrawer(); break;
       case 'drawer-close': closeDrawer(); break;
       case 'auth-mode': {
