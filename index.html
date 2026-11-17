@@ -588,6 +588,11 @@
   }
   .cb-day { border-radius: 14px; padding: 8px 8px 10px; background: var(--ink); color: #FFFFFF; min-height: 74px; }
   .cb-day.is-rest { background: rgba(241, 245, 249, .95); color: var(--ink-2); border: 1px dashed var(--line-2); }
+  .st-ring { --p: 0; width: 112px; height: 112px; border-radius: 50%; display: grid; place-items: center; flex-shrink: 0; background: conic-gradient(var(--ink) calc(var(--p) * 1%), var(--line) 0); }
+  .st-ring > div { width: 94px; height: 94px; border-radius: 50%; background: #FFFFFF; display: grid; place-content: center; text-align: center; }
+  .st-ring.is-done { background: conic-gradient(var(--ink-0) 100%, var(--ink-0) 0); box-shadow: 0 10px 26px -14px rgba(15, 23, 42, .7); }
+  .burn-bar { display: flex; gap: 2px; height: 10px; border-radius: 999px; overflow: hidden; background: var(--line); }
+  .burn-bar i { display: block; height: 100%; }
   .tabbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 42; padding: 6px max(8px, env(safe-area-inset-left, 0px)) calc(6px + env(safe-area-inset-bottom, 0px));
     background: linear-gradient(180deg, rgba(255, 255, 255, .78), rgba(255, 255, 255, .94)); -webkit-backdrop-filter: blur(22px) saturate(1.8); backdrop-filter: blur(22px) saturate(1.8);
     border-top: 1px solid rgba(226, 232, 240, .9); box-shadow: 0 -10px 30px -22px rgba(15, 23, 42, .45); }
@@ -1295,6 +1300,86 @@
       <span class="block mt-1.5 text-[12px] text-slate-500 leading-5">${t.note}</span>
     </button>`;
   }
+  // ---- daily steps goal (default 10,000, kept on the profile) ----
+  const STEP_GOAL = 10000;
+  const STEP_PRESETS = [5000, 8000, 10000, 12000, 15000];
+  const stepGoalOf = u => { const g = Math.round(Number(u.profile && u.profile.stepGoal)); return g >= 500 && g <= 100000 ? g : STEP_GOAL; };
+  // Steps of a day: counted on outdoor sessions; a treadmill session (or an old one without them) is
+  // estimated from its distance and the step length for the user's height.
+  function daySteps(u, date) {
+    const h = (u.profile && u.profile.height) || 170;
+    let steps = 0, est = 0;
+    u.cardio.filter(c => c.date === date).forEach(c => {
+      if (c.steps > 0) steps += c.steps;
+      else if (c.distance > 0) est += Math.round(c.distance * 1000 / strideM(h, (c.speed || 0) >= RUN_FROM ? 165 : WALK_CADENCE));
+    });
+    return { steps: steps + est, est };
+  }
+  function setStepGoal(u, v) {
+    const n = Math.round(num(v));
+    if (!(n >= 500 && n <= 100000)) { toast('الهدف غير صحيح', 'اختر رقماً بين 500 و 100,000 خطوة.', 'err'); return; }
+    u.profile = Object.assign({}, u.profile, { stepGoal: n });
+    ui.stepEdit = false;
+    saveDB();
+    renderApp();
+    toast('تم تحديث هدف الخطوات', `${fmt(n)} خطوة باليوم`);
+  }
+  function homeSteps(u) {
+    const g = stepGoalOf(u), s = daySteps(u, today());
+    const done = s.steps >= g, left = Math.max(0, g - s.steps);
+    const real = Math.round(s.steps / g * 100), pctv = Math.min(100, real);
+    const stride = strideM((u.profile && u.profile.height) || 170, WALK_CADENCE);
+    const big = s.steps >= 100000 ? 'text-[19px]' : s.steps >= 10000 ? 'text-[24px]' : 'text-[26px]';
+    return `<section class="card p-5 sm:p-6" aria-labelledby="st-title">
+      <div class="flex items-center gap-4 sm:gap-5">
+        <div class="st-ring ${done ? 'is-done' : ''}" style="--p:${pctv}" role="img" aria-label="${fmt(s.steps)} خطوة من ${fmt(g)}">
+          <div><span class="num ${big} font-extrabold leading-none text-slate-900">${fmt(s.steps)}</span><span class="block text-[11px] text-slate-500 mt-1">من <span class="num">${fmt(g)}</span></span></div>
+        </div>
+        <div class="min-w-0 flex-1">
+          <p class="eyebrow">هدف الخطوات اليوم</p>
+          <h2 id="st-title" class="font-display font-extrabold text-xl sm:text-2xl text-slate-900 leading-snug">${done ? 'حققت هدفك اليوم 🎉' : s.steps ? `باقي <span class="num">${fmt(left)}</span> خطوة` : `هدفك <span class="num">${fmt(g)}</span> خطوة`}</h2>
+          <p class="mt-1 text-[14px] text-slate-500 leading-6">${done ? `مشيت <span class="num">${fmt(s.steps)}</span> خطوة (<span class="num" dir="ltr">${real}%</span> من هدفك). كفو!` : `تقريباً <span class="num">${fmt(left * stride / 1000, 1)}</span> كم، يعني <span class="num">${fmt(Math.round(left / WALK_CADENCE))}</span> دقيقة مشي.`}</p>
+          ${s.est ? `<p class="mt-1 text-[12px] text-slate-400">منها <span class="num">${fmt(s.est)}</span> خطوة تقديرية من مسافة السير.</p>` : ''}
+        </div>
+      </div>
+      <div class="mt-4 flex flex-wrap gap-2">
+        <button type="button" data-act="steps-log" class="btn-dark h-10 text-sm">${icon('plus', 'w-4 h-4')} سجّل خطواتك</button>
+        <button type="button" data-act="step-goal-edit" aria-expanded="${!!ui.stepEdit}" class="btn-ghost h-10 text-sm">${icon('target', 'w-4 h-4')} ${ui.stepEdit ? 'إلغاء' : 'غيّر الهدف'}</button>
+      </div>
+      ${ui.stepEdit ? `<form data-form="step-goal" class="mt-3 rounded-2xl bg-slate-50 border border-slate-200 p-3 fade-in" novalidate>
+        <p class="text-[13px] font-bold text-slate-600">اختر هدفك اليومي أو اكتبه:</p>
+        <div class="mt-2 flex flex-wrap gap-1.5">${STEP_PRESETS.map(n => `<button type="button" data-act="step-goal-set" data-v="${n}" aria-pressed="${n === g}" class="chip h-8 ${n === g ? 'chip-on' : ''}"><span class="num">${fmt(n)}</span></button>`).join('')}</div>
+        <div class="mt-2.5 flex gap-2">
+          <label for="step-goal" class="sr-only">عدد الخطوات</label>
+          <input id="step-goal" class="inp num h-11 flex-1 min-w-0" inputmode="numeric" autocomplete="off" value="${g}">
+          <button class="btn-dark h-11 px-4 text-sm shrink-0">حفظ</button>
+        </div>
+      </form>` : ''}
+    </section>`;
+  }
+  // ---- calories burned today: the body at rest so far + walking/cardio + weights ----
+  function homeBurn(u) {
+    const st = dayStats(u, today());
+    const p = u.profile;
+    const now = new Date();
+    const rest = validProfile(p) ? Math.round(bmr(p) * (now.getHours() * 60 + now.getMinutes()) / 1440) : 0;
+    const active = Math.round(st.burnTotal), total = rest + active;
+    const parts = [['جسمك وهو مرتاح', rest, '#CBD5E1', 'حتى الحين'], ['المشي والكارديو', Math.round(st.cardioKcal), '#1E293B', ''], ['الحديد', Math.round(st.liftKcal), '#64748B', st.sets ? `${fmt(st.sets)} ${arN(st.sets, 'جولة', 'جولتين', 'جولات', 'جولة')}` : '']];
+    return `<section class="card p-5 sm:p-6" aria-labelledby="burn-title">
+      <div class="flex items-start justify-between gap-3">
+        <div class="min-w-0">
+          <p class="eyebrow">السعرات المحروقة اليوم</p>
+          <h2 id="burn-title" class="flex items-baseline gap-2"><span class="num text-[40px] sm:text-[44px] font-extrabold leading-none text-slate-900">${fmt(total)}</span><span class="text-sm font-bold text-slate-500">سعرة بالمجموع</span></h2>
+          <p class="mt-1.5 text-[14px] text-slate-600">منها حركة وتمرين: <b class="num text-slate-900">${fmt(active)}</b> سعرة</p>
+        </div>
+        <span class="hm-tile-ic shrink-0 ia">${icon('flame', 'w-5 h-5')}</span>
+      </div>
+      <div class="burn-bar mt-4" aria-hidden="true">${parts.map(x => x[1] > 0 && total > 0 ? `<i style="width:${(x[1] / total * 100).toFixed(2)}%;background:${x[2]}"></i>` : '').join('')}</div>
+      <ul class="mt-3 grid gap-1.5">${parts.map(x => `<li class="flex items-center gap-2 text-[14px]"><span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:${x[2]}"></span><span class="text-slate-600">${x[0]}${x[3] ? ` <span class="text-[12px] text-slate-400">(${x[3]})</span>` : ''}</span><span class="ms-auto num font-bold text-slate-900">${fmt(x[1])}</span></li>`).join('')}</ul>
+      <p class="mt-3 text-[12px] text-slate-400 leading-5">${p && p.set ? 'حرق الراحة محسوب من وزنك وطولك وعمرك، ويزيد مع ساعات اليوم.' : 'حرق الراحة محسوب من بيانات افتراضية. حدّث وزنك وطولك وعمرك بصفحة السعرات لتقدير أدق.'}</p>
+      <button type="button" data-act="nav" data-v="calories" class="btn-text mt-1 -ms-2">رصيد السعرات ${icon('arrowR', 'w-4 h-4 rtl-flip')}</button>
+    </section>`;
+  }
   function homeTiles(u) {
     const st = dayStats(u, today());
     const kc = calLeft(u);
@@ -1302,7 +1387,7 @@
     const nMeals = u.meals.filter(m => m.date === today()).length;
     return `<div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
       ${homeTile({ v: tp.page ? 'page-' + tp.page.id : 'log', icon: 'dumbbell', label: 'التمرين', value: fmt(st.reps), unit: 'عدة', cta: 'سجّل', note: st.sets ? `${fmt(st.sets)} ${arN(st.sets, 'جولة', 'جولتين', 'جولات', 'جولة')} · ${fmt(st.exercises)} ${arN(st.exercises, 'تمرين', 'تمرينين', 'تمارين', 'تمرين')}` : 'ما سجّلت جولات اليوم' })}
-      ${homeTile({ v: 'cardio', icon: 'route', label: 'المشي والكارديو', value: fmt(st.walkMin), unit: 'دقيقة', cta: 'سجّل', note: st.cardioKcal ? `${fmt(st.cardioKcal)} سعرة حركة` : 'خطوات، مشي، جري أو سير' })}
+      ${homeTile({ v: 'cardio', icon: 'route', label: 'المشي والكارديو', value: fmt(st.walkMin), unit: 'دقيقة', cta: 'سجّل', note: st.cardioKcal ? `${fmt(daySteps(u, today()).steps)} خطوة · ${fmt(st.cardioKcal)} سعرة` : 'خطوات، مشي، جري أو سير' })}
       ${homeTile({ v: 'calories', icon: 'flame', label: 'رصيد السعرات', value: kc.target ? fmt(kc.left) : '—', unit: kc.target ? 'متبقي' : '', cta: 'افتح', bar: kc.target ? Math.max(0, kc.net) / kc.target : null, note: kc.target ? `من هدف ${fmt(Math.round(kc.target))} سعرة` : 'حدّد هدفك اليومي' })}
       ${homeTile({ v: 'meals', icon: 'meal', label: 'الأكل', value: fmt(st.eaten), unit: 'سعرة', cta: 'سجّل', note: nMeals ? `${fmt(nMeals)} ${arN(nMeals, 'وجبة', 'وجبتين', 'وجبات', 'وجبة')} اليوم` : 'صوّر وجبتك ونحسبها لك' })}
     </div>`;
@@ -1376,6 +1461,10 @@
   function homeView(u) {
     return `<section class="space-y-6 fade-in">
       ${homeHero(u)}
+      <div class="grid gap-4 md:grid-cols-2 items-start">
+        ${homeSteps(u)}
+        ${homeBurn(u)}
+      </div>
       ${homeTiles(u)}
       <div class="grid gap-4 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] items-start">
         ${homeBoard(u)}
@@ -5914,7 +6003,9 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
     if (c.error) { toast('لا يمكن حفظ الجلسة', c.error, 'err'); return; }
     const entry = { id: uid(), date: today(), mode: c.mode, minutes: c.minutes, speed: Math.round(c.speed * 100) / 100, incline: c.incline, distance: Math.round(c.distance * 1000) / 1000, kcal: Math.round(c.kcal), ts: Date.now() };
     if (c.mode === 'outdoor') entry.steps = c.steps;
+    const goal = stepGoalOf(u), before = daySteps(u, today()).steps;
     u.cardio.push(entry);
+    if (before < goal && daySteps(u, today()).steps >= goal) setTimeout(() => toast(`حققت هدف ${fmt(goal)} خطوة اليوم 🎉`, 'كفو! كمّل كذا بكرة.'), 500);
     saveDB();
     renderApp();
     toast(c.mode === 'treadmill' ? 'تم حفظ جلسة السير الكهربائي' : 'تم حفظ جلسة المشي', `${fmt(c.minutes)} دقيقة · ${fmt(c.distance, 2)} كم · ${fmt(c.kcal)} سعرة · +${fmt(c.minutes * SCORE.perCardioMin + c.kcal / SCORE.kcalPer)} نقطة`);
@@ -5966,6 +6057,9 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
     switch (act) {
       case 'nav': if (u) { closeDrawer(true); setView(t.dataset.v); } break;
       case 'cbum-mus': ui.cbumMus = t.dataset.v; renderApp(); break;
+      case 'steps-log': if (u) { ui.cardioMode = 'outdoor'; ui.outMeasure = 'steps'; setView('cardio'); const el = $('#out-steps'); if (el) el.focus({ preventScroll: true }); } break;
+      case 'step-goal-edit': ui.stepEdit = !ui.stepEdit; renderApp(); if (ui.stepEdit) { const el = $('#step-goal'); if (el) el.focus(); } break;
+      case 'step-goal-set': if (u) setStepGoal(u, t.dataset.v); break;
       case 'cb-jump': { const el = document.getElementById(t.dataset.to); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); break; }
       case 'drawer-open': if (u) openDrawer(); break;
       case 'drawer-close': closeDrawer(); break;
@@ -6342,6 +6436,7 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
       case 'cardio': if (u) saveCardio(u); break;
       case 'meal': if (u) addMeal(u, $('#meal-name').value, $('#meal-kcal').value, $('#meal-slot').value); break;
       case 'profile': if (u) saveProfile(u); break;
+      case 'step-goal': if (u) setStepGoal(u, $('#step-goal').value); break;
       case 'add-page': if (u) addPage(u); break;
       case 'wiz': if (u) wizNext(u); break;
       case 'maxes': if (u) saveMaxes(u); break;
@@ -6496,7 +6591,7 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
   /* =========================================================
      Write guards, demo accounts, splash
      ========================================================= */
-  const WRITE_ACTS = new Set(['ai-add', 'open-add-page', 'ex-suggest', 'ask-confirm', 'del-ex', 'del-page', 'del-log', 'del-cardio', 'meal-quick', 'del-meal', 'chat-quick', 'del-msg', 'clear-chat', 'del-acc', 'del-all-acc', 'set-done', 'set-undo', 'cfg-save', 'share-finish', 'prog-start', 'prog-switch', 'prog-stop', 'prog-reweek', 'diet-add', 'ex-swap', 'bd-save', 'bd-del']);
+  const WRITE_ACTS = new Set(['ai-add', 'open-add-page', 'ex-suggest', 'ask-confirm', 'del-ex', 'del-page', 'del-log', 'del-cardio', 'meal-quick', 'del-meal', 'chat-quick', 'del-msg', 'clear-chat', 'del-acc', 'del-all-acc', 'set-done', 'set-undo', 'cfg-save', 'share-finish', 'prog-start', 'prog-switch', 'prog-stop', 'prog-reweek', 'diet-add', 'ex-swap', 'bd-save', 'bd-del', 'step-goal-set']);
   function guardWrite() {
     if (!readOnly) return true;
     toast('وضع المشاهدة فقط', 'لتسجيل تمارينك اطلب من صاحب الصفحة صلاحية «Contributor».', 'err');
