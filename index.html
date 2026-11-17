@@ -769,6 +769,7 @@
     chevR: '<path d="m9.5 6 6 6-6 6"/>',
     quote: '<path d="M9.5 7.5C6.5 8.5 5 10.5 5 13.5V17h4.5v-4.5H7c0-1.8.9-3 2.5-3.5M18.5 7.5c-3 1-4.5 3-4.5 6V17h4.5v-4.5H16c0-1.8.9-3 2.5-3.5"/>',
     moon: '<path d="M19.5 14.5A8 8 0 1 1 9.5 4.5a6.5 6.5 0 0 0 10 10Z"/>',
+    pen: '<path d="M4 20h4L19 9a2.83 2.83 0 0 0-4-4L4 16v4Z"/><path d="m13.5 6.5 4 4"/>',
     swap: '<path d="M4 8h15M15 4l4 4-4 4M20 16H5M9 12l-4 4 4 4"/>',
     up: '<path d="m6 15 6-6 6 6"/>',
     down: '<path d="m6 9 6 6 6-6"/>'
@@ -1016,7 +1017,8 @@
     const kc = calLeft(u);
     return [
       { title: '', items: [{ v: 'home', label: 'الرئيسية', icon: 'home', badge: st.score ? fmt(st.score) : '' }] },
-      { title: 'التمرين', add: true, items: [{ v: 'programs', label: info ? info.prog.name : 'البرامج التدريبية', icon: 'clip', badge: info ? '' : 'ابدأ', alert: !info, tone: info ? progTone(info.prog) : null }]
+      { title: 'التمرين', add: true, items: [{ v: 'programs', label: info ? info.prog.name : 'البرامج التدريبية', icon: 'clip', badge: info ? '' : 'ابدأ', alert: !info, tone: info ? progTone(info.prog) : null, on: view === 'programs' && !ui.builder },
+        { act: 'bd-new', label: 'اصنع برنامجك بنفسك', icon: 'pen', badge: myPrograms(u).length ? fmt(myPrograms(u).length) : '', on: view === 'programs' && !!ui.builder }]
         .concat(u.pages.filter(p => p.prog).map(p => {
           const ps = pageDayStats(u, p.id, d);
           const isToday = !!info && typeof info.slot === 'number' && info.act.pageIds[info.slot] === p.id;
@@ -1062,8 +1064,8 @@
         ${g.title ? `<p class="px-3 mb-2 text-[11.5px] font-extrabold text-slate-400">${g.title}</p>` : ''}
         <ul class="space-y-1">
           ${g.items.map(it => {
-            const active = view === it.v;
-            return `<li><button data-act="nav" data-v="${it.v}" ${active ? 'aria-current="page"' : ''} class="nav-it ${active ? 'is-on ia' : ''}${active && ui.navAnimNow === it.v ? ' liquid' : ''}">
+            const active = it.on != null ? it.on : view === it.v;
+            return `<li><button ${it.act ? `data-act="${it.act}"` : `data-act="nav" data-v="${it.v}"`} ${active ? 'aria-current="page"' : ''} class="nav-it ${active ? 'is-on ia' : ''}${active && ui.navAnimNow === (it.v || 'programs') ? ' liquid' : ''}">
               <span class="nav-ic${it.tone ? ' has-tone' : ''}"${it.tone ? ` style="--tone:${it.tone.bg};--on:${it.tone.fg}"` : ''}>${icon(it.icon, 'w-[18px] h-[18px]')}</span>
               <span class="truncate flex-1 text-start">${esc(it.label)}</span>
               ${it.badge ? `<span class="nav-badge ${it.alert && !active ? 'is-alert' : ''}">${it.badge}</span>` : ''}
@@ -6289,7 +6291,7 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
       case 'prog-back': ui.progBrowse = false; ui.confirm = null; renderApp(); window.scrollTo(0, 0); break;
       case 'prog-stop': if (u) stopProgram(u); break;
       // ---- build your own program ----
-      case 'bd-new': if (u) { closeDrawer(true); bdOpen(u, null); } break;
+      case 'bd-new': if (u) { closeDrawer(true); if (ui.builder && view === 'programs') window.scrollTo(0, 0); else bdOpen(u, null); } break;
       case 'bd-edit': if (u) bdOpen(u, t.dataset.id); break;
       case 'bd-cancel': ui.builder = null; ui.confirm = null; renderApp(); window.scrollTo(0, 0); break;
       case 'bd-tpl': {
