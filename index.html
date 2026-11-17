@@ -1843,16 +1843,60 @@
   ui.ai = { blob: null, url: '', desc: '', status: 'idle', result: null, error: '', ctl: null };
   const AI_OFF = {
     claude: 'الذكاء الاصطناعي غير متاح في هذه الصفحة الآن.',
-    local: 'حاسبة السعرات بالذكاء الاصطناعي متاحة في رابط Claude. هنا سجّل وجبتك من «سجل الوجبات» أو من الاقتراحات السريعة.'
+    local: 'حاسبة السعرات بالذكاء الاصطناعي ما اشتغلت الحين. سجّل وجبتك من «سجل الوجبات» أو من الاقتراحات السريعة.',
+    wait: 'جارٍ تجهيز الذكاء الاصطناعي…',
+    setup: 'الحاسبة جاهزة وتنتظر تفعيل المشرف (مفتاح Gemini مجاني). لين ذاك سجّل وجبتك من «سجل الوجبات» أو من الاقتراحات السريعة.'
   };
   async function initAI() {
     const C = window.claude;
-    if (!C || typeof C.use !== 'function') { aiProvider = null; aiOffReason = AI_OFF.local; return; }
+    if (!C || typeof C.use !== 'function') { aiProvider = null; aiOffReason = AI_OFF.wait; return; }   // Gemini: asked after sign-in (probeAI)
     try { aiSample = await C.use('sample'); } catch (e) { aiSample = null; }
     if (!aiSample) { aiProvider = null; aiOffReason = AI_OFF.claude; requestRender(); return; }
     aiProvider = 'claude';
     try { const lim = await aiSample.limits(); aiImagesOK = !!(lim && lim.images); } catch (e) { aiImagesOK = false; }
     requestRender();
+  }
+  // ---- Gemini (GitHub version): the vf-meal Edge Function holds the key and calls Gemini for signed-in members ----
+  let aiProbeAt = 0;
+  async function probeAI() {
+    if (window.claude || !sb || !authUid || aiProvider === 'gemini') return;
+    aiProbeAt = Date.now();
+    const sg = sessionGen;
+    try {
+      const s = (await sb.auth.getSession()).data.session;
+      if (!s) return;
+      const r = await fetch(SB_URL + '/functions/v1/vf-meal', { method: 'POST', headers: { 'Content-Type': 'application/json', apikey: SB_KEY, Authorization: 'Bearer ' + s.access_token }, body: '{"probe":true}' });
+      const j = await r.json().catch(() => ({}));
+      if (sg !== sessionGen) return;
+      if (r.ok && j.configured) { aiProvider = 'gemini'; aiImagesOK = true; aiOffReason = ''; }
+      else { aiProvider = null; aiOffReason = r.ok ? AI_OFF.setup : AI_OFF.local; }
+    } catch (e) {
+      if (sg === sessionGen) { aiProvider = null; aiOffReason = AI_OFF.local; }
+    }
+    requestRender();
+  }
+  const blobB64 = blob => new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = () => res(String(r.result).split(',')[1] || '');
+    r.onerror = () => rej(new Error('read'));
+    r.readAsDataURL(blob);
+  });
+  async function geminiMeal(desc, blob, signal) {
+    const s = sb && (await sb.auth.getSession()).data.session;
+    if (!s) throw { code: 'session_expired' };
+    const body = { desc };
+    if (blob) { body.image = await blobB64(blob); body.mime = blob.type || 'image/jpeg'; }
+    let r;
+    try {
+      r = await fetch(SB_URL + '/functions/v1/vf-meal', { method: 'POST', signal, headers: { 'Content-Type': 'application/json', apikey: SB_KEY, Authorization: 'Bearer ' + s.access_token }, body: JSON.stringify(body) });
+    } catch (e) {
+      if (e && e.name === 'AbortError') throw { code: 'cancelled' };
+      throw { message: 'Failed to fetch' };
+    }
+    const j = await r.json().catch(() => ({}));
+    if (r.ok && j.result) return j.result;
+    const map = { not_configured: 'not_configured', bad_key: 'bad_key', rate_limited: 'rate_limited', daily_limit: 'daily_limit', bad_image: 'image_rejected', refused: 'refused', invalid_json: 'invalid_json', empty: 'empty_completion', auth: 'session_expired' };
+    throw { code: map[j.error] || 'upstream' };
   }
   function prepImage(file) {
     return new Promise((resolve, reject) => {
@@ -1911,7 +1955,11 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
       refused: 'ما قدر الذكاء الاصطناعي يحلل هذا الطلب. جرّب صورة أوضح أو وصفاً آخر.',
       invalid_json: 'وصلنا رد غير مكتمل. اضغط «احسب السعرات» مرة ثانية.',
       empty_completion: 'ما وصلنا رد. جرّب صورة أوضح أو وصفاً أقصر.',
-      session_expired: 'انتهت جلستك في Claude. سجّل دخولك من جديد ثم حاول.',
+      session_expired: 'انتهت جلستك. سجّل دخولك من جديد ثم حاول.',
+      not_configured: 'الحاسبة تحتاج مفتاح Gemini من المشرف.',
+      bad_key: 'مفتاح Gemini غير صحيح أو موقوف، والمشرف يحتاج يحدّثه.',
+      daily_limit: 'وصلت حدك اليومي (40 تحليل). جرّب بكرة.',
+      upstream: 'خدمة الذكاء الاصطناعي ما ردّت الحين. حاول بعد شوي.',
       images_unavailable: 'إرسال الصور غير متاح هنا. اكتب وصف الوجبة بدلاً منها.',
       not_granted: 'لم يُسمح للصفحة باستخدام الذكاء الاصطناعي.',
       sampling_disabled: 'الذكاء الاصطناعي غير متاح لحسابك.'
@@ -1933,10 +1981,13 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
     st.ctl = new AbortController();
     renderApp();
     try {
-      const prompt = aiPrompt(desc, !!st.blob);
-      const opts = { signal: st.ctl.signal };
-      if (st.blob) opts.images = [st.blob];
-      const raw = await aiSample.json(prompt, opts);
+      let raw;
+      if (aiProvider === 'gemini') raw = await geminiMeal(desc, st.blob, st.ctl.signal);
+      else {
+        const opts = { signal: st.ctl.signal };
+        if (st.blob) opts.images = [st.blob];
+        raw = await aiSample.json(aiPrompt(desc, !!st.blob), opts);
+      }
       if (req !== aiReq) return;
       const res = normalizeAI(raw);
       st.result = res;
@@ -1946,7 +1997,7 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
       const code = e && e.code;
       if (code === 'cancelled') { st.status = 'idle'; renderApp(); return; }
       if (code === 'images_unavailable') aiImagesOK = false;
-      if (['not_granted', 'sampling_disabled', 'not_declared', 'capability_disabled', 'capability_removed'].includes(code)) { aiProvider = null; aiOffReason = aiErrorText(e); }
+      if (['not_granted', 'sampling_disabled', 'not_declared', 'capability_disabled', 'capability_removed', 'not_configured', 'bad_key'].includes(code)) { aiProvider = null; aiOffReason = code === 'not_configured' ? AI_OFF.setup : aiErrorText(e); }
       st.status = 'error';
       st.error = aiErrorText(e);
     }
@@ -1993,7 +2044,15 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
       </div>
     </div>`;
     if (!aiProvider) {
-      return `<div class="card p-5 sm:p-6">${head}<p class="mt-3 text-sm text-slate-600 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5">${esc(aiOffReason || 'جارٍ تجهيز الذكاء الاصطناعي…')}</p></div>`;
+      const how = aiOffReason === AI_OFF.setup && isAdmin() ? `<div class="mt-3 rounded-xl border border-slate-200 p-3.5 text-sm text-slate-700 leading-6">
+        <p class="font-bold text-slate-900">للمشرف: فعّل الحاسبة بثلاث خطوات</p>
+        <ol class="mt-1.5 space-y-1 list-decimal ps-5">
+          <li>سوّ مفتاح مجاني من <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener" class="font-bold underline underline-offset-2">Google AI Studio</a>.</li>
+          <li>حطه في <a href="https://supabase.com/dashboard/project/vygspsfsymerfxwbsxnf/functions/secrets" target="_blank" rel="noopener" class="font-bold underline underline-offset-2">أسرار Supabase</a> باسم <code dir="ltr" class="num font-bold">GEMINI_API_KEY</code>.</li>
+          <li>حدّث الصفحة.</li>
+        </ol>
+      </div>` : '';
+      return `<div class="card p-5 sm:p-6">${head}<p class="mt-3 text-sm text-slate-600 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5">${esc(aiOffReason || AI_OFF.wait)}</p>${how}</div>`;
     }
     const loading = st.status === 'loading';
     const photo = st.url ? `<div class="relative mt-4 rounded-2xl overflow-hidden border border-slate-200 bg-slate-100">
@@ -2050,7 +2109,7 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
       <textarea id="ai-desc" rows="2" maxlength="400" class="inp py-2.5 leading-6 resize-none" placeholder="مثال: صحن كبسة دجاج متوسط مع سلطة وعلبة لبن">${esc(st.desc)}</textarea>
       <button data-act="ai-analyze" class="btn-dark w-full h-12 mt-3">${icon('sparkle', 'w-5 h-5')} ${st.url ? 'حلّل الصورة' : 'احسب السعرات'}</button>
       ${notice ? `<p class="mt-3 text-sm font-bold text-slate-800 bg-slate-100 border border-slate-300 rounded-xl px-3 py-2.5" role="alert">${esc(notice)}</p>` : ''}
-      <p class="mt-3 text-[11px] text-slate-400 leading-5">التحليل يتم عبر Claude من حسابك. الصورة لا تُحفظ في الموقع، والأرقام تقديرية.</p>
+      <p class="mt-3 text-[11px] text-slate-400 leading-5">${aiProvider === 'gemini' ? 'التحليل يتم عبر Gemini من Google.' : 'التحليل يتم عبر Claude من حسابك.'} الصورة لا تُحفظ في الموقع، والأرقام تقديرية.</p>
     </div>`;
   }
   function macroPanel(u, p) {
@@ -6392,6 +6451,7 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
     sessionGen++; loadGen++;
     stopLive();
     authUid = null; serverAdmin = null; currentKey = null;
+    if (aiProvider === 'gemini') { aiProvider = null; aiOffReason = AI_OFF.wait; }
     writeLS(SESSION_KEY, null);
     remote.accounts = new Map(); remote.days = new Map(); remoteVer = new Map(); accOwner.clear();
     known.clear(); pendingW.clear(); unconfirmed.clear(); inflight.clear();
@@ -6432,7 +6492,7 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
     rebuildFromRemote();
     if (first) {
       const k = myKey();
-      if (k) { currentKey = k; writeLS(SESSION_KEY, k); refreshAdmin(); }
+      if (k) { currentKey = k; writeLS(SESSION_KEY, k); refreshAdmin(); probeAI(); }
       readyWaiters.splice(0).forEach(f => f());
       if (!k && !ui.authBusy) { endSession('لم يعد هذا الحساب موجوداً في اللوحة'); return; }
       renderApp();
@@ -6443,6 +6503,7 @@ ${desc ? `ملاحظة المستخدم: """${desc.replace(/"""/g, '"')}"""\n` :
   }
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible' && authUid && Date.now() - lastLoad > 20000) fullLoad();
+    if (document.visibilityState === 'visible' && authUid && aiProvider !== 'gemini' && Date.now() - aiProbeAt > 60000) probeAI();
   });
   window.addEventListener('online', () => { if (authUid) { flushPending(); fullLoad(); } });
   setInterval(() => { if (authUid && !liveUp && Date.now() - lastLoad > 60000) fullLoad(); }, 30000);
